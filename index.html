@@ -363,7 +363,7 @@ var DEFAULT_DATA = {
         title: 'Своя игра КДМ',
         subtitle: 'Комитет по делам молодёжи · 1999',
         finalQuestionValue: 1000,
-        players: ['Амина','Испай','Шавла'],
+        players: ['Игрок 1','Игрок 2','Игрок 3'],
         rounds: [
             {
                 title: "Раунд 1", points: [100,200,300,400,500], playerIndices: [0,1,2],
@@ -461,13 +461,12 @@ var DEFAULT_DATA = {
     }]
 };
 
-var STORAGE_KEY = 'svoya-igra-v42';
-var OLD_KEYS = ['svoya-igra-v39','svoya-igra-v38','svoya-igra-v37','svoya-igra-v36','svoya-igra-v35','svoya-igra-v34','svoya-igra-v33','svoya-igra-v32','svoya-igra-v31','svoya-igra-v30','svoya-igra-v29','svoya-igra-v28','svoya-igra-v27','svoya-igra-v26','svoya-igra-v25','svoya-igra-v24','svoya-igra-v23','svoya-igra-v22','svoya-igra-v21','svoya-igra-v20','svoya-igra-v19','svoya-igra-v18','svoya-igra-v17','svoya-igra-v16','svoya-igra-v15','svoya-igra-v14','svoya-igra-v13','svoya-igra-v12','svoya-igra-v11','svoya-igra-v10','svoya-igra-v9','svoya-igra-v8','svoya-igra-v7','svoya-igra-v6','svoya-igra-v5','svoya-igra-v4','svoya-igra-v3','svoya-igra-v2','svoya-igra-config-v1'];
+var STORAGE_KEY = 'svoya-igra-v40';
 var deepClone = function(o) { return JSON.parse(JSON.stringify(o)); };
 var generateId = function() { return 'g' + Date.now() + '-' + Math.random().toString(36).slice(2, 8); };
 
 function migrateGame(game) {
-    if (!Array.isArray(game.players)) game.players = ['Амина','Испай','Шавла'];
+    if (!Array.isArray(game.players)) game.players = ['Игрок 1','Игрок 2','Игрок 3'];
     if (typeof game.finalQuestionValue !== 'number') game.finalQuestionValue = 1000;
     if (!Array.isArray(game.rounds)) game.rounds = [];
     if (!Array.isArray(game.finalTopics)) game.finalTopics = [];
@@ -482,15 +481,6 @@ function loadData() {
             if (parsed && Array.isArray(parsed.games) && parsed.games.length) {
                 parsed.games.forEach(migrateGame);
                 return parsed;
-            }
-        }
-        for (var i = 0; i < OLD_KEYS.length; i++) {
-            var legacy = localStorage.getItem(OLD_KEYS[i]);
-            if (legacy) {
-                try {
-                    var old = JSON.parse(legacy);
-                    if (old && Array.isArray(old.games)) { old.games.forEach(migrateGame); return old; }
-                } catch (e) {}
             }
         }
     } catch (e) {}
@@ -574,7 +564,7 @@ function renderMenu() {
 function addNewGame() {
     var newGame = {
         id: generateId(), title: 'Новая игра', subtitle: '', finalQuestionValue: 1000,
-        players: ['Амина','Испай','Шавла'],
+        players: ['Игрок 1','Игрок 2','Игрок 3'],
         rounds: [{ title: "Раунд 1", points: [100,200,300,400,500], playerIndices: [0,1,2], topics: [1,2,3,4,5].map(function(n) { return { title: 'Тема ' + n, questions: [100,200,300,400,500].map(function(p, i) { return { points: p, question: 'Вопрос ' + n + '-' + (i+1), answer: 'Ответ' }; }) }; }) }],
         finalTopics: Array.from({ length: 10 }, function(_, i) { return { title: 'Тема ' + (i+1), question: 'Вопрос финала ' + (i+1), answer: 'Ответ' }; })
     };
@@ -593,18 +583,25 @@ function startGame(gameId) {
     modalState = 'question';
     catReceiverPi = null; auctionWinnerPi = null; auctionBid = 0; secretModifierKey = null;
     passReceiverPi = null; passValue = 0;
-    roundScores = {};
-    game.rounds.forEach(function(r, idx) {
-        roundScores[idx] = {};
-        (r.playerIndices || []).forEach(function(pi) { roundScores[idx][pi] = 0; });
-    });
+    
+    // Если уже есть подключившиеся по телефону игроки, подставляем их имена
+    if (connectedPlayers.length > 0) {
+        syncConnectedPlayersToGame();
+    } else {
+        roundScores = {};
+        game.rounds.forEach(function(r, idx) {
+            roundScores[idx] = {};
+            (r.playerIndices || []).forEach(function(pi) { roundScores[idx][pi] = 0; });
+        });
+    }
+    
     roundWinners = {}; finalists = []; finalScores = {};
     gameTitleEl.textContent = game.title || 'Своя игра';
     gameSubtitleEl.textContent = game.subtitle || '';
     renderBoard(); renderScorePanel(); showScreen('gameScreen');
     
-    if (!IS_PUBLIC && !playerMode) {
-        if (typeof initMQTT === 'function') initMQTT(true, roomCode);
+    if (!IS_PUBLIC && !playerMode && !mqttClient) {
+        initMQTT(true, roomCode);
     }
 }
 
@@ -652,6 +649,10 @@ function renderScorePanel() {
     if (!currentGame) return;
     var round = currentGame.rounds[currentRound]; if (!round) return;
     var playerIndices = round.playerIndices || [];
+    
+    // Адаптируем сетку карточек под количество игроков
+    scorePanel.style.gridTemplateColumns = 'repeat(' + Math.max(1, playerIndices.length) + ', 1fr)';
+    
     var maxScore = -Infinity, leaderPi = null;
     playerIndices.forEach(function(pi) { var s = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0; if (s > maxScore) { maxScore = s; leaderPi = pi; } });
     var hasLeader = maxScore > 0;
@@ -674,7 +675,15 @@ function computeValue(cell) { var base = parseInt(cell.dataset.points, 10) || 0;
 
 function openQuestion(cell) {
     currentCell = cell; catReceiverPi = null; auctionWinnerPi = null; auctionBid = 0; secretModifierKey = null; passReceiverPi = null; passValue = 0;
+    buzzedPlayer = null;
     hideAllModalPanels(); var type = cell.dataset.type || 'normal';
+    
+    // Показываем ведущему кнопку открытия баззеров на телефонах
+    if (!playerMode && !IS_PUBLIC && mqttClient) {
+        document.getElementById('hostStartBuzzBtn').style.display = 'block';
+        document.getElementById('hostEvaluationBtns').style.display = 'none';
+        document.getElementById('hostStatusText').textContent = "Вопрос открыт. Нажмите кнопку или Пробел, чтобы разрешить ответ.";
+    }
     
     if (type === 'modifier') { modalState = 'modifier-intro'; modifierIntro.style.display = 'flex'; modalOverlay.classList.add('open'); return; }
     if (type === 'secret') { var pool = SECRET_MODIFIER_POOL.slice(); secretModifierKey = pool[Math.floor(Math.random() * pool.length)]; }
@@ -765,11 +774,12 @@ bidPlus.addEventListener('click', function() { var step = parseInt(bidInput.step
 passValueMinus.addEventListener('click', function() { var step = parseInt(passValueInput.step, 10) || 100; var minVal = parseInt(passValueInput.min, 10) || 200; passValueInput.value = Math.max(minVal, (parseInt(passValueInput.value, 10) || minVal) - step); });
 passValuePlus.addEventListener('click', function() { var step = parseInt(passValueInput.step, 10) || 100; var maxVal = parseInt(passValueInput.max, 10) || 1000; passValueInput.value = Math.min(maxVal, (parseInt(passValueInput.value, 10) || 200) + step); });
 
-function showAnswer() { if (modalState === 'answer') return; modalState = 'answer'; modalQuestion.style.display = 'none'; modalImage.style.display = 'none'; if (currentCell.dataset.type === 'manual') { } else { modalAnswer.classList.add('visible'); } }
+function showAnswer() { if (modalState === 'answer') return; modalState = 'answer'; modalQuestion.style.display = 'none'; modalImage.style.display = 'none'; if (currentCell.dataset.type !== 'manual') { modalAnswer.classList.add('visible'); } }
 
 function buildScoringPanel(isModifier) {
     playerSelectRow.innerHTML = ''; selectedScoringPi = null; adjustMinus.disabled = true; adjustPlus.disabled = true; adjustFlip.disabled = true;
     var round = currentGame.rounds[currentRound]; var playerIndices = round.playerIndices || []; var type = currentCell.dataset.type || 'normal';
+    playerSelectRow.style.gridTemplateColumns = 'repeat(' + Math.max(1, playerIndices.length) + ', 1fr)';
     var modKey = getModifierKey(currentCell); var mod = modKey ? MODIFIER_REGISTRY[modKey] : null; var isFlip = !isModifier && mod && mod.special === 'flip'; var baseValue;
     if (isModifier) { baseValue = parseInt(currentCell.dataset.modValue, 10) || parseInt(currentCell.dataset.points, 10) || 0; }
     else if (type === 'auction' && auctionWinnerPi != null) baseValue = auctionBid;
@@ -794,13 +804,17 @@ function selectScoringPlayer(pi) { selectedScoringPi = pi; var btns = playerSele
 function updateScoringPanelScores() { var btns = playerSelectRow.querySelectorAll('.player-select-btn'); btns.forEach(function(btn) { var pi = parseInt(btn.dataset.pi, 10); var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0; var el = btn.querySelector('.psb-score'); el.textContent = score; el.classList.toggle('negative', score < 0); }); }
 function adjustRoundScore(delta) { if (selectedScoringPi == null) return; roundScores[currentRound][selectedScoringPi] = (roundScores[currentRound][selectedScoringPi] || 0) + delta; updateScoringPanelScores(); renderScorePanel(); }
 function flipSelectedScore() { if (selectedScoringPi == null) return; var cur = roundScores[currentRound][selectedScoringPi] || 0; roundScores[currentRound][selectedScoringPi] = -cur; updateScoringPanelScores(); renderScorePanel(); }
-function toggleScoringPanel() { scoringPanelVisible = !scoringPanelVisible; if (scoringPanelVisible) scoringPanel.classList.add('visible'); else scoringPanel.classList.remove('visible'); }
 
 function closeQuestion() {
     modalOverlay.classList.remove('open'); hideAllModalPanels(); selectedScoringPi = null; catReceiverPi = null; auctionWinnerPi = null; auctionBid = 0; secretModifierKey = null; passReceiverPi = null; passValue = 0; modalState = 'question';
     if (currentCell) { var key = currentCell.dataset.key; if (key) answeredCells.add(key); currentCell.classList.add('answered'); currentCell = null; }
-    renderScorePanel(); var remaining = board.querySelectorAll('.cell-points:not(.answered)').length; if (remaining === 0) endRound();
-    if (mqttClient && !playerMode) mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'question_closed' }));
+    renderScorePanel(); 
+    if (!playerMode && !IS_PUBLIC) {
+        document.getElementById('hostStartBuzzBtn').style.display = 'none';
+        document.getElementById('hostEvaluationBtns').style.display = 'none';
+        if (mqttClient) mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'question_closed' }));
+    }
+    var remaining = board.querySelectorAll('.cell-points:not(.answered)').length; if (remaining === 0) endRound();
 }
 
 function endRound() {
@@ -823,7 +837,7 @@ function startFinalRound() {
     finalSelectView.style.display = 'flex'; finalRevealView.style.display = 'none'; finalQuestionView.style.display = 'none'; finalAnswerText.classList.remove('visible'); finalScoringPanel.classList.remove('visible');
     renderFinalTopics(); updateFinalTurn(); finalOverlay.classList.add('open');
 }
-function updateFinalTurn() { finalTurn.textContent = 'Ход игрока ' + ((finalEliminated % 3) + 1); }
+function updateFinalTurn() { finalTurn.textContent = 'Ход игрока ' + ((finalEliminated % finalists.length) + 1); }
 function renderFinalTopics() { finalTopicsEl.innerHTML = ''; finalRemaining.forEach(function(idx) { var topic = currentGame.finalTopics[idx]; var card = document.createElement('div'); card.className = 'final-topic-card'; card.textContent = topic.title; card.addEventListener('click', function() { eliminateFinalTopic(idx); }); finalTopicsEl.appendChild(card); }); }
 function eliminateFinalTopic(idx) {
     if (finalState !== 'select') return; finalRemaining = finalRemaining.filter(function(i) { return i !== idx; }); finalEliminated++;
@@ -891,13 +905,48 @@ var myName = "";
 var connectedPlayers = [];
 var activeTurnPlayer = null;
 var buzzedPlayer = null;
+var remoteAvailableQuestions = []; // Хранит доступные вопросы на телефоне игрока
 
 if (!playerMode && !IS_PUBLIC) {
     roomCode = Math.floor(1000 + Math.random() * 9000).toString();
     var codeDisplay = document.createElement('div');
-    codeDisplay.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--gold);color:#000;padding:15px;font-weight:bold;font-size:24px;z-index:1000;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.5);font-family:Georgia,serif;';
-    codeDisplay.innerHTML = 'Код: ' + roomCode;
+    codeDisplay.style.cssText = 'position:fixed;bottom:20px;right:20px;background:var(--gold);color:#000;padding:12px 18px;font-weight:bold;font-size:20px;z-index:1000;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.5);font-family:Georgia,serif;';
+    codeDisplay.innerHTML = 'Код комнаты: ' + roomCode;
     document.body.appendChild(codeDisplay);
+}
+
+// Синхронизируем подключённых по телефону игроков с табло игры
+function syncConnectedPlayersToGame() {
+    if (!currentGame || connectedPlayers.length === 0) return;
+    currentGame.players = connectedPlayers.slice();
+    var indices = connectedPlayers.map(function(_, idx) { return idx; });
+    currentGame.rounds.forEach(function(r, rIdx) {
+        r.playerIndices = indices;
+        if (!roundScores[rIdx]) roundScores[rIdx] = {};
+        indices.forEach(function(pi) {
+            if (typeof roundScores[rIdx][pi] !== 'number') roundScores[rIdx][pi] = 0;
+        });
+    });
+    renderScorePanel();
+    if (modalOverlay.classList.contains('open')) buildScoringPanel(modalState === 'modifier');
+    if (typeof broadcast === 'function') broadcast();
+}
+
+// Собираем доступные вопросы текущего раунда для отправки на телефон игрока
+function getAvailableQuestionsPayload() {
+    if (!currentGame) return [];
+    var round = currentGame.rounds[currentRound];
+    if (!round) return [];
+    var list = [];
+    round.topics.forEach(function(topic, ti) {
+        topic.questions.forEach(function(q, qi) {
+            var key = currentRound + '-' + ti + '-' + qi;
+            if (!answeredCells.has(key)) {
+                list.push({ key: key, topic: topic.title, points: q.points });
+            }
+        });
+    });
+    return list;
 }
 
 function initMQTT(isHost, code) {
@@ -927,20 +976,23 @@ function initMQTT(isHost, code) {
                 if (!connectedPlayers.includes(data.name)) {
                     connectedPlayers.push(data.name);
                     renderHostPlayerList();
+                    syncConnectedPlayersToGame();
                 }
             }
             if (data.type === 'buzz') {
                 if (!buzzedPlayer) {
                     buzzedPlayer = data.name;
-                    document.getElementById('hostStatusText').textContent = "Ответил: " + buzzedPlayer;
+                    document.getElementById('hostStatusText').textContent = "Отвечает: " + buzzedPlayer;
                     document.getElementById('hostStartBuzzBtn').style.display = 'none';
                     document.getElementById('hostEvaluationBtns').style.display = 'flex';
-                    // Начисляем баллы ведущему локально (для визуала на экране)
-                    var pi = currentGame.players.indexOf(buzzedPlayer);
-                    if (pi !== -1) {
-                        // Автовыбор игрока в панели начисления
-                        var btns = playerSelectRow.querySelectorAll('.player-select-btn');
-                        btns.forEach(function(b) { if (parseInt(b.dataset.pi, 10) === pi) b.click(); });
+                    
+                    // Блокируем кнопки у остальных игроков
+                    mqttClient.publish(topic, JSON.stringify({ type: 'player_buzzed', name: buzzedPlayer }));
+                    
+                    // Выделяем игрока на панели начисления баллов
+                    if (currentGame) {
+                        var pi = currentGame.players.indexOf(buzzedPlayer);
+                        if (pi !== -1) selectScoringPlayer(pi);
                     }
                 }
             }
@@ -948,37 +1000,48 @@ function initMQTT(isHost, code) {
                 var cell = document.querySelector('.cell-points[data-key="' + data.key + '"]');
                 if (cell && !cell.classList.contains('answered')) {
                     openQuestion(cell);
-                    mqttClient.publish(topic, JSON.stringify({ type: 'question_opened' }));
                 }
             }
         } else {
+            // ЛОГИКА НА ТЕЛЕФОНЕ ИГРОКА
             if (data.type === 'your_turn') {
                 activeTurnPlayer = data.name;
+                remoteAvailableQuestions = data.questions || [];
+                document.getElementById('buzzBtn').style.display = 'none';
+                
                 if (myName === activeTurnPlayer) {
                     document.getElementById('playerStatus').textContent = "ТВОЙ ХОД! Выбери тему:";
                     document.getElementById('playerBoard').style.display = 'flex';
                     renderPlayerBoard();
                 } else {
-                    document.getElementById('playerStatus').textContent = "Ход игрока: " + activeTurnPlayer;
+                    document.getElementById('playerStatus').textContent = "Тему выбирает: " + activeTurnPlayer;
                     document.getElementById('playerBoard').style.display = 'none';
                 }
             }
             if (data.type === 'question_opened') {
                 document.getElementById('buzzBtn').style.display = 'block';
                 document.getElementById('playerBoard').style.display = 'none';
-                document.getElementById('playerStatus').textContent = "ВНИМАНИЕ, ВОПРОС!";
+                document.getElementById('playerStatus').textContent = "ЖМИ КНОПКУ, ЕСЛИ ЗНАЕШЬ ОТВЕТ!";
+            }
+            if (data.type === 'player_buzzed') {
+                document.getElementById('buzzBtn').style.display = 'none';
+                if (data.name === myName) {
+                    document.getElementById('playerStatus').textContent = "ТЫ ОТВЕЧАЕШЬ!";
+                } else {
+                    document.getElementById('playerStatus').textContent = "Первым нажал: " + data.name;
+                }
             }
             if (data.type === 'evaluation') {
                 document.getElementById('buzzBtn').style.display = 'none';
                 if (data.name === myName) {
-                    document.getElementById('playerStatus').textContent = data.correct ? "Верно! +" + data.points : "Неверно! -" + data.points;
+                    document.getElementById('playerStatus').textContent = data.correct ? "Верно! +" + data.points : "Неверно! −" + data.points;
                 } else {
                     document.getElementById('playerStatus').textContent = data.name + (data.correct ? " ответил верно!" : " ответил неверно.");
                 }
             }
             if (data.type === 'question_closed') {
                 document.getElementById('buzzBtn').style.display = 'none';
-                document.getElementById('playerStatus').textContent = "Ждем следующего вопроса...";
+                document.getElementById('playerStatus').textContent = "Ждем следующего хода...";
             }
         }
     });
@@ -1000,8 +1063,13 @@ function renderHostPlayerList() {
         btn.textContent = 'Дать ход';
         btn.onclick = function() {
             if (mqttClient) {
-                mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'your_turn', name: name }));
-                document.getElementById('hostStatusText').textContent = "Ход передан: " + name;
+                activeTurnPlayer = name;
+                mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ 
+                    type: 'your_turn', 
+                    name: name,
+                    questions: getAvailableQuestionsPayload()
+                }));
+                document.getElementById('hostStatusText').textContent = "Выбирает тему: " + name;
             }
         };
         item.appendChild(btn);
@@ -1022,94 +1090,147 @@ function buzz() {
     if (!mqttClient) return;
     mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'buzz', name: myName }));
     document.getElementById('buzzBtn').style.display = 'none';
-    document.getElementById('playerStatus').textContent = "Ждём решения ведущего...";
+    document.getElementById('playerStatus').textContent = "Отправлено! Ждём ведущего...";
 }
 
 function renderPlayerBoard() {
     var container = document.getElementById('playerTopics');
     container.innerHTML = '';
-    var round = currentGame.rounds[currentRound];
-    round.topics.forEach(function(topic, ti) {
-        topic.questions.forEach(function(q, qi) {
-            var key = currentRound + '-' + ti + '-' + qi;
-            if (!answeredCells.has(key)) {
-                var btn = document.createElement('button');
-                btn.className = 'player-topic-btn';
-                btn.innerHTML = '<div class="pt-title">' + topic.title + '</div><div class="pt-points">' + q.points + '</div>';
-                btn.onclick = function() {
-                    if (!mqttClient) return;
-                    mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'select_topic', key: key }));
-                    document.getElementById('playerBoard').style.display = 'none';
-                    document.getElementById('playerStatus').textContent = "Ты выбрал: " + topic.title + " за " + q.points + " баллов. Ждем вопроса...";
-                };
-                container.appendChild(btn);
-            }
-        });
+    if (!remoteAvailableQuestions || remoteAvailableQuestions.length === 0) {
+        container.innerHTML = '<div style="color:#fff;">Нет доступных вопросов</div>';
+        return;
+    }
+    remoteAvailableQuestions.forEach(function(item) {
+        var btn = document.createElement('button');
+        btn.className = 'player-topic-btn';
+        btn.innerHTML = '<div class="pt-title">' + item.topic + '</div><div class="pt-points">' + item.points + '</div>';
+        btn.onclick = function() {
+            if (!mqttClient) return;
+            mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'select_topic', key: item.key }));
+            document.getElementById('playerBoard').style.display = 'none';
+            document.getElementById('playerStatus').textContent = "Выбрано: " + item.topic + " (" + item.points + ")";
+        };
+        container.appendChild(btn);
     });
 }
 
 // === ФУНКЦИИ ВЕДУЩЕГО ===
 function hostStartBuzz() {
     if (!mqttClient) return;
+    buzzedPlayer = null;
     mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'question_opened' }));
     document.getElementById('hostStartBuzzBtn').style.display = 'none';
-    document.getElementById('hostStatusText').textContent = "Ждем, кто нажмет первым...";
+    document.getElementById('hostStatusText').textContent = "Кнопки открыты! Ждем ответа...";
 }
 
 function hostEvaluate(isCorrect) {
     if (!mqttClient) return;
     var points = parseInt(scoreInput.value, 10) || 0;
-    if (buzzedPlayer) {
-        var pi = currentGame.players.indexOf(buzzedPlayer);
+    var responder = buzzedPlayer;
+    
+    if (responder && currentGame) {
+        var pi = currentGame.players.indexOf(responder);
         if (pi !== -1) {
             roundScores[currentRound][pi] = (roundScores[currentRound][pi] || 0) + (isCorrect ? points : -points);
+            updateScoringPanelScores();
             renderScorePanel();
         }
     }
-    mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'evaluation', correct: isCorrect, points: points, name: buzzedPlayer }));
+    
+    mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ 
+        type: 'evaluation', 
+        correct: isCorrect, 
+        points: points, 
+        name: responder 
+    }));
     
     document.getElementById('hostEvaluationBtns').style.display = 'none';
-    document.getElementById('hostStatusText').textContent = "Ответ оценен. Закрываем вопрос...";
-    
-    var winnerName = buzzedPlayer;
     buzzedPlayer = null;
-    
-    setTimeout(function() {
-        closeQuestion();
-        mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'question_closed' }));
-        
-        // Передаем ход тому, кто ответил верно (или первому в списке, если неверно)
-        if (isCorrect && winnerName) {
-            activeTurnPlayer = winnerName;
-        } else {
-            activeTurnPlayer = connectedPlayers[0] || null;
-        }
-        
-        if (activeTurnPlayer) {
-            mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'your_turn', name: activeTurnPlayer }));
-            document.getElementById('hostStatusText').textContent = "Ход передан: " + activeTurnPlayer;
-        }
-    }, 2000);
+
+    if (isCorrect) {
+        document.getElementById('hostStatusText').textContent = "Верно! Показываем ответ и закрываем...";
+        showAnswer();
+        setTimeout(function() {
+            closeQuestion();
+            // Победитель вопроса выбирает следующую тему
+            activeTurnPlayer = responder;
+            if (activeTurnPlayer) {
+                mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ 
+                    type: 'your_turn', 
+                    name: activeTurnPlayer,
+                    questions: getAvailableQuestionsPayload()
+                }));
+                document.getElementById('hostStatusText').textContent = "Тему выбирает: " + activeTurnPlayer;
+            }
+        }, 2500);
+    } else {
+        // Если ответил неверно — даём возможность другим игрокам нажать кнопку!
+        document.getElementById('hostStatusText').textContent = "Неверно! Можете снова открыть кнопки для остальных.";
+        document.getElementById('hostStartBuzzBtn').style.display = 'block';
+    }
 }
 
-// Перехватываем пробел у ведущего (открывает кнопки на телефонах)
+// ==========================================
+// ПРИВЯЗКА КНОПОК ИНТЕРФЕЙСА И КЛАВИАТУРЫ
+// ==========================================
+btnAddGame.addEventListener('click', addNewGame);
+btnMenuFullscreen.addEventListener('click', toggleFullscreen);
+btnBackToMenu.addEventListener('click', backToMenu);
+btnGameEditor.addEventListener('click', function() { if (currentGameId) openEditor(currentGameId); });
+btnReset.addEventListener('click', resetGame);
+btnFullscreen.addEventListener('click', toggleFullscreen);
+prevRoundBtn.addEventListener('click', function() { goToRound(currentRound - 1); });
+nextRoundBtn.addEventListener('click', nextRound);
+editorSave.addEventListener('click', saveEditor);
+editorClose.addEventListener('click', closeEditor);
+
+adjustMinus.addEventListener('click', function() { adjustRoundScore(-(parseInt(scoreInput.value, 10) || 0)); });
+adjustPlus.addEventListener('click', function() { adjustRoundScore(parseInt(scoreInput.value, 10) || 0); });
+adjustFlip.addEventListener('click', flipSelectedScore);
+
+finalAdjustMinus.addEventListener('click', function() { adjustFinalScore(-(parseInt(finalScoreInput.value, 10) || 0)); });
+finalAdjustPlus.addEventListener('click', function() { adjustFinalScore(parseInt(finalScoreInput.value, 10) || 0); });
+
+// Клики по модальному окну (показать ответ / закрыть)
+modalOverlay.addEventListener('click', function(e) {
+    if (e.target.closest('button') || e.target.closest('input')) return;
+    if (modalState === 'modifier-intro') revealModifier();
+    else if (modalState === 'modifier') closeQuestion();
+    else if (modalState === 'question') showAnswer();
+    else if (modalState === 'answer') closeQuestion();
+});
+
+breakOverlay.addEventListener('click', function() {
+    var mode = breakOverlay.dataset.mode;
+    breakOverlay.classList.remove('open');
+    if (mode === 'round-results') nextRound();
+    else if (mode === 'final-intro') startFinalRound();
+    else if (mode === 'finish') backToMenu();
+});
+
+finalRevealView.addEventListener('click', showFinalQuestion);
+finalQuestionView.addEventListener('click', function(e) {
+    if (e.target.closest('button') || e.target.closest('input')) return;
+    if (finalState === 'question') showFinalAnswer();
+    else if (finalState === 'answer') closeFinalRound();
+});
+
 document.addEventListener('keydown', function(e) {
-    if ((e.key === ' ' || e.code === 'Space') && !playerMode && !IS_PUBLIC && modalState === 'question') {
-        if (mqttClient) mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'question_opened' }));
+    if (playerMode || IS_PUBLIC) return;
+    if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') {
+        if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') toggleFullscreen();
+    }
+    if ((e.key === ' ' || e.code === 'Space') && modalOverlay.classList.contains('open') && modalState === 'question') {
+        e.preventDefault();
+        hostStartBuzz();
     }
 });
 
-// Принудительно инициализируем MQTT при старте игры ведущим
-var originalStartGame = startGame;
-startGame = function(gameId) {
-    originalStartGame(gameId);
-    if (!playerMode && !IS_PUBLIC) {
-        initMQTT(true, roomCode);
-    }
-};
-
 if (playerMode) {
     showScreen('playerScreen');
+} else {
+    renderMenu();
+    showScreen('menuScreen');
 }
 
 // ==========================================
@@ -1125,7 +1246,8 @@ function buildPublicState() {
         currentCell: currentCell ? { key: currentCell.dataset.key || '', topic: currentCell.dataset.topic || '', points: currentCell.dataset.points || '', question: currentCell.dataset.question || '', answer: currentCell.dataset.answer || '', image: currentCell.dataset.image || '', type: currentCell.dataset.type || '', modifier: currentCell.dataset.modifier || '', modTitle: currentCell.dataset.modTitle || '', modDesc: currentCell.dataset.modDesc || '', modIcon: currentCell.dataset.modIcon || '', modValue: currentCell.dataset.modValue || '' } : null,
         catReceiverPi: catReceiverPi, auctionWinnerPi: auctionWinnerPi, passReceiverPi: passReceiverPi, passValue: passValue, secretModifierKey: secretModifierKey,
         breakOpen: breakOverlay.classList.contains('open'), breakMode: breakOverlay.dataset.mode || '', breakLabel: breakLabel.textContent, breakTitle: breakTitle.textContent, breakSubtitle: breakSubtitle.textContent, breakScoresHtml: breakScores.innerHTML,
-        finalOpen: finalOverlay.classList.contains('open'), finalState: finalState, finalRemaining: finalRemaining, finalCurrentTopic: finalCurrentTopic, finalists: finalists, finalScores: finalScores, finalEliminated: finalEliminated, finalRevealTitle: finalRevealTitle.textContent
+        finalOpen: finalOverlay.classList.contains('open'), finalState: finalState, finalRemaining: finalRemaining, finalCurrentTopic: finalCurrentTopic, finalists: finalists, finalScores: finalScores, finalEliminated: finalEliminated, finalRevealTitle: finalRevealTitle.textContent,
+        players: currentGame ? currentGame.players : []
     };
 }
 
@@ -1139,6 +1261,10 @@ function broadcast() {
 function applyPublicState(state) {
     if (!state) return;
     if (state.gameId) { currentGameId = state.gameId; currentGame = getGame(state.gameId); } else { currentGameId = null; currentGame = null; }
+    if (currentGame && Array.isArray(state.players) && state.players.length) {
+        currentGame.players = state.players;
+        currentGame.rounds.forEach(function(r) { r.playerIndices = state.players.map(function(_, i){ return i; }); });
+    }
     currentRound = state.round || 0; roundScores = state.roundScores || {}; answeredCells = new Set(state.answeredCells || []); selectedScoringPi = state.selectedScoringPi; modalState = state.modalState || 'question'; catReceiverPi = state.catReceiverPi; auctionWinnerPi = state.auctionWinnerPi; passReceiverPi = state.passReceiverPi; passValue = state.passValue || 0; secretModifierKey = state.secretModifierKey;
     finalState = state.finalState || 'select'; finalRemaining = state.finalRemaining || []; finalCurrentTopic = state.finalCurrentTopic; finalists = state.finalists || []; finalScores = state.finalScores || {}; finalEliminated = state.finalEliminated || 0;
 
@@ -1163,7 +1289,7 @@ function applyPublicState(state) {
 
     if (state.finalOpen) {
         finalSelectView.style.display = 'none'; finalRevealView.style.display = 'none'; finalQuestionView.style.display = 'none'; finalAnswerText.classList.remove('visible'); finalScoringPanel.classList.remove('visible');
-        if (state.finalState === 'select') { finalSelectView.style.display = 'flex'; finalTurn.textContent = 'Ход игрока ' + ((state.finalEliminated % 3) + 1); finalTopicsEl.innerHTML = ''; finalRemaining.forEach(function(idx) { var topic = currentGame.finalTopics[idx]; var card = document.createElement('div'); card.className = 'final-topic-card'; card.textContent = topic.title; finalTopicsEl.appendChild(card); }); }
+        if (state.finalState === 'select') { finalSelectView.style.display = 'flex'; finalTurn.textContent = 'Ход игрока ' + ((state.finalEliminated % Math.max(1, finalists.length)) + 1); finalTopicsEl.innerHTML = ''; finalRemaining.forEach(function(idx) { var topic = currentGame.finalTopics[idx]; var card = document.createElement('div'); card.className = 'final-topic-card'; card.textContent = topic.title; finalTopicsEl.appendChild(card); }); }
         else if (state.finalState === 'reveal') { finalRevealView.style.display = 'flex'; finalRevealTitle.textContent = state.finalRevealTitle || ''; }
         else if (state.finalState === 'question') { finalQuestionView.style.display = 'flex'; finalTopicSmall.textContent = state.finalCurrentTopic ? state.finalCurrentTopic.title : ''; finalQuestionText.textContent = state.finalCurrentTopic ? state.finalCurrentTopic.question : ''; finalQuestionText.style.display = ''; }
         else if (state.finalState === 'answer') { finalQuestionView.style.display = 'flex'; finalTopicSmall.textContent = state.finalCurrentTopic ? state.finalCurrentTopic.title : ''; finalQuestionText.style.display = 'none'; finalAnswerText.textContent = ((state.finalCurrentTopic && state.finalCurrentTopic.answer) || 'не указан'); finalAnswerText.classList.add('visible'); }
@@ -1189,9 +1315,6 @@ if (!IS_PUBLIC && !playerMode) {
     if (BC) { BC.onmessage = function(ev) { if (ev.data && ev.data.type === 'public-ready') broadcast(); }; }
     setTimeout(broadcast, 600);
 }
-
-renderMenu();
-showScreen('menuScreen');
 </script>
 
 </body>
