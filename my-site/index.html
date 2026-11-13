@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Своя игра КДМ</title>
+<style>
+:root{--bg-0:#06122c;--blue:#1a3a8a;--blue-deep:#122a5c;--green:#1e6b3a;--green-dark:#145028;--red:#c41e2a;--red-dark:#8e141d;--gold:#f0c419;--text:#e8eefc;--muted:#7a89b0;--purple:#8a4dff;--purple-light:#b98bff;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg-0);background-image:radial-gradient(ellipse at 50% 0%,#122a5c 0%,#06122c 65%);min-height:100vh;color:var(--text);padding:40px 20px;letter-spacing:.02em;-webkit-font-smoothing:antialiased;}
+.screen{display:none;}.screen.active{display:block;}
+.header{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;max-width:1200px;margin:0 auto 24px;padding-bottom:24px;}
+.header-brand{display:flex;align-items:center;gap:20px;}
+.header-logo{height:78px;filter:drop-shadow(0 0 14px rgba(240,196,25,.35));}
+.header-title{display:flex;flex-direction:column;gap:6px;}
+.header h1{font-family:Georgia,serif;font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);line-height:1.1;text-shadow:0 2px 12px rgba(240,196,25,.25);}
+.header .subtitle{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#9aa8d0;}
+.header-actions{display:flex;gap:20px;flex-wrap:wrap;align-items:center;}
+.btn-reset{background:transparent;color:var(--gold);border:none;padding:10px 4px;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:color .2s,opacity .2s;}
+.btn-reset:hover{color:#fff;opacity:.85;}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;max-width:1200px;margin:0 auto;}
+.game-card{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);padding:24px;display:flex;flex-direction:column;gap:14px;}
+.game-card-title{font-family:Georgia,serif;font-size:20px;font-weight:700;color:var(--gold);letter-spacing:.08em;}
+.game-card-subtitle{font-size:12px;color:#9aa8d0;letter-spacing:.15em;text-transform:uppercase;min-height:15px;}
+.game-card-meta{font-size:11px;color:var(--muted);letter-spacing:.1em;margin-top:auto;}
+.game-card-actions{display:flex;gap:10px;align-items:center;margin-top:8px;}
+.btn-play{flex:1;background:var(--gold);color:var(--bg-0);border:none;padding:12px 16px;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;}
+.btn-play:hover{opacity:.9;}
+.icon-btn{background:transparent;color:var(--gold);border:1px solid rgba(240,196,25,.4);width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.icon-btn:hover{background:var(--gold);color:var(--bg-0);}
+.icon-btn svg{width:18px;height:18px;}
+.add-game-wrap{max-width:1200px;margin:28px auto 0;display:flex;justify-content:center;}
+.btn-add-game{background:transparent;color:var(--gold);border:2px dashed rgba(240,196,25,.5);padding:18px 40px;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;}
+.btn-add-game:hover{border-color:var(--gold);background:rgba(240,196,25,.08);}
+.menu-empty{max-width:1200px;margin:40px auto;text-align:center;color:var(--muted);font-size:14px;}
+.round-nav{max-width:1200px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;gap:20px;}
+.round-nav-btn{background:transparent;color:var(--gold);border:1px solid rgba(240,196,25,.4);width:40px;height:40px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.round-nav-btn:hover:not(:disabled){background:var(--gold);color:var(--bg-0);}
+.round-nav-btn:disabled{opacity:.3;cursor:not-allowed;}
+.round-nav-label{font-family:Georgia,serif;font-size:clamp(14px,1.6vw,18px);font-weight:700;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);min-width:220px;text-align:center;}
+.score-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:1200px;margin:0 auto 16px;}
+.score-card{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px;border:2px solid transparent;}
+.score-card.leader{background:linear-gradient(180deg,var(--green) 0%,var(--green-dark) 100%);box-shadow:0 0 0 2px var(--gold) inset;}
+.score-card.answering{border-color:var(--gold);}
+.score-card-name{font-family:Georgia,serif;font-size:15px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;}
+.score-card-score{font-family:Georgia,serif;font-size:28px;font-weight:700;color:#fff;}
+.score-card.negative .score-card-score{color:#ff8b8b;}
+.board{display:grid;grid-template-columns:1.4fr repeat(5,1fr);gap:4px;max-width:1200px;margin:0 auto;}
+.cell-topic{background:linear-gradient(180deg,var(--green) 0%,var(--green-dark) 100%);padding:22px 12px;font-family:Georgia,serif;font-size:clamp(11px,1.4vw,14px);font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);text-align:center;display:flex;align-items:center;justify-content:center;min-height:64px;}
+.cell-points{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);color:var(--gold);font-family:Georgia,serif;font-size:clamp(18px,2.2vw,26px);font-weight:700;padding:32px 8px;text-align:center;cursor:pointer;user-select:none;}
+.cell-points:hover{background:linear-gradient(180deg,#2a52b8 0%,var(--blue) 100%);color:#fff;}
+.cell-points.answered{background:linear-gradient(180deg,var(--red) 0%,var(--red-dark) 100%);color:transparent;cursor:default;pointer-events:none;}
+.modal-overlay{position:fixed;inset:0;background:var(--bg-0);background-image:radial-gradient(ellipse at 50% 40%,#122a5c 0%,#06122c 70%);display:none;z-index:100;}
+.modal-overlay.open{display:flex;}
+.modal{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px;text-align:center;overflow-y:auto;}
+.modal-topic{font-size:clamp(13px,1.4vw,15px);letter-spacing:.35em;text-transform:uppercase;color:#f0c419;margin-bottom:12px;font-weight:700;}
+.modal-points{font-family:Georgia,serif;font-size:clamp(24px,2.6vw,34px);color:var(--bg-0);background:var(--gold);padding:8px 28px;margin-bottom:16px;font-weight:700;display:inline-flex;align-items:baseline;gap:10px;}
+.modal-points.pos{background:#7ed996;}
+.modal-points.neg{background:#ff8b8b;}
+.modal-points .mod-badge{font-size:.6em;letter-spacing:.15em;}
+.modal-points .base-val{font-size:.6em;opacity:.55;text-decoration:line-through;}
+.modal-question{font-family:Georgia,serif;font-size:clamp(24px,3.5vw,44px);line-height:1.4;color:#fff;max-width:1000px;margin:0 auto 32px;}
+.modal img{max-width:80vw;max-height:38vh;object-fit:contain;margin-bottom:24px;}
+.modal-answer{display:none;font-family:Georgia,serif;font-size:clamp(20px,2.6vw,34px);line-height:1.35;color:var(--gold);max-width:1000px;padding:20px 40px;margin-bottom:24px;font-weight:700;white-space:pre-line;text-align:left;}
+.modal-answer.visible{display:block;}
+.modal-answer-preview{display:block;font-family:Georgia,serif;font-size:clamp(13px,1.5vw,18px);line-height:1.4;color:#9aa8d0;max-width:1000px;margin:-20px auto 24px;padding:12px 24px;border-left:3px solid var(--gold);text-align:left;white-space:pre-line;font-style:italic;opacity:.75;}
+.modal-score-panel{display:none;gap:10px;width:100%;max-width:720px;margin-top:24px;flex-wrap:wrap;justify-content:center;}
+body.public-mode .modal-score-panel{display:flex;}
+.modal-score-panel .score-card{flex:1;min-width:120px;padding:10px 14px;background:rgba(26,58,138,.6);}
+.modal-score-panel .score-card-name{font-size:14px;}
+.modal-score-panel .score-card-score{font-size:24px;}
+.modifier-intro{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;width:100%;max-width:100%;padding:0 20px;}
+.modifier-intro-word{font-family:Georgia,serif;font-size:clamp(28px,7vw,100px);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--purple-light);text-shadow:0 6px 50px rgba(138,77,255,.8);line-height:1.1;text-align:center;max-width:100%;word-break:break-word;}
+.modifier-panel{display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:720px;margin-bottom:24px;}
+.modifier-icon{font-size:90px;line-height:1;}
+.modifier-title{font-family:Georgia,serif;font-size:clamp(30px,5vw,60px);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-light);}
+.modifier-desc{font-family:Georgia,serif;font-size:clamp(16px,2vw,24px);color:#fff;letter-spacing:.05em;max-width:700px;line-height:1.5;}
+.pass-panel{display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:720px;}
+.modal-select{display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:720px;}
+.select-players{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;}
+.select-player-btn{background:rgba(26,58,138,.5);border:2px solid transparent;color:#fff;padding:20px 12px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.select-player-btn:hover{background:rgba(42,82,184,.65);border-color:var(--gold);}
+.select-player-name{font-family:Georgia,serif;font-size:16px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;}
+.select-player-score{font-family:Georgia,serif;font-size:22px;font-weight:700;color:#fff;}
+.auction-panel{display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:720px;}
+.bid-row{display:flex;align-items:center;justify-content:center;gap:16px;width:100%;max-width:420px;}
+.bid-btn{background:transparent;border:2px solid var(--gold);color:var(--gold);width:54px;height:54px;font-size:24px;font-weight:700;cursor:pointer;font-family:Georgia,serif;}
+.bid-btn:hover{background:var(--gold);color:var(--bg-0);}
+.bid-input{flex:1;background:rgba(26,58,138,.5);border:2px solid var(--gold);color:#fff;font-family:Georgia,serif;font-size:32px;font-weight:700;padding:12px 20px;text-align:center;outline:none;}
+.bid-presets{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.bid-preset{background:transparent;border:1px solid rgba(240,196,25,.5);color:var(--gold);padding:8px 16px;font-family:inherit;font-size:12px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;}
+.bid-preset:hover{background:rgba(240,196,25,.15);}
+.scoring-panel{display:none;flex-direction:column;gap:20px;width:100%;max-width:720px;margin-top:8px;}
+.scoring-panel.visible{display:flex;}
+.player-select-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.player-select-btn{background:rgba(26,58,138,.5);border:2px solid transparent;color:#fff;padding:16px 10px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.player-select-btn:hover:not(.locked){background:rgba(42,82,184,.65);}
+.player-select-btn.selected{border-color:var(--gold);background:rgba(240,196,25,.18);box-shadow:0 0 0 1px var(--gold) inset;}
+.player-select-btn.locked{opacity:.35;cursor:not-allowed;}
+.psb-name{font-family:Georgia,serif;font-size:16px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;text-align:center;word-break:break-word;}
+.psb-score{font-family:Georgia,serif;font-size:26px;font-weight:700;color:#fff;}
+.psb-score.negative{color:#ff8b8b;}
+.adjust-row{display:flex;justify-content:center;align-items:center;gap:12px;}
+.adjust-btn{background:transparent;border:2px solid;padding:14px 28px;font-family:Georgia,serif;font-size:20px;font-weight:700;letter-spacing:.08em;cursor:pointer;min-width:80px;}
+.adjust-btn.minus{color:#ff8b8b;border-color:var(--red);}
+.adjust-btn.minus:hover:not(:disabled){background:var(--red);color:#fff;}
+.adjust-btn.plus{color:#7ed996;border-color:var(--green);}
+.adjust-btn.plus:hover:not(:disabled){background:var(--green);color:#fff;}
+.adjust-btn:disabled{opacity:.35;cursor:not-allowed;}
+.adjust-btn.flip{color:var(--purple-light);border-color:var(--purple);min-width:320px;}
+.adjust-btn.flip:hover:not(:disabled){background:var(--purple);color:#fff;}
+.score-input{width:120px;background:#06122c;border:2px solid var(--gold);color:#fff;font-family:Georgia,serif;font-size:24px;font-weight:700;text-align:center;padding:10px;outline:none;}
+.break-overlay{position:fixed;inset:0;background:var(--bg-0);background-image:radial-gradient(ellipse at 50% 40%,#122a5c 0%,#06122c 70%);display:none;z-index:200;}
+.break-overlay.open{display:flex;}
+.break-content{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 40px;text-align:center;overflow-y:auto;}
+.break-label{font-family:Georgia,serif;font-size:clamp(12px,1.4vw,15px);letter-spacing:.5em;text-transform:uppercase;color:#9aa8d0;margin-bottom:24px;font-weight:700;}
+.break-title{font-family:Georgia,serif;font-size:clamp(40px,7vw,100px);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);line-height:1;margin-bottom:32px;}
+.break-subtitle{font-family:Georgia,serif;font-size:clamp(18px,2.4vw,30px);color:#fff;letter-spacing:.1em;margin-bottom:40px;}
+.break-scores{width:100%;max-width:600px;margin:0 auto 40px;display:flex;flex-direction:column;gap:8px;}
+.break-score-row{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;background:rgba(26,58,138,.45);font-family:Georgia,serif;font-size:20px;}
+.break-score-row.winner{background:linear-gradient(180deg,var(--green) 0%,var(--green-dark) 100%);font-size:22px;font-weight:700;box-shadow:0 0 0 2px var(--gold) inset;}
+.break-score-row.loser{opacity:.8;}
+.break-score-name{color:var(--gold);text-transform:uppercase;}
+.break-score-value{color:#fff;font-weight:700;}
+.final-overlay{position:fixed;inset:0;background:var(--bg-0);background-image:radial-gradient(ellipse at 50% 40%,#122a5c 0%,#06122c 70%);display:none;z-index:250;}
+.final-overlay.open{display:flex;}
+.final-content{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px;text-align:center;overflow-y:auto;}
+.final-label{font-family:Georgia,serif;font-size:clamp(12px,1.4vw,15px);letter-spacing:.5em;text-transform:uppercase;color:#9aa8d0;margin-bottom:20px;font-weight:700;}
+.final-turn{font-family:Georgia,serif;font-size:clamp(22px,3vw,38px);font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:40px;}
+.final-topics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:1200px;width:100%;margin-bottom:40px;}
+.final-topic-card{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);color:var(--gold);font-family:Georgia,serif;font-size:clamp(12px,1.4vw,18px);font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:28px 12px;text-align:center;cursor:pointer;user-select:none;min-height:100px;display:flex;align-items:center;justify-content:center;}
+.final-topic-card:hover{background:linear-gradient(180deg,#2a52b8 0%,var(--blue) 100%);color:#fff;}
+.final-reveal-title{font-family:Georgia,serif;font-size:clamp(48px,10vw,140px);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);line-height:1.05;margin:20px 0 60px;padding:0 20px;}
+.final-question-text{font-family:Georgia,serif;font-size:clamp(24px,3.5vw,44px);line-height:1.4;color:#fff;max-width:1000px;margin:0 auto 30px;}
+.final-topic-small{font-family:Georgia,serif;font-size:clamp(13px,1.4vw,15px);letter-spacing:.35em;text-transform:uppercase;color:#f0c419;margin-bottom:20px;font-weight:700;}
+.final-answer-text{display:none;font-family:Georgia,serif;font-size:clamp(20px,2.8vw,38px);line-height:1.35;color:var(--gold);max-width:1000px;padding:20px 40px;font-weight:700;margin-bottom:20px;white-space:pre-line;text-align:left;}
+.final-answer-text.visible{display:block;}
+.editor-overlay{position:fixed;inset:0;background:rgba(6,18,44,.97);display:none;z-index:400;}
+.editor-overlay.open{display:flex;}
+.editor-content{width:100%;height:100%;display:flex;flex-direction:column;padding:24px 32px;}
+.editor-header{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:12px;}
+.editor-title-wrap{display:flex;flex-direction:column;gap:4px;}
+.editor-header h2{font-family:Georgia,serif;color:var(--gold);font-size:20px;letter-spacing:.2em;text-transform:uppercase;}
+.editor-game-title{font-size:12px;color:#9aa8d0;letter-spacing:.15em;text-transform:uppercase;}
+.editor-actions{display:flex;gap:16px;flex-wrap:wrap;}
+#editorTextarea{flex:1;background:#0b1a3e;color:#e8eefc;border:1px solid rgba(240,196,25,.3);padding:16px;font-family:'Consolas','Monaco',monospace;font-size:13px;line-height:1.55;resize:none;outline:none;}
+#editorTextarea:focus{border-color:var(--gold);}
+.editor-status{margin-top:12px;min-height:20px;font-size:13px;}
+.editor-status.ok{color:#5cd07a;}.editor-status.err{color:#ff6b6b;}
+body.public-mode .header-actions{display:none!important;}
+body.fullscreen-mode .header-actions{display:none!important;}
+body.public-mode .round-nav-btn{display:none!important;}
+body.public-mode .round-nav{gap:0;}
+body.public-mode .cell-points{pointer-events:none!important;cursor:default!important;}
+body.public-mode .cell-points:hover{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);color:var(--gold);}
+body.public-mode .scoring-panel{display:none!important;}
+body.public-mode .adjust-row{display:none!important;}
+body.public-mode .modal-answer-preview{display:none!important;}
+@media(max-width:900px){.final-topics{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:700px){body{padding:20px 10px;}.header{margin-bottom:16px;padding-bottom:16px;gap:14px;}.header-logo{height:56px;}.cell-topic{padding:14px 6px;min-height:52px;letter-spacing:.12em;}.cell-points{padding:22px 4px;}.modal{padding:30px 16px;}.break-content{padding:30px 20px;}.final-content{padding:30px 16px;}.final-topics{grid-template-columns:repeat(2,1fr);gap:8px;}.editor-content{padding:16px;}.round-nav-label{letter-spacing:.2em;min-width:160px;}.round-nav{gap:12px;}.player-select-row,.select-players{gap:6px;}.player-select-btn,.select-player-btn{padding:10px 4px;}.psb-name,.select-player-name{font-size:12px;}.psb-score,.select-player-score{font-size:20px;}.adjust-btn{padding:10px 16px;font-size:16px;min-width:60px;}.score-input{width:80px;font-size:18px;padding:8px;}.adjust-btn.flip{min-width:220px;font-size:14px;}.bid-input{font-size:24px;padding:8px 12px;}.bid-btn{width:44px;height:44px;font-size:20px;}.modifier-icon{font-size:64px;}.modal-answer{padding:16px 20px;text-align:left;}}
+@media(max-width:480px){.header h1{letter-spacing:.14em;}.header-logo{height:46px;}.header .subtitle{letter-spacing:.25em;font-size:10px;}.board{grid-template-columns:1.2fr repeat(5,1fr);}.score-panel{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="screen active" id="menuScreen">
+    <header class="header">
+        <div class="header-brand">
+            <img src="logo.png.jpg" alt="Герб КДМ" class="header-logo">
+            <div class="header-title">
+                <h1>Мои игры</h1>
+                <span class="subtitle">Своя игра · КДМ · 1999</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-reset" id="btnMenuFullscreen">На весь экран (F)</button>
+        </div>
+    </header>
+    <div class="games-grid" id="gamesGrid"></div>
+    <div class="add-game-wrap">
+        <button class="btn-add-game" id="btnAddGame">+ Новая игра</button>
+    </div>
+</div>
+
+<div class="screen" id="gameScreen">
+    <header class="header">
+        <div class="header-brand">
+            <img src="logo.png.jpg" alt="Герб КДМ" class="header-logo">
+            <div class="header-title">
+                <h1 id="gameTitle">Своя игра</h1>
+                <span class="subtitle" id="gameSubtitle"></span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-reset" id="btnBackToMenu">◀ Меню</button>
+            <button class="btn-reset" id="btnGameEditor">Редактор</button>
+            <button class="btn-reset" id="btnReset">Начать заново</button>
+            <button class="btn-reset" id="btnPublicScreen">Открыть экран зрителя</button>
+            <button class="btn-reset" id="btnFullscreen">На весь экран (F)</button>
+        </div>
+    </header>
+    <div class="round-nav">
+        <button class="round-nav-btn" id="prevRound">◀</button>
+        <div class="round-nav-label" id="roundIndicator">Раунд 1 из 3</div>
+        <button class="round-nav-btn" id="nextRound">▶</button>
+    </div>
+    <div class="score-panel" id="scorePanel"></div>
+    <main class="board" id="board"></main>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modifier-intro" id="modifierIntro" style="display:none;"><div class="modifier-intro-word">МОДИФИКАТОР</div></div>
+        <div class="modifier-panel" id="modifierPanel" style="display:none;">
+            <div class="modifier-icon" id="modifierIcon">✨</div><div class="modifier-title" id="modifierTitle"></div><div class="modifier-desc" id="modifierDesc"></div>
+        </div>
+        <div class="modal-select" id="catSelectPanel" style="display:none;"><div class="modal-topic" id="catTopicLabel"></div><div class="select-players" id="catSelectRow"></div></div>
+        <div class="auction-panel" id="auctionPanel" style="display:none;">
+            <div class="modal-topic" id="auctionTopicLabel"></div>
+            <div class="bid-row">
+                <button class="bid-btn" id="bidMinus">−</button>
+                <input type="number" class="bid-input" id="bidInput" value="100" min="0" step="100">
+                <button class="bid-btn" id="bidPlus">+</button>
+            </div>
+            <div class="bid-presets" id="bidPresets"></div>
+            <div class="select-players" id="auctionSelectRow"></div>
+        </div>
+        <div class="pass-panel" id="passPanel" style="display:none;">
+            <div class="modal-topic" id="passTopicLabel"></div>
+            <div class="bid-row">
+                <button class="bid-btn" id="passValueMinus">−</button>
+                <input type="number" class="bid-input" id="passValueInput" value="500" min="200" max="1000" step="100">
+                <button class="bid-btn" id="passValuePlus">+</button>
+            </div>
+            <div class="bid-presets" id="passPresets"></div>
+            <div class="select-players" id="passSelectRow"></div>
+        </div>
+        <div class="modal-topic" id="modalTopic" style="display:none;"></div>
+        <div class="modal-points" id="modalPoints" style="display:none;">
+            <span class="base-val" id="modalPointsBase" style="display:none;"></span>
+            <span id="modalPointsVal"></span>
+            <span class="mod-badge" id="modalPointsMod" style="display:none;"></span>
+        </div>
+        <div class="modal-question" id="modalQuestion" style="display:none;"></div>
+        <img id="modalImage" src="" alt="" style="display:none;">
+        <div class="modal-answer" id="modalAnswer"></div>
+        <div class="modal-answer-preview" id="modalAnswerPreview"></div>
+        
+        <div class="scoring-panel" id="scoringPanel">
+            <div class="player-select-row" id="playerSelectRow"></div>
+            <div class="adjust-row" id="adjustRow">
+                <button class="adjust-btn minus" id="adjustMinus" disabled>−</button>
+                <input type="text" inputmode="numeric" class="score-input" id="scoreInput" value="0">
+                <button class="adjust-btn plus" id="adjustPlus" disabled>+</button>
+            </div>
+            <div class="adjust-row" id="flipRow" style="display:none;"><button class="adjust-btn flip" id="adjustFlip" disabled>⇄ Перевернуть счёт</button></div>
+        </div>
+        <div class="modal-score-panel" id="modalScorePanel"></div>
+    </div>
+</div>
+
+<div class="break-overlay" id="breakOverlay">
+    <div class="break-content">
+        <div class="break-label" id="breakLabel"></div>
+        <div class="break-title" id="breakTitle"></div>
+        <div class="break-subtitle" id="breakSubtitle"></div>
+        <div class="break-scores" id="breakScores"></div>
+    </div>
+</div>
+
+<div class="final-overlay" id="finalOverlay">
+    <div class="final-content">
+        <div id="finalSelectView" style="display:flex;flex-direction:column;align-items:center;width:100%;">
+            <div class="final-label">Финальный раунд</div>
+            <div class="final-turn" id="finalTurn">Ход игрока 1</div>
+            <div class="final-topics" id="finalTopics"></div>
+        </div>
+        <div id="finalRevealView" style="display:none;flex-direction:column;align-items:center;width:100%;">
+            <div class="final-label">Тема финального раунда</div>
+            <div class="final-reveal-title" id="finalRevealTitle"></div>
+        </div>
+        <div id="finalQuestionView" style="display:none;flex-direction:column;align-items:center;width:100%;">
+            <div class="final-topic-small" id="finalTopicSmall"></div>
+            <div class="final-question-text" id="finalQuestionText"></div>
+            <div class="final-answer-text" id="finalAnswerText"></div>
+            <div class="scoring-panel" id="finalScoringPanel">
+                <div class="player-select-row" id="finalPlayerSelectRow"></div>
+                <div class="adjust-row">
+                    <button class="adjust-btn minus" id="finalAdjustMinus" disabled>−</button>
+                    <input type="text" inputmode="numeric" class="score-input" id="finalScoreInput" value="0">
+                    <button class="adjust-btn plus" id="finalAdjustPlus" disabled>+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="editor-overlay" id="editorOverlay">
+    <div class="editor-content">
+        <div class="editor-header">
+            <div class="editor-title-wrap"><h2>Редактор игры</h2><div class="editor-game-title" id="editorGameTitle"></div></div>
+            <div class="editor-actions">
+                <button class="btn-reset" id="editorSave">Сохранить</button>
+                <button class="btn-reset" id="editorClose">Закрыть</button>
+            </div>
+        </div>
+        <textarea id="editorTextarea" spellcheck="false"></textarea>
+        <div class="editor-status" id="editorStatus"></div>
+    </div>
+</div>
+
+<script>
+var MODIFIER_REGISTRY = {
+    x2:      { label: '×2', sign: 'pos', apply: function(b) { return b * 2; } },
+    x3:      { label: '×3', sign: 'pos', apply: function(b) { return b * 3; } },
+    plus500: { label: '+500', sign: 'pos', apply: function(b) { return b + 500; } },
+    plus1000:{ label: '+1000', sign: 'pos', apply: function(b) { return b + 1000; } },
+    half:    { label: '÷2', sign: 'neg', apply: function(b) { return Math.round(b / 2); } },
+    minus500:{ label: '−500', sign: 'neg', apply: function(b) { return Math.max(0, b - 500); } },
+    zero:    { label: '×0', sign: 'neg', apply: function() { return 0; } },
+    flip:    { label: '⇄', sign: 'neg', special: 'flip', apply: null }
+};
+var SECRET_MODIFIER_POOL = ['x2','x3','plus500','plus1000','half','minus500','zero','flip'];
+
+var DEFAULT_DATA = {
+    games: [{
+        id: 'default-1',
+        title: 'Своя игра КДМ',
+        subtitle: 'Комитет по делам молодёжи · 1999',
+        finalQuestionValue: 1000,
+        players: ['Мадина','Абдулбасир','Мурат','Джавад','Гайдар','Хадижат','Мурад','Мадина М','Камиль'],
+        rounds: [
+            {
+                title: "Раунд 1", points: [100,200,300,400,500], playerIndices: [0,1,2],
+                topics: [
+                    { title: "Кино", questions: [
+                        { points: 100, question: "Фильм про мальчика, которого забыли на Рождество, и он защищает свой дом от грабителей", answer: "Один дома"},
+                        { points: 200, question: "Фильм про человека, который случайно попал в прошлое и изменил будущее. В названии есть направление движения.", answer: "«Назад в будущее»" },
+                        { points: 300, question: "Какой фильм считается самым кассовым в истории кино с учётом перевыпусков?", answer: "«Аватар»" },
+                        { points: 400, question: "Какой фильм получил «Оскар» за лучший фильм на церемонии 2020 года и стал первым неанглоязычным лауреатом в этой категории?", answer: "«Паразиты»" },
+                        { points: 500, question: "Какой фильм Андрея Тарковского снят по повести братьев Стругацких о Зоне?", answer: "«Сталкер»" }
+                    ]},
+                    { title: "Цитаты и кадры", questions: [
+                        { points: 100, question: "«Я вернусь».", answer: "Терминатор" },
+                        { points: 200, question: "«Да пребудет с тобой Сила».", answer: "«Звёздные войны»" },
+                        { points: 300, question: "«Я — твой отец».", answer: "«Звёздные войны»" },
+                        { points: 400, question: "«Зачем ты такой серьёзный?»", answer: "«Тёмный рыцарь» (Джокер)" },
+                        { points: 500, question: "«Я — Грут».", answer: "«Стражи Галактики»" }
+                    ]},
+                    { title: "Адреса Дагестана", questions: [
+                        { points: 100, question: "Крупнейший песчаный бархан Европы. Здесь снимали «Белое солнце пустыни».", answer: "Бархан Сарыкум" },
+                        { points: 200, question: "Самый глубокий каньон Европы. Визитная карточка Дагестана.", answer: "Сулакский каньон" },
+                        { points: 300, question: "Древнее село-призрак на горе Гамсутльмеэр. Последний житель умер в 2015 году.", answer: "Гамсутль" },
+                        { points: 400, question: "В Махачкале есть место, где можно найти всё: от брендовых вещей до бабушкиных носков. Здесь торгуются так, что базарный шум заглушает любой трек. Где местные делают «шопинг-челлендж»?", answer: "Второй рынок" },
+                        { points: 500, question: "В Махачкале есть бульвар, который местные называют главным местом для «чилл-аут» прогулок. Там назначают встречи, катаются на самокатах и едят мороженое. Как он называется?", answer: "Родопский бульвар." }
+                    ]},
+                    { title: "Кошачьи", questions: [
+                        { points: 100, question: "Как звали кота из Простоквашино?", answer: "Матроскин" },
+                        { points: 200, question: "Какая большая кошка самая быстрая на суше?", answer: "Гепард" },
+                        { points: 300, question: "Сколько усов у кошки в среднем?", answer: "24 (по 12 с каждой стороны)" },
+                        { points: 400, question: "Какое животное из семейства кошачьих самое крупное?", answer: "Тигр" },
+                        { points: 500, question: "Почему кошка сидит на компьютере?", answer: "Потому что там мышка" }
+                    ]},
+                    { title: "ДГУ", questions: [
+                        { points: 100, question: "В каком году был основан Дагестанский государственный университет, если считать от открытия его предшественника — агро-педагогического института?", answer: "В 1931 году" },
+                        { points: 200, question: "Чьё имя носил педагогический институт — предшественник ДГУ — до 1957 года?", answer: "Сулеймана Стальского, народного поэта Дагестана" },
+                        { points: 300, question: "лавный босс в игре под названием «Студенческая жизнь». Именно это слово заставляет сердце биться чаще, а сон — исчезать. То, во что превращается жизнь студента два раза в год. Что это?", answer: "Сессия" },
+                        { points: 400, question: "Этот выпускник ДГУ — известный российский предприниматель и государственный деятель, чья супруга также окончила ДГУ. Назовите его.", answer: "Сулейман Керимов" },
+                        { points: 500, question: "Где студенты ДГУ проходят главный курс выживания, делят одну розетку на пятерых, учат матанализ в 3 часа ночи и заводят лучших друзей на всю жизнь?", answer: "Общага" }
+                    ]}
+                ]
+            },
+            {
+                title: "Раунд 2", points: [100,200,300,400,500], playerIndices: [3,4,5],
+                topics: [
+                    { title: "Алиэкспресс", questions: [
+                        { points: 100, question: "«Не дай своему лицу замёрзнуть и запылиться. Имеет ушки, резинку и надпись Fashion. Носится на лице.»", answer: "Маска для лица" },
+                        { points: 200, question: "«Если ты сидишь как вопросительный знак — это для тебя. Выглядит как ремни, которые надеваются на плечи.»", answer: "Корректор осанки" },
+                        { points: 300, question: "«Если ты замерз и проголодался одновременно - завернись в лепешку. Круглый, мягкий, с реалистичным принтом подгоревшего теста.»", answer: "Плед-лаваш" },
+                        { points: 400, question: "«Преврати свой смартфон в домашний кинотеатр! Крепится к телефону, имеет линзу и иногда пульт.»", answer: "Мини-проектор для смартфона" },
+                        { points: 500, question: "«Умная лампа с Bluetooth и музыкой! Меняет цвет, мигает под ритм, управляется с телефона.»", answer: "Светодиодная лампа с Bluetooth-колонкой" }
+                    ]},
+                    { title: "Самая самая", questions: [
+                        { points: 100, question: "Самое глубокое место на планете. Глубина — почти 11 километров.", answer: "Марианская впадина" },
+                        { points: 200, question: "Все думают, что самая большая пустыня — это Сахара с её песком и верблюдами. Но это полный кринж. На самом деле самая огромная пустыня на Земле — это целый ледяной континент с пингвинами. Назовите её.", answer: "Антарктическая пустыня" },
+                        { points: 300, question: "Абсолютный рекордсмен по скорости. В пикирующем полете он разгоняется быстрее, чем студент, бегущий в столовую на большой перемене (более 300 км/ч). Что это за птица?", answer: "Сапсан" },
+                        { points: 400, question: "Это здание — главный герой всех фоток из отпуска. Оно настолько высокое, что на его вершине можно встретить рассвет дважды за день, пока остальные люди спят. Самое высокое здание в мире. Что это?.", answer: "Бурдж-Халифа" },
+                        { points: 500, question: "Самое скачиваемое приложение в мире за последние годы. Именно оно подарило нам «brain rot» (гниение мозга), бесконечный скроллинг и танцы под треки, которые застревают в голове на неделю. Что это?", answer: "TikTok" }
+                    ]},
+                    { title: "Вспомни 5", questions: [
+                        { points: 100, type: "manual", question: "Назовите 5 фруктов." },
+                        { points: 200, type: "manual", question: "Назовите 5 пород собак." },
+                        { points: 300, type: "manual", question: "Назовите 5 вещей, которые жизненно необходимо брать в универ?" },
+                        { points: 400, type: "manual", question: "Назовите 5 фильмов, в названии которых есть число." },
+                        { points: 500, type: "manual", question: "Назовите 5 отговорок, чтобы не идти на пару." }
+                    ]},
+                    { title: "Женский цитатник", questions: [
+                        { points: 100, question: "Закончите фразу Симоны де Бовуар: «Женщиной не рождаются, …»", answer: "…женщиной становятся." },
+                        { points: 200, question: "Закончите фразу Коко Шанель: «Мода проходит, …»", answer: "…стиль остаётся." },
+                        { points: 300, question: "Закончите фразу Элеоноры Рузвельт: «Никто не может заставить вас чувствовать себя неполноценным без …»", answer: "…вашего согласия." },
+                        { points: 400, question: "Закончите фразу Майи Энджелоу: «Люди забудут, что вы говорили, люди забудут, что вы делали, но они никогда не забудут …»", answer: "…что вы заставили их почувствовать." },
+                        { points: 500, question: "Закончите фразу Маргарет Тэтчер: «Если хочешь, чтобы что-то было сказано, попроси мужчину; если хочешь, чтобы что-то было сделано, …»", answer: "…попроси женщину." }
+                    ]},
+                    { title: "Аниме и Манга: Твой бекграунд", questions: [
+                        { points: 100, question: "Главный герой этого аниме — парень в соломенной шляпе, который растягивается как резиновый и хочет стать Королем пиратов.", answer: "Луффи из «One Piece»" },
+                        { points: 200, question: "Как в аниме-культуре называют красивую девушку-персонажа, в которую фанаты безответно влюбляются?", answer: "Вайфу" },
+                        { points: 300, question: "Главный герой аниме «Наруто» мечтает стать главой своей деревни и получить этот титул. Как он называется?", answer: "Хокаге" },
+                        { points: 400, question: "В аниме «Тетрадь смерти» нужно сделать две вещи, чтобы убить человека с помощью тетради. Первое — написать его имя. А что нужно сделать второе?", answer: "Представить его лицо в воображении" },
+                        { points: 500, question: "Какое аниме считается абсолютным долгожителем и выходит до сих пор, начавшись еще в 1999 году (про пиратов)?", answer: "One Piece" }
+                    ]},
+                ]
+            },
+            {
+                title: "Раунд 3", points: [100,200,300,400,500], playerIndices: [6,7,8],
+                topics: [
+                    { title: "Лучше 5", questions: [
+                        { points: 100,  type: "manual", question: "Назовите 5 вещей, которые лучше не делать в кинотеатре.»" },
+                        { points: 200,  type: "manual", question: "Назовите 5 вещей, которые лучше не делать в чужом доме." },
+                        { points: 300,  type: "manual", question: "Назовите 5 вещей, которые лучше не писать в общий чат." },
+                        { points: 400, type: "manual", question: "Назовите 5 вещей, которые лучше не говорить на первом свидании." },
+                        { points: 500, type: "manual", question: "Назовите 5 вещей, которые лучше не делать в лифте с незнакомцем." }
+                    ]},
+                    { title: "Интернет-сленг", questions: [
+                        { points: 100, question: "Этим словом зумеры называют что-то очень смешное. Пришло из английского, означает «смеяться вслух».", answer: "LOL" },
+                        { points: 200, question: "Этим словом зумеры называют чувство неловкости и стыда за чьи-то действия.", answer: "Кринж" },
+                        { points: 300, question: "Это слово означает «разбираться в чём-то», «быть в теме».", answer: "Шарить" },
+                        { points: 400, question: "Это слово пришло из английского и означает «доставлять удовольствие», «быть приятным».", answer: "Вайб" },
+                        { points: 500, question: "Это слово означает «человек, который всё время ноет и жалуется».", answer: "Нытик" }
+                    ]},
+                    { title: "Студенческая жизнь", questions: [
+                        { points: 100, question: "Это слово студенты используют, когда говорят про учёбу. Оно означает «зубрить», «учить до посинения».", answer: "Грызть гранит науки" },
+                        { points: 200, question: "Это время суток, когда студент начинает готовиться к экзамену, который завтра.", answer: "Ночь" },
+                        { points: 300, question: "Это слово означает «списать».", answer: "Сдуть" },
+                        { points: 400, question: "Это состояние, когда студент не спал всю ночь, но всё равно пришёл на пару.", answer: "Зомби / овощ" },
+                        { points: 500, question: "Это фраза, которую студент говорит преподавателю, когда не готов.", answer: "«Я не готов»" }
+                    ]},
+                    { title: "Смешарики", questions: [
+                        { points: 100,  question: "«Это только кажется, что море большое. На самом деле оно маленькое, бесследно в нём ничего не исчезает». Чья цитата?", answer: "Крош (серия «Маленькое большое море»)" },
+                        { points: 200,  question: "«Очень трудно жить, думая о каждой ошибке, которую ты совершил, поэтому всё плохое забываешь, а помнишь только хорошее — очень удобно, но от себя не уйдёшь». Чья цитата?", answer: "Кар-Карыч" },
+                        { points: 300,  question: "«Иногда случается, что вещи теряют свой смысл. Вот смысл окна, например, чтобы в него смотреть. А порой смотришь в него, а смотреть там нечего… И непонятно, то ли жизнь всегда была бессмысленной, а ты просто не замечал этого, то ли смысл был, но куда-то затерялся». Чья цитата?", answer: "Бараш" },
+                        { points: 400, question: "«Такой вот парадокс: мы совершаем подвиги для тех, кому до нас уже нет никакого дела, а любят нас те, кому мы нужны и без всяких подвигов». Чья цитата?", answer: "Лосяш (серия «Торжество разума»)" },
+                        { points: 500, question: "«Всё станет пылью, и воюющий с нею превратится в пыль…» Чья цитата?", answer: "Лосяш" }
+                    ]},
+                    { title: "Зуммер-студент: учёба и деньги", questions: [
+                        { points: 100, question: "Что такое «дедлайн» и почему он иногда «паника»?", answer: "Крайний срок; паника — когда всё делается в последний момент" },
+                        { points: 200, question: "Стипендия 4 000 ₽. Подработка 600 ₽/час, 10 часов в неделю. Сколько за 4 недели вместе со стипендией?", answer: "28 000 ₽: 600 × 10 × 4 + 4 000" },
+                        { points: 300, question: "Курс стоит 12 000 ₽. Скидка 25%, затем промокод ещё 10% от новой цены. Сколько итого?", answer: "8 100 ₽: 12 000 × 0,75 × 0,9" },
+                        { points: 400, question: "3 задачи по 45 минут, между ними перерывы по 10 минут. Сколько всего времени?", answer: "155 минут = 2 ч 35 мин" },
+                        { points: 500, question: "Тест: 30 вопросов. Верный +2, неверный −0,5, пропуск 0. Студент: 20 верно, 5 неверно, 5 пропуск. Итог?", answer: "37,5 балла: 40 − 2,5" }
+                    ]}
+                ]
+            }
+        ],
+        finalTopics: [
+            { title: "Анатомия",       question: "Какой внутренний орган человека способен полностью восстанавливаться (регенерировать), даже если удалить до 70% его тканей?", answer: "Печень" },
+            { title: "Кулинария",     question: "Главный ингредиент популярного мексиканского соуса гуакамоле, сытным и очень полезным. Что ЭТО", answer: "Авокадо" },
+            { title: "Изобретения",  question: "Кто изобрёл лампу накаливания?", answer: "Томас Эдисон" },
+            { title: "Камушки", question: "Какой природный минерал считается самым твердым на планете Земля?", answer: "Алмаз" },
+            { title: "Кавказская война",       question: "Как звали первого имама Дагестана", answer: "Гази-Муххамад" },
+            { title: "Рандом",    question: "Назовите любимое число ведущего( от 1 до 9)?", answer: "7" },
+            { title: "Фастфуд",   question: "В какой стране появился в мире первый ресторан МАКДОНАЛЬС за пределами США?", answer: "Канада" },
+            { title: "Город",          question: "Назовите город: Этот Город ветров и Город небоскрёбов стоит на озере Мичиган. В этом городе в 1920-1930-х годах действовал самый знаменитый гангстер Аль Капоне.?", answer: "Чикаго" },
+            { title: "Кинематограф", question: "Первый «Оскар» 1929?", answer: "«Крылья» (Wings)" },
+            { title: "Интернет",      question: "Какая функция в современных браузерах и текстовых редакторах обязана своим появлением программисту Ларри Теслеру, который в 1970-х годах заменил сложные команды перемещения текста простым сочетанием двух действий?", answer: "Копировать-вставить (Copy & Paste/Вырезать-вставить)" }
+        ]
+    }]
+};
+
+var STORAGE_KEY = 'svoya-igra-v31';
+var OLD_KEYS = ['svoya-igra-v26','svoya-igra-v25','svoya-igra-v24','svoya-igra-v23','svoya-igra-v22','svoya-igra-v21','svoya-igra-v20','svoya-igra-v19','svoya-igra-v18','svoya-igra-v17','svoya-igra-v16','svoya-igra-v15','svoya-igra-v14','svoya-igra-v13','svoya-igra-v12','svoya-igra-v11','svoya-igra-v10','svoya-igra-v9','svoya-igra-v8','svoya-igra-v7','svoya-igra-v6','svoya-igra-v5','svoya-igra-v4','svoya-igra-v3','svoya-igra-v2','svoya-igra-config-v1'];
+var deepClone = function(o) { return JSON.parse(JSON.stringify(o)); };
+var generateId = function() { return 'g' + Date.now() + '-' + Math.random().toString(36).slice(2, 8); };
+
+function migrateGame(game) {
+    if (!Array.isArray(game.players)) {
+        game.players = ['Игрок 1','Игрок 2','Игрок 3','Игрок 4','Игрок 5','Игрок 6','Игрок 7','Игрок 8','Игрок 9'];
+    }
+    if (typeof game.finalQuestionValue !== 'number') game.finalQuestionValue = 1000;
+    if (!Array.isArray(game.rounds)) game.rounds = [];
+    game.rounds.forEach(function(r, i) {
+        if (!Array.isArray(r.playerIndices)) {
+            r.playerIndices = [i*3, i*3+1, i*3+2].filter(function(n) { return n < game.players.length; });
+        }
+    });
+    if (!Array.isArray(game.finalTopics)) game.finalTopics = [];
+    return game;
+}
+
+function loadData() {
+    try {
+        var saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            var parsed = JSON.parse(saved);
+            if (parsed && Array.isArray(parsed.games) && parsed.games.length) {
+                parsed.games.forEach(migrateGame);
+                return parsed;
+            }
+        }
+        for (var i = 0; i < OLD_KEYS.length; i++) {
+            var legacy = localStorage.getItem(OLD_KEYS[i]);
+            if (legacy) {
+                try {
+                    var old = JSON.parse(legacy);
+                    if (old && Array.isArray(old.games)) { old.games.forEach(migrateGame); return old; }
+                    if (old && Array.isArray(old.rounds)) {
+                        return { games: [migrateGame({ id: 'migrated-1', title: 'Игра (миграция)', subtitle: '', rounds: old.rounds, finalTopics: old.finalTopics || [] })] };
+                    }
+                } catch (e) {}
+            }
+        }
+    } catch (e) {}
+    return deepClone(DEFAULT_DATA);
+}
+
+function saveData() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); } catch (e) {}
+}
+
+var appData = loadData();
+
+var currentGameId = null, currentGame = null, currentRound = 0;
+var answeredCells = new Set(), currentCell = null, gameFinished = false, editingGameId = null;
+var modalState = 'question';
+var catReceiverPi = null, auctionWinnerPi = null, auctionBid = 0, secretModifierKey = null;
+var passReceiverPi = null, passValue = 0;
+var scoringPanelVisible = true;
+var roundScores = {}, roundWinners = {};
+var finalState = 'select', finalRemaining = [], finalEliminated = 0;
+var finalCurrentTopic = null, finalists = [], finalScores = {};
+var selectedScoringPi = null, selectedFinalPi = null;
+
+function $(id) { return document.getElementById(id); }
+var menuScreen = $('menuScreen'), gameScreen = $('gameScreen');
+var gamesGrid = $('gamesGrid'), btnAddGame = $('btnAddGame'), btnMenuFullscreen = $('btnMenuFullscreen');
+var board = $('board'), modalOverlay = $('modalOverlay');
+var modifierIntro = $('modifierIntro'), modifierPanel = $('modifierPanel'), modifierIcon = $('modifierIcon'), modifierTitle = $('modifierTitle'), modifierDesc = $('modifierDesc');
+var catSelectPanel = $('catSelectPanel'), catTopicLabel = $('catTopicLabel'), catSelectRow = $('catSelectRow');
+var auctionPanel = $('auctionPanel'), auctionTopicLabel = $('auctionTopicLabel');
+var bidInput = $('bidInput'), bidMinus = $('bidMinus'), bidPlus = $('bidPlus'), bidPresets = $('bidPresets'), auctionSelectRow = $('auctionSelectRow');
+var passPanel = $('passPanel'), passTopicLabel = $('passTopicLabel');
+var passValueInput = $('passValueInput'), passValueMinus = $('passValueMinus'), passValuePlus = $('passValuePlus');
+var passPresets = $('passPresets'), passSelectRow = $('passSelectRow');
+var modalTopic = $('modalTopic'), modalPoints = $('modalPoints'), modalPointsBase = $('modalPointsBase'), modalPointsVal = $('modalPointsVal'), modalPointsMod = $('modalPointsMod');
+var modalQuestion = $('modalQuestion'), modalImage = $('modalImage'), modalAnswer = $('modalAnswer'), modalAnswerPreview = $('modalAnswerPreview');
+var scoringPanel = $('scoringPanel'), playerSelectRow = $('playerSelectRow');
+var adjustRow = $('adjustRow'), adjustMinus = $('adjustMinus'), adjustPlus = $('adjustPlus'), scoreInput = $('scoreInput');
+var flipRow = $('flipRow'), adjustFlip = $('adjustFlip');
+var modalScorePanel = $('modalScorePanel');
+var breakOverlay = $('breakOverlay'), breakLabel = $('breakLabel'), breakTitle = $('breakTitle'), breakSubtitle = $('breakSubtitle'), breakScores = $('breakScores');
+var finalOverlay = $('finalOverlay');
+var finalSelectView = $('finalSelectView'), finalRevealView = $('finalRevealView'), finalQuestionView = $('finalQuestionView');
+var finalTurn = $('finalTurn'), finalTopicsEl = $('finalTopics'), finalRevealTitle = $('finalRevealTitle'), finalTopicSmall = $('finalTopicSmall');
+var finalQuestionText = $('finalQuestionText'), finalAnswerText = $('finalAnswerText');
+var finalScoringPanel = $('finalScoringPanel'), finalPlayerSelectRow = $('finalPlayerSelectRow');
+var finalAdjustMinus = $('finalAdjustMinus'), finalAdjustPlus = $('finalAdjustPlus'), finalScoreInput = $('finalScoreInput');
+var roundIndicator = $('roundIndicator'), prevRoundBtn = $('prevRound'), nextRoundBtn = $('nextRound'), scorePanel = $('scorePanel');
+var gameTitleEl = $('gameTitle'), gameSubtitleEl = $('gameSubtitle');
+var btnBackToMenu = $('btnBackToMenu'), btnGameEditor = $('btnGameEditor'), btnReset = $('btnReset'), btnFullscreen = $('btnFullscreen');
+var editorOverlay = $('editorOverlay'), editorTextarea = $('editorTextarea'), editorStatus = $('editorStatus'), editorGameTitle = $('editorGameTitle');
+var editorSave = $('editorSave'), editorClose = $('editorClose');
+
+function showScreen(id) {
+    var screens = document.querySelectorAll('.screen');
+    for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
+    $(id).classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+function renderMenu() {
+    gamesGrid.innerHTML = '';
+    if (!appData.games.length) {
+        var e = document.createElement('div');
+        e.className = 'menu-empty';
+        e.textContent = 'Пока нет ни одной игры.';
+        e.style.gridColumn = '1 / -1';
+        gamesGrid.appendChild(e);
+        return;
+    }
+    appData.games.forEach(function(game) {
+        var card = document.createElement('div');
+        card.className = 'game-card';
+        card.innerHTML = '<div class="game-card-title"></div><div class="game-card-subtitle"></div><div class="game-card-meta"></div><div class="game-card-actions"><button class="btn-play">Играть</button><button class="icon-btn" data-act="edit" title="Редактор"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button><button class="icon-btn" data-act="del" title="Удалить"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg></button></div>';
+        card.querySelector('.game-card-title').textContent = game.title || 'Без названия';
+        card.querySelector('.game-card-subtitle').textContent = game.subtitle || '';
+        var rc = Array.isArray(game.rounds) ? game.rounds.length : 0;
+        var fc = Array.isArray(game.finalTopics) ? game.finalTopics.length : 0;
+        var pc = Array.isArray(game.players) ? game.players.length : 0;
+        card.querySelector('.game-card-meta').textContent = rc + ' раунд(а) · ' + pc + ' игроков · ' + fc + ' финальных тем';
+        card.querySelector('.btn-play').addEventListener('click', function() { startGame(game.id); });
+        card.querySelector('[data-act="edit"]').addEventListener('click', function() { openEditor(game.id); });
+        card.querySelector('[data-act="del"]').addEventListener('click', function() { deleteGame(game.id, game.title); });
+        gamesGrid.appendChild(card);
+    });
+}
+
+function addNewGame() {
+    var newGame = {
+        id: generateId(), title: 'Новая игра', subtitle: '', finalQuestionValue: 1000,
+        players: ['Игрок 1','Игрок 2','Игрок 3','Игрок 4','Игрок 5','Игрок 6','Игрок 7','Игрок 8','Игрок 9'],
+        rounds: [{
+            title: "Раунд 1", points: [100,200,300,400,500], playerIndices: [0,1,2],
+            topics: [1,2,3,4,5].map(function(n) {
+                return {
+                    title: 'Тема ' + n,
+                    questions: [100,200,300,400,500].map(function(p, i) {
+                        return { points: p, question: 'Вопрос ' + n + '-' + (i+1), answer: 'Ответ' };
+                    })
+                };
+            })
+        }],
+        finalTopics: Array.from({ length: 10 }, function(_, i) {
+            return { title: 'Тема ' + (i+1), question: 'Вопрос финала ' + (i+1), answer: 'Ответ' };
+        })
+    };
+    appData.games.push(newGame);
+    saveData();
+    renderMenu();
+    openEditor(newGame.id);
+}
+
+function deleteGame(id, title) {
+    if (!confirm('Удалить игру «' + (title || 'Без названия') + '»?')) return;
+    appData.games = appData.games.filter(function(g) { return g.id !== id; });
+    saveData();
+    renderMenu();
+}
+
+function getGame(id) {
+    for (var i = 0; i < appData.games.length; i++) {
+        if (appData.games[i].id === id) return appData.games[i];
+    }
+    return null;
+}
+
+function startGame(gameId) {
+    var game = getGame(gameId);
+    if (!game) return;
+    migrateGame(game);
+    currentGameId = gameId; currentGame = game; currentRound = 0;
+    answeredCells = new Set(); currentCell = null; gameFinished = false;
+    modalState = 'question';
+    catReceiverPi = null; auctionWinnerPi = null; auctionBid = 0; secretModifierKey = null;
+    passReceiverPi = null; passValue = 0;
+    roundScores = {};
+    game.rounds.forEach(function(r, idx) {
+        roundScores[idx] = {};
+        (r.playerIndices || []).forEach(function(pi) { roundScores[idx][pi] = 0; });
+    });
+    roundWinners = {}; finalists = []; finalScores = {};
+    gameTitleEl.textContent = game.title || 'Своя игра';
+    gameSubtitleEl.textContent = game.subtitle || '';
+    renderBoard(); renderScorePanel(); showScreen('gameScreen');
+}
+
+function backToMenu() {
+    modalOverlay.classList.remove('open');
+    breakOverlay.classList.remove('open'); breakOverlay.dataset.mode = '';
+    finalOverlay.classList.remove('open');
+    currentGameId = null; currentGame = null;
+    passReceiverPi = null; passValue = 0;
+    renderMenu(); showScreen('menuScreen');
+}
+
+function renderBoard() {
+    board.innerHTML = '';
+    if (!currentGame) return;
+    var round = currentGame.rounds[currentRound];
+    if (!round) return;
+    var corner = document.createElement('div');
+    corner.className = 'cell-topic'; corner.textContent = 'Темы / Баллы';
+    board.appendChild(corner);
+    round.points.forEach(function(p) {
+        var el = document.createElement('div');
+        el.className = 'cell-topic'; el.textContent = p;
+        board.appendChild(el);
+    });
+    round.topics.forEach(function(topic, ti) {
+        var title = document.createElement('div');
+        title.className = 'cell-topic'; title.textContent = topic.title;
+        board.appendChild(title);
+        topic.questions.forEach(function(q, qi) {
+            var cell = document.createElement('div');
+            cell.className = 'cell-points';
+            cell.textContent = q.points;
+            var key = currentRound + '-' + ti + '-' + qi;
+            if (answeredCells.has(key)) cell.classList.add('answered');
+            cell.dataset.key = key;
+            cell.dataset.topic = topic.title;
+            cell.dataset.points = q.points;
+            cell.dataset.question = q.question || '';
+            cell.dataset.answer = q.answer || '';
+            if (q.image) cell.dataset.image = q.image;
+            if (q.type) cell.dataset.type = q.type;
+            if (q.modifier) cell.dataset.modifier = q.modifier;
+            if (q.modTitle) cell.dataset.modTitle = q.modTitle;
+            if (q.modDesc) cell.dataset.modDesc = q.modDesc;
+            if (q.modIcon) cell.dataset.modIcon = q.modIcon;
+            if (typeof q.modValue === 'number') cell.dataset.modValue = q.modValue;
+            if (typeof q.minValue === 'number') cell.dataset.minValue = q.minValue;
+            if (typeof q.maxValue === 'number') cell.dataset.maxValue = q.maxValue;
+            cell.addEventListener('click', function() { openQuestion(cell); });
+            board.appendChild(cell);
+        });
+    });
+    updateRoundNav();
+}
+
+function updateRoundNav() {
+    var total = currentGame.rounds.length;
+    roundIndicator.textContent = 'Раунд ' + (currentRound + 1) + ' из ' + total;
+    prevRoundBtn.disabled = currentRound === 0;
+    nextRoundBtn.disabled = false;
+}
+
+function goToRound(idx) {
+    if (idx < 0 || idx >= currentGame.rounds.length) return;
+    currentRound = idx;
+    if (!roundScores[idx]) {
+        roundScores[idx] = {};
+        (currentGame.rounds[idx].playerIndices || []).forEach(function(pi) { roundScores[idx][pi] = 0; });
+    }
+    renderBoard(); renderScorePanel();
+}
+
+function nextRound() {
+    var total = currentGame.rounds.length;
+    if (currentRound < total - 1) goToRound(currentRound + 1);
+    else showFinalIntro();
+}
+
+function renderScorePanel() {
+    scorePanel.innerHTML = '';
+    if (modalScorePanel) modalScorePanel.innerHTML = '';
+    if (!currentGame) return;
+    var round = currentGame.rounds[currentRound];
+    if (!round) return;
+    var playerIndices = round.playerIndices || [];
+    var maxScore = -Infinity, leaderPi = null;
+    playerIndices.forEach(function(pi) {
+        var s = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0;
+        if (s > maxScore) { maxScore = s; leaderPi = pi; }
+    });
+    var hasLeader = maxScore > 0;
+    playerIndices.forEach(function(pi) {
+        var name = currentGame.players[pi] || ('Игрок ' + (pi + 1));
+        var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0;
+        var card = document.createElement('div');
+        card.className = 'score-card';
+        if (hasLeader && pi === leaderPi) card.classList.add('leader');
+        if (selectedScoringPi === pi) card.classList.add('answering');
+        if (score < 0) card.classList.add('negative');
+        card.innerHTML = '<div class="score-card-name"></div><div class="score-card-score"></div>';
+        card.querySelector('.score-card-name').textContent = name;
+        card.querySelector('.score-card-score').textContent = score;
+        scorePanel.appendChild(card);
+
+        if (modalScorePanel) {
+            var mc = card.cloneNode(true);
+            modalScorePanel.appendChild(mc);
+        }
+    });
+}
+
+function getModifierKey(cell) {
+    if (!cell) return null;
+    if (cell.dataset.type === 'secret') return secretModifierKey;
+    return cell.dataset.modifier || null;
+}
+
+function computeValue(cell) {
+    var base = parseInt(cell.dataset.points, 10) || 0;
+    var key = getModifierKey(cell);
+    if (!key || !MODIFIER_REGISTRY[key]) return base;
+    var m = MODIFIER_REGISTRY[key];
+    if (m.special === 'flip' || !m.apply) return base;
+    return Math.max(0, Math.round(m.apply(base)));
+}
+
+function openQuestion(cell) {
+    currentCell = cell;
+    catReceiverPi = null; auctionWinnerPi = null; auctionBid = 0; secretModifierKey = null;
+    passReceiverPi = null; passValue = 0;
+    hideAllModalPanels();
+    var type = cell.dataset.type || 'normal';
+    if (type === 'modifier') {
+        modalState = 'modifier-intro';
+        modifierIntro.style.display = 'flex';
+        modalOverlay.classList.add('open');
+        return;
+    }
+    if (type === 'secret') {
+        var pool = SECRET_MODIFIER_POOL.slice();
+        secretModifierKey = pool[Math.floor(Math.random() * pool.length)];
+    }
+    if (type === 'cat') {
+        modalState = 'cat-select';
+        catTopicLabel.textContent = cell.dataset.topic;
+        buildCatSelectRow();
+        catSelectPanel.style.display = 'flex';
+        modalOverlay.classList.add('open');
+        return;
+    }
+    if (type === 'auction') {
+        modalState = 'auction';
+        auctionTopicLabel.textContent = cell.dataset.topic;
+        var base = parseInt(cell.dataset.points, 10) || 100;
+        bidInput.value = base; bidInput.step = base;
+        buildAuctionPresets(base);
+        buildAuctionSelectRow();
+        auctionPanel.style.display = 'flex';
+        modalOverlay.classList.add('open');
+        return;
+    }
+    if (type === 'pass') {
+        modalState = 'pass';
+        buildPassPanel();
+        passPanel.style.display = 'flex';
+        modalOverlay.classList.add('open');
+        return;
+    }
+    showQuestionPanel();
+    modalState = 'question';
+    modalOverlay.classList.add('open');
+}
+
+function revealModifier() {
+    modifierIntro.style.display = 'none';
+    modalState = 'modifier';
+    var cell = currentCell;
+    modifierPanel.style.display = 'flex';
+    modifierIcon.textContent = cell.dataset.modIcon || '✨';
+    modifierTitle.textContent = cell.dataset.modTitle || 'МОДИФИКАТОР';
+    modifierDesc.textContent = cell.dataset.modDesc || '';
+    buildScoringPanel(true);
+    scoringPanel.classList.add('visible');
+}
+
+function hideAllModalPanels() {
+    modifierIntro.style.display = 'none';
+    modifierPanel.style.display = 'none';
+    catSelectPanel.style.display = 'none';
+    auctionPanel.style.display = 'none';
+    passPanel.style.display = 'none';
+    modalTopic.style.display = 'none';
+    modalPoints.style.display = 'none';
+    modalPointsBase.style.display = 'none';
+    modalPointsMod.style.display = 'none';
+    modalQuestion.style.display = 'none';
+    modalImage.style.display = 'none';
+    modalAnswer.classList.remove('visible');
+    if (modalAnswerPreview) modalAnswerPreview.textContent = '';
+    scoringPanel.classList.remove('visible');
+    adjustRow.style.display = 'flex';
+    flipRow.style.display = 'none';
+}
+
+function showQuestionPanel() {
+    var cell = currentCell;
+    var base = parseInt(cell.dataset.points, 10) || 0;
+    var final = computeValue(cell);
+    var modKey = getModifierKey(cell);
+    var mod = modKey ? MODIFIER_REGISTRY[modKey] : null;
+    var isPass = (cell.dataset.type === 'pass' && passReceiverPi != null);
+    if (isPass) { final = passValue; base = passValue; mod = null; }
+    modalTopic.style.display = '';
+    modalPoints.style.display = 'inline-flex';
+    modalQuestion.style.display = '';
+    modalTopic.textContent = cell.dataset.topic;
+    modalPoints.classList.remove('pos', 'neg');
+    if (mod && mod.sign === 'pos') modalPoints.classList.add('pos');
+    else if (mod && mod.sign === 'neg') modalPoints.classList.add('neg');
+    if (!isPass && mod && mod.apply && final !== base) {
+        modalPointsBase.style.display = '';
+        modalPointsBase.textContent = base;
+    } else modalPointsBase.style.display = 'none';
+    modalPointsVal.textContent = final;
+    if (mod) {
+        modalPointsMod.style.display = '';
+        modalPointsMod.textContent = mod.label;
+    } else modalPointsMod.style.display = 'none';
+    modalQuestion.textContent = cell.dataset.question;
+    if (cell.dataset.type === 'manual') {
+        modalAnswer.textContent = '';
+    } else {
+        modalAnswer.textContent = cell.dataset.answer || 'не указан';
+    }
+    if (modalAnswerPreview) {
+        var a = cell.dataset.answer || '';
+        modalAnswerPreview.textContent = a ? ('Ответ для ведущего:\n' + a) : '';
+    }
+    if (cell.dataset.image) {
+        modalImage.src = cell.dataset.image;
+        modalImage.style.display = '';
+    } else { modalImage.src = ''; modalImage.style.display = 'none'; }
+
+    buildScoringPanel(false);
+    scoringPanel.classList.add('visible');
+}
+
+function buildCatSelectRow() {
+    catSelectRow.innerHTML = '';
+    var round = currentGame.rounds[currentRound];
+    (round.playerIndices || []).forEach(function(pi) {
+        var name = currentGame.players[pi] || ('Игрок ' + (pi + 1));
+        var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0;
+        var btn = document.createElement('button');
+        btn.className = 'select-player-btn';
+        btn.innerHTML = '<div class="select-player-name"></div><div class="select-player-score"></div>';
+        btn.querySelector('.select-player-name').textContent = name;
+        btn.querySelector('.select-player-score').textContent = score;
+        btn.addEventListener('click', function() { selectCatReceiver(pi); });
+        catSelectRow.appendChild(btn);
+    });
+}
+
+function selectCatReceiver(pi) {
+    catReceiverPi = pi;
+    catSelectPanel.style.display = 'none';
+    showQuestionPanel();
+    modalState = 'question';
+}
+
+function buildAuctionPresets(base) {
+    bidPresets.innerHTML = '';
+    [1,2,3,4,5].forEach(function(m) {
+        var b = document.createElement('button');
+        b.className = 'bid-preset';
+        b.textContent = base * m;
+        b.addEventListener('click', function() { bidInput.value = base * m; });
+        bidPresets.appendChild(b);
+    });
+}
+
+function buildAuctionSelectRow() {
+    auctionSelectRow.innerHTML = '';
+    var round = currentGame.rounds[currentRound];
+    (round.playerIndices || []).forEach(function(pi) {
+        var name = currentGame.players[pi] || ('Игрок ' + (pi + 1));
+        var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0;
+        var btn = document.createElement('button');
+        btn.className = 'select-player-btn';
+        btn.innerHTML = '<div class="select-player-name"></div><div class="select-player-score"></div>';
+        btn.querySelector('.select-player-name').textContent = name;
+        btn.querySelector('.select-player-score').textContent = score;
+        btn.addEventListener('click', function() { selectAuctionWinner(pi); });
+        auctionSelectRow.appendChild(btn);
+    });
+}
+
+function selectAuctionWinner(pi) {
+    var bid = parseInt(bidInput.value, 10) || 0;
+    if (bid <= 0) { alert('Введите ставку больше 0'); return; }
+    auctionWinnerPi = pi; auctionBid = bid;
+    auctionPanel.style.display = 'none';
+    showQuestionPanel();
+    modalState = 'question';
+}
+
+function buildPassPanel() {
+    passTopicLabel.textContent = currentCell.dataset.topic || '';
+    var minVal = parseInt(currentCell.dataset.minValue, 10) || 200;
+    var maxVal = parseInt(currentCell.dataset.maxValue, 10) || 1000;
+    passValueInput.min = minVal;
+    passValueInput.max = maxVal;
+    passValueInput.step = 100;
+    var def = Math.round(((minVal + maxVal) / 2) / 100) * 100;
+    if (def < minVal) def = minVal;
+    if (def > maxVal) def = maxVal;
+    passValueInput.value = def;
+
+    passPresets.innerHTML = '';
+    [200, 400, 600, 800, 1000].forEach(function(v) {
+        if (v < minVal || v > maxVal) return;
+        var b = document.createElement('button');
+        b.className = 'bid-preset';
+        b.textContent = v;
+        b.addEventListener('click', function() { passValueInput.value = v; });
+        passPresets.appendChild(b);
+    });
+
+    passSelectRow.innerHTML = '';
+    var round = currentGame.rounds[currentRound];
+    (round.playerIndices || []).forEach(function(pi) {
+        var name = currentGame.players[pi] || ('Игрок ' + (pi + 1));
+        var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0;
+        var btn = document.createElement('button');
+        btn.className = 'select-player-btn';
+        btn.innerHTML = '<div class="select-player-name"></div><div class="select-player-score"></div>';
+        btn.querySelector('.select-player-name').textContent = name;
+        btn.querySelector('.select-player-score').textContent = score;
+        btn.addEventListener('click', function() { selectPassReceiver(pi); });
+        passSelectRow.appendChild(btn);
+    });
+}
+
+function selectPassReceiver(pi) {
+    var val = parseInt(passValueInput.value, 10) || 0;
+    var minVal = parseInt(passValueInput.min, 10) || 200;
+    var maxVal = parseInt(passValueInput.max, 10) || 1000;
+    if (val < minVal || val > maxVal) {
+        alert('Введите значение от ' + minVal + ' до ' + maxVal);
+        return;
+    }
+    passReceiverPi = pi;
+    passValue = val;
+    passPanel.style.display = 'none';
+    showQuestionPanel();
+    modalState = 'question';
+}
+
+bidMinus.addEventListener('click', function() {
+    var step = parseInt(bidInput.step, 10) || 100;
+    bidInput.value = Math.max(0, (parseInt(bidInput.value, 10) || 0) - step);
+});
+bidPlus.addEventListener('click', function() {
+    var step = parseInt(bidInput.step, 10) || 100;
+    bidInput.value = (parseInt(bidInput.value, 10) || 0) + step;
+});
+
+passValueMinus.addEventListener('click', function() {
+    var step = parseInt(passValueInput.step, 10) || 100;
+    var minVal = parseInt(passValueInput.min, 10) || 200;
+    passValueInput.value = Math.max(minVal, (parseInt(passValueInput.value, 10) || minVal) - step);
+});
+passValuePlus.addEventListener('click', function() {
+    var step = parseInt(passValueInput.step, 10) || 100;
+    var maxVal = parseInt(passValueInput.max, 10) || 1000;
+    passValueInput.value = Math.min(maxVal, (parseInt(passValueInput.value, 10) || 200) + step);
+});
+
+function showAnswer() {
+    if (modalState === 'answer') return;
+    modalState = 'answer';
+    modalQuestion.style.display = 'none';
+    modalImage.style.display = 'none';
+    if (currentCell.dataset.type === 'manual') { } else { modalAnswer.classList.add('visible'); }
+}
+
+function buildScoringPanel(isModifier) {
+    playerSelectRow.innerHTML = '';
+    selectedScoringPi = null;
+    adjustMinus.disabled = true; adjustPlus.disabled = true; adjustFlip.disabled = true;
+    var round = currentGame.rounds[currentRound];
+    var playerIndices = round.playerIndices || [];
+    var type = currentCell.dataset.type || 'normal';
+    var modKey = getModifierKey(currentCell);
+    var mod = modKey ? MODIFIER_REGISTRY[modKey] : null;
+    var isFlip = !isModifier && mod && mod.special === 'flip';
+    var baseValue;
+    if (isModifier) {
+        baseValue = parseInt(currentCell.dataset.modValue, 10) || parseInt(currentCell.dataset.points, 10) || 0;
+    } else if (type === 'auction' && auctionWinnerPi != null) baseValue = auctionBid;
+    else if (type === 'pass' && passReceiverPi != null) baseValue = passValue;
+    else baseValue = computeValue(currentCell);
+    
+    if(scoreInput) scoreInput.value = baseValue;
+    
+    if (isFlip) { adjustRow.style.display = 'none'; flipRow.style.display = 'flex'; }
+    else { adjustRow.style.display = 'flex'; flipRow.style.display = 'none'; }
+    
+    playerIndices.forEach(function(pi) {
+        var name = currentGame.players[pi] || ('Игрок ' + (pi + 1));
+        var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0;
+        var btn = document.createElement('button');
+        btn.className = 'player-select-btn';
+        btn.dataset.pi = pi;
+        if (!isModifier && ((type === 'cat' && catReceiverPi != null && pi !== catReceiverPi) ||
+            (type === 'auction' && auctionWinnerPi != null && pi !== auctionWinnerPi) ||
+            (type === 'pass' && passReceiverPi != null && pi !== passReceiverPi))) {
+            btn.classList.add('locked');
+        }
+        btn.innerHTML = '<div class="psb-name"></div><div class="psb-score"></div>';
+        btn.querySelector('.psb-name').textContent = name;
+        var sEl = btn.querySelector('.psb-score');
+        sEl.textContent = score;
+        if (score < 0) sEl.classList.add('negative');
+        if (!btn.classList.contains('locked')) {
+            btn.addEventListener('click', function() { selectScoringPlayer(pi); });
+        }
+        playerSelectRow.appendChild(btn);
+    });
+    if (!isModifier) {
+        if (type === 'cat' && catReceiverPi != null) selectScoringPlayer(catReceiverPi);
+        else if (type === 'auction' && auctionWinnerPi != null) selectScoringPlayer(auctionWinnerPi);
+        else if (type === 'pass' && passReceiverPi != null) selectScoringPlayer(passReceiverPi);
+    }
+    renderScorePanel();
+}
+
+function selectScoringPlayer(pi) {
+    selectedScoringPi = pi;
+    var btns = playerSelectRow.querySelectorAll('.player-select-btn');
+    btns.forEach(function(b) {
+        if (b.classList.contains('locked')) return;
+        b.classList.toggle('selected', parseInt(b.dataset.pi, 10) === pi);
+    });
+    adjustMinus.disabled = false; adjustPlus.disabled = false; adjustFlip.disabled = false;
+    renderScorePanel();
+}
+
+function updateScoringPanelScores() {
+    var btns = playerSelectRow.querySelectorAll('.player-select-btn');
+    btns.forEach(function(btn) {
+        var pi = parseInt(btn.dataset.pi, 10);
+        var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0;
+        var el = btn.querySelector('.psb-score');
+        el.textContent = score;
+        el.classList.toggle('negative', score < 0);
+    });
+}
+
+function adjustRoundScore(delta) {
+    if (selectedScoringPi == null) return;
+    roundScores[currentRound][selectedScoringPi] = (roundScores[currentRound][selectedScoringPi] || 0) + delta;
+    updateScoringPanelScores(); renderScorePanel();
+}
+
+function flipSelectedScore() {
+    if (selectedScoringPi == null) return;
+    var cur = roundScores[currentRound][selectedScoringPi] || 0;
+    roundScores[currentRound][selectedScoringPi] = -cur;
+    updateScoringPanelScores(); renderScorePanel();
+}
+
+function toggleScoringPanel() {
+    scoringPanelVisible = !scoringPanelVisible;
+    if (scoringPanelVisible) scoringPanel.classList.add('visible');
+    else scoringPanel.classList.remove('visible');
+}
+
+function closeQuestion() {
+    modalOverlay.classList.remove('open');
+    hideAllModalPanels();
+    selectedScoringPi = null;
+    catReceiverPi = null; auctionWinnerPi = null; auctionBid = 0; secretModifierKey = null;
+    passReceiverPi = null; passValue = 0;
+    modalState = 'question';
+    if (currentCell) {
+        var key = currentCell.dataset.key;
+        if (key) answeredCells.add(key);
+        currentCell.classList.add('answered');
+        currentCell = null;
+    }
+    renderScorePanel();
+    var remaining = board.querySelectorAll('.cell-points:not(.answered)').length;
+    if (remaining === 0) endRound();
+
+    if (typeof broadcast === 'function') broadcast();
+}
+
+function endRound() {
+    var scores = roundScores[currentRound] || {};
+    var round = currentGame.rounds[currentRound];
+    var playerIndices = round.playerIndices || [];
+    var sorted = playerIndices.map(function(pi) {
+        return { pi: pi, name: currentGame.players[pi] || ('Игрок ' + (pi + 1)), score: scores[pi] != null ? scores[pi] : 0 };
+    }).sort(function(a, b) { return b.score - a.score; });
+    roundWinners[currentRound] = sorted[0] ? sorted[0].pi : null;
+    breakLabel.textContent = 'Раунд ' + (currentRound + 1) + ' завершён';
+    breakTitle.textContent = 'Итоги'; breakSubtitle.textContent = '';
+    breakScores.innerHTML = '';
+    sorted.forEach(function(p, i) {
+        var row = document.createElement('div');
+        row.className = 'break-score-row ' + (i === 0 ? 'winner' : 'loser');
+        row.innerHTML = '<div class="break-score-name"></div><div class="break-score-value"></div>';
+        row.querySelector('.break-score-name').textContent = (i === 0 ? '🏆 ' : '') + p.name;
+        row.querySelector('.break-score-value').textContent = p.score;
+        breakScores.appendChild(row);
+    });
+    breakOverlay.dataset.mode = 'round-results';
+    breakOverlay.classList.add('open');
+}
+
+function showFinalIntro() {
+    finalists = currentGame.rounds.map(function(r, idx) {
+        var w = roundWinners[idx];
+        if (w != null) return w;
+        return (r.playerIndices || [])[0];
+    }).filter(function(x) { return x != null; });
+    breakLabel.textContent = 'Основные раунды завершены';
+    breakTitle.textContent = 'Финал';
+    breakSubtitle.textContent = 'Играют: ' + finalists.map(function(pi) { return currentGame.players[pi] || ('Игрок ' + (pi + 1)); }).join(' · ');
+    breakScores.innerHTML = '';
+    breakOverlay.dataset.mode = 'final-intro';
+    breakOverlay.classList.add('open');
+}
+
+function startFinalRound() {
+    finalState = 'select'; finalEliminated = 0; finalCurrentTopic = null;
+    finalRemaining = (currentGame.finalTopics || []).map(function(_, i) { return i; });
+    finalScores = {};
+    finalists.forEach(function(pi) { finalScores[pi] = 0; });
+    selectedFinalPi = null;
+    finalSelectView.style.display = 'flex'; finalRevealView.style.display = 'none'; finalQuestionView.style.display = 'none';
+    finalAnswerText.classList.remove('visible'); finalScoringPanel.classList.remove('visible');
+    renderFinalTopics(); updateFinalTurn(); finalOverlay.classList.add('open');
+}
+
+function updateFinalTurn() {
+    finalTurn.textContent = 'Ход игрока ' + ((finalEliminated % 3) + 1);
+}
+
+function renderFinalTopics() {
+    finalTopicsEl.innerHTML = '';
+    finalRemaining.forEach(function(idx) {
+        var topic = currentGame.finalTopics[idx];
+        var card = document.createElement('div');
+        card.className = 'final-topic-card';
+        card.textContent = topic.title;
+        card.addEventListener('click', function() { eliminateFinalTopic(idx); });
+        finalTopicsEl.appendChild(card);
+    });
+}
+
+function eliminateFinalTopic(idx) {
+    if (finalState !== 'select') return;
+    finalRemaining = finalRemaining.filter(function(i) { return i !== idx; });
+    finalEliminated++;
+    if (finalRemaining.length === 1) {
+        finalCurrentTopic = currentGame.finalTopics[finalRemaining[0]];
+        finalState = 'reveal';
+        finalSelectView.style.display = 'none'; finalRevealView.style.display = 'flex';
+        finalRevealTitle.textContent = finalCurrentTopic.title;
+    } else if (finalRemaining.length === 0) {
+        finalState = 'reveal';
+        finalCurrentTopic = { title: '—', question: '—', answer: '—' };
+        finalSelectView.style.display = 'none'; finalRevealView.style.display = 'flex';
+        finalRevealTitle.textContent = finalCurrentTopic.title;
+    } else { renderFinalTopics(); updateFinalTurn(); }
+}
+
+function showFinalQuestion() {
+    finalState = 'question';
+    finalRevealView.style.display = 'none'; finalQuestionView.style.display = 'flex';
+    finalTopicSmall.textContent = finalCurrentTopic.title;
+    finalQuestionText.textContent = finalCurrentTopic.question; finalQuestionText.style.display = '';
+    finalAnswerText.textContent = finalCurrentTopic.answer || 'не указан';
+    finalAnswerText.classList.remove('visible'); finalScoringPanel.classList.remove('visible');
+}
+
+function showFinalAnswer() {
+    if (finalState === 'answer') return;
+    finalState = 'answer';
+    finalQuestionText.style.display = 'none'; finalAnswerText.classList.add('visible');
+    buildFinalScoringPanel(); finalScoringPanel.classList.add('visible');
+}
+
+function buildFinalScoringPanel() {
+    finalPlayerSelectRow.innerHTML = ''; selectedFinalPi = null;
+    finalAdjustMinus.disabled = true; finalAdjustPlus.disabled = true;
+    var value = currentGame.finalQuestionValue || 1000;
+    if(finalScoreInput) finalScoreInput.value = value;
+    finalists.forEach(function(pi) {
+        var name = currentGame.players[pi] || ('Игрок ' + (pi + 1));
+        var score = finalScores[pi] || 0;
+        var btn = document.createElement('button');
+        btn.className = 'player-select-btn'; btn.dataset.pi = pi;
+        btn.innerHTML = '<div class="psb-name"></div><div class="psb-score"></div>';
+        btn.querySelector('.psb-name').textContent = name;
+        var sEl = btn.querySelector('.psb-score'); sEl.textContent = score;
+        if (score < 0) sEl.classList.add('negative');
+        btn.addEventListener('click', function() { selectFinalPlayer(pi); });
+        finalPlayerSelectRow.appendChild(btn);
+    });
+}
+
+function selectFinalPlayer(pi) {
+    selectedFinalPi = pi;
+    var btns = finalPlayerSelectRow.querySelectorAll('.player-select-btn');
+    btns.forEach(function(b) { b.classList.toggle('selected', parseInt(b.dataset.pi, 10) === pi); });
+    finalAdjustMinus.disabled = false; finalAdjustPlus.disabled = false;
+}
+
+function updateFinalScoringScores() {
+    var btns = finalPlayerSelectRow.querySelectorAll('.player-select-btn');
+    btns.forEach(function(btn) {
+        var pi = parseInt(btn.dataset.pi, 10);
+        var score = finalScores[pi] || 0;
+        var el = btn.querySelector('.psb-score');
+        el.textContent = score; el.classList.toggle('negative', score < 0);
+    });
+}
+
+function adjustFinalScore(delta) {
+    if (selectedFinalPi == null) return;
+    finalScores[selectedFinalPi] = (finalScores[selectedFinalPi] || 0) + delta;
+    updateFinalScoringScores();
+}
+
+function closeFinalRound() { finalOverlay.classList.remove('open'); showFinalResults(); }
+
+function showFinalResults() {
+    var sorted = finalists.map(function(pi) {
+        return { pi: pi, name: currentGame.players[pi] || ('Игрок ' + (pi + 1)), score: finalScores[pi] || 0 };
+    }).sort(function(a, b) { return b.score - a.score; });
+    breakLabel.textContent = 'Финал завершён';
+    breakTitle.textContent = '🏆 ' + (sorted[0] ? sorted[0].name : '—');
+    breakSubtitle.textContent = 'Победитель игры'; breakScores.innerHTML = '';
+    sorted.forEach(function(p, i) {
+        var row = document.createElement('div');
+        row.className = 'break-score-row ' + (i === 0 ? 'winner' : 'loser');
+        row.innerHTML = '<div class="break-score-name"></div><div class="break-score-value"></div>';
+        row.querySelector('.break-score-name').textContent = (i === 0 ? '🥇 ' : (i === 1 ? '🥈 ' : '🥉 ')) + p.name;
+        row.querySelector('.break-score-value').textContent = p.score;
+        breakScores.appendChild(row);
+    });
+    gameFinished = true; breakOverlay.dataset.mode = 'finish'; breakOverlay.classList.add('open');
+}
+
+function resetGame() {
+    breakOverlay.classList.remove('open'); breakOverlay.dataset.mode = ''; breakScores.innerHTML = '';
+    modalOverlay.classList.remove('open'); finalOverlay.classList.remove('open');
+    hideAllModalPanels();
+    currentRound = 0; currentCell = null; gameFinished = false;
+    answeredCells = new Set(); modalState = 'question';
+    selectedScoringPi = null; selectedFinalPi = null;
+    catReceiverPi = null; auctionWinnerPi = null; auctionBid = 0; secretModifierKey = null;
+    passReceiverPi = null; passValue = 0;
+    finalState = 'select'; finalRemaining = []; finalEliminated = 0;
+    finalCurrentTopic = null; finalScores = {};
+    roundScores = {};
+    currentGame.rounds.forEach(function(r, idx) {
+        roundScores[idx] = {};
+        (r.playerIndices || []).forEach(function(pi) { roundScores[idx][pi] = 0; });
+    });
+    roundWinners = {};
+    renderBoard(); renderScorePanel();
+}
+
+function toggleFullscreen() {
+    var fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+    if (!fsEl) {
+        var el = document.documentElement;
+        var req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+        if (req) {
+            var p = req.call(el);
+            if (p && p.catch) p.catch(function(err) { alert('Фуллскрин: ' + err.message); });
+        }
+    } else {
+        var exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+        if (exit) exit.call(document);
+    }
+}
+
+function updateFullscreenMode() {
+    var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+    document.body.classList.toggle('fullscreen-mode', isFs);
+}
+
+document.addEventListener('fullscreenchange', updateFullscreenMode);
+document.addEventListener('webkitfullscreenchange', updateFullscreenMode);
+document.addEventListener('MSFullscreenChange', updateFullscreenMode);
+
+function openEditor(gameId) {
+    var game = getGame(gameId);
+    if (!game) return;
+    migrateGame(game);
+    editingGameId = gameId;
+    editorTextarea.value = JSON.stringify({
+        title: game.title || '', subtitle: game.subtitle || '',
+        finalQuestionValue: game.finalQuestionValue || 1000,
+        players: game.players || [], rounds: game.rounds || [], finalTopics: game.finalTopics || []
+    }, null, 2);
+    editorGameTitle.textContent = game.title || 'Без названия';
+    editorStatus.textContent = ''; editorStatus.className = 'editor-status';
+    editorOverlay.classList.add('open');
+}
+
+function closeEditor() { editorOverlay.classList.remove('open'); editingGameId = null; }
+
+function saveEditor() {
+    if (!editingGameId) return;
+    try {
+        var parsed = JSON.parse(editorTextarea.value);
+        if (!Array.isArray(parsed.rounds)) throw new Error('Нужно поле "rounds"');
+        if (!Array.isArray(parsed.finalTopics)) throw new Error('Нужно поле "finalTopics"');
+        if (!Array.isArray(parsed.players)) throw new Error('Нужно поле "players"');
+        var game = getGame(editingGameId);
+        if (!game) throw new Error('Игра не найдена');
+        game.title = parsed.title || game.title;
+        game.subtitle = parsed.subtitle || '';
+        game.finalQuestionValue = typeof parsed.finalQuestionValue === 'number' ? parsed.finalQuestionValue : 1000;
+        game.players = parsed.players; game.rounds = parsed.rounds; game.finalTopics = parsed.finalTopics;
+        saveData();
+        editorGameTitle.textContent = game.title;
+        editorStatus.textContent = '✓ Сохранено'; editorStatus.className = 'editor-status ok';
+        if (currentGameId === editingGameId) {
+            currentGame = game;
+            gameTitleEl.textContent = game.title; gameSubtitleEl.textContent = game.subtitle;
+            answeredCells = new Set();
+            if (currentRound >= game.rounds.length) currentRound = 0;
+            roundScores = {};
+            game.rounds.forEach(function(r, idx) {
+                roundScores[idx] = {};
+                (r.playerIndices || []).forEach(function(pi) { roundScores[idx][pi] = 0; });
+            });
+            renderBoard(); renderScorePanel();
+        }
+    } catch (e) {
+        editorStatus.textContent = '✗ Ошибка: ' + e.message;
+        editorStatus.className = 'editor-status err';
+    }
+}
+
+document.addEventListener('keydown', function(e) {
+    if (editorOverlay.classList.contains('open')) return;
+
+    var isInput = (e.target && e.target.tagName === 'INPUT');
+
+    if (!isInput) {
+        if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') { e.preventDefault(); toggleFullscreen(); return; }
+        if (e.key === 'h' || e.key === 'H' || e.key === 'р' || e.key === 'Р') { e.preventDefault(); toggleScoringPanel(); return; }
+    }
+
+    if (isInput) {
+        if (e.key === 'Enter' || e.key === 'Escape') { e.target.blur(); return; }
+        if (e.key === ' ' || e.code === 'Space') {
+            e.preventDefault(); e.target.blur();
+            if (finalOverlay.classList.contains('open') && finalState === 'answer') closeFinalRound();
+            else if (modalState === 'answer') closeQuestion();
+            else if (modalState === 'question') showAnswer();
+            return;
+        }
+        if (e.key === '+' || e.code === 'Equal' || e.key === '=') {
+            e.preventDefault(); var val = Math.abs(parseInt(e.target.value, 10)) || 0;
+            if (finalOverlay.classList.contains('open') && finalState === 'answer') adjustFinalScore(+val);
+            else if (modalOverlay.classList.contains('open')) adjustRoundScore(+val);
+            return;
+        }
+        if (e.key === '-' || e.key === '_' || e.code === 'Minus') {
+            e.preventDefault(); var val = Math.abs(parseInt(e.target.value, 10)) || 0;
+            if (finalOverlay.classList.contains('open') && finalState === 'answer') adjustFinalScore(-val);
+            else if (modalOverlay.classList.contains('open')) adjustRoundScore(-val);
+            return;
+        }
+        return;
+    }
+
+    if (finalOverlay.classList.contains('open')) {
+        if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space') {
+            e.preventDefault();
+            if (finalState === 'reveal') showFinalQuestion();
+            else if (finalState === 'question') showFinalAnswer();
+            else if (finalState === 'answer') closeFinalRound();
+            return;
+        }
+        if (finalState !== 'answer') return;
+        if (e.key === '1' || e.key === '2' || e.key === '3') {
+            e.preventDefault();
+            var btns = finalPlayerSelectRow.querySelectorAll('.player-select-btn');
+            if (btns[parseInt(e.key, 10) - 1]) btns[parseInt(e.key, 10) - 1].click();
+            return;
+        }
+        if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=') {
+            e.preventDefault(); 
+            var val = Math.abs(parseInt(finalScoreInput.value, 10)) || 0;
+            adjustFinalScore(+val); 
+            return;
+        }
+        if (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') {
+            e.preventDefault(); 
+            var val = Math.abs(parseInt(finalScoreInput.value, 10)) || 0;
+            adjustFinalScore(-val); 
+            return;
+        }
+        return;
+    }
+    if (breakOverlay.classList.contains('open')) {
+        if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space') {
+            e.preventDefault();
+            var mode = breakOverlay.dataset.mode;
+            if (mode === 'final-intro') { breakOverlay.classList.remove('open'); breakOverlay.dataset.mode = ''; startFinalRound(); }
+            else if (mode === 'finish') resetGame();
+            else if (mode === 'round-results') {
+                breakOverlay.classList.remove('open'); breakOverlay.dataset.mode = '';
+                if (currentRound === currentGame.rounds.length - 1) showFinalIntro(); else goToRound(currentRound + 1);
+            }
+        }
+        return;
+    }
+    if (modalOverlay.classList.contains('open')) {
+        if (modalState === 'modifier-intro') {
+            if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space') { e.preventDefault(); revealModifier(); }
+            return;
+        }
+        if (modalState === 'modifier') {
+            if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space') { e.preventDefault(); closeQuestion(); return; }
+            if (e.key === '1' || e.key === '2' || e.key === '3') {
+                e.preventDefault();
+                var btns = playerSelectRow.querySelectorAll('.player-select-btn');
+                if (btns[parseInt(e.key, 10) - 1] && !btns[parseInt(e.key, 10) - 1].classList.contains('locked')) btns[parseInt(e.key, 10) - 1].click();
+                return;
+            }
+            var val = Math.abs(parseInt(scoreInput.value, 10)) || 0;
+            if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=') { e.preventDefault(); adjustRoundScore(+val); return; }
+            if (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') { e.preventDefault(); adjustRoundScore(-val); return; }
+            return;
+        }
+        if (modalState === 'cat-select') {
+            if (e.key === '1' || e.key === '2' || e.key === '3') {
+                e.preventDefault();
+                var btns = catSelectRow.querySelectorAll('.select-player-btn');
+                if (btns[parseInt(e.key, 10) - 1]) btns[parseInt(e.key, 10) - 1].click();
+            }
+            return;
+        }
+        if (modalState === 'auction') {
+            if (e.key === '1' || e.key === '2' || e.key === '3') {
+                e.preventDefault();
+                var btns = auctionSelectRow.querySelectorAll('.select-player-btn');
+                if (btns[parseInt(e.key, 10) - 1]) btns[parseInt(e.key, 10) - 1].click();
+                return;
+            }
+            if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=') { e.preventDefault(); bidPlus.click(); return; }
+            if (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') { e.preventDefault(); bidMinus.click(); return; }
+            return;
+        }
+        if (modalState === 'pass') {
+            if (e.key === '1' || e.key === '2' || e.key === '3') {
+                e.preventDefault();
+                var btns = passSelectRow.querySelectorAll('.select-player-btn');
+                var idx = parseInt(e.key, 10) - 1;
+                if (btns[idx]) btns[idx].click();
+                return;
+            }
+            if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=') {
+                e.preventDefault(); passValuePlus.click(); return;
+            }
+            if (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') {
+                e.preventDefault(); passValueMinus.click(); return;
+            }
+            return;
+        }
+        if (modalState === 'question') {
+            if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space') { e.preventDefault(); showAnswer(); return; }
+            if (e.key === '1' || e.key === '2' || e.key === '3') {
+                e.preventDefault();
+                var btns = playerSelectRow.querySelectorAll('.player-select-btn');
+                if (btns[parseInt(e.key, 10) - 1] && !btns[parseInt(e.key, 10) - 1].classList.contains('locked')) btns[parseInt(e.key, 10) - 1].click();
+                return;
+            }
+            var val = Math.abs(parseInt(scoreInput.value, 10)) || 0;
+            if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=') { e.preventDefault(); adjustRoundScore(+val); return; }
+            if (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') { e.preventDefault(); adjustRoundScore(-val); return; }
+            return;
+        }
+        if (modalState === 'answer') {
+            if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space') { e.preventDefault(); closeQuestion(); return; }
+            if (e.key === '1' || e.key === '2' || e.key === '3') {
+                e.preventDefault();
+                var btns = playerSelectRow.querySelectorAll('.player-select-btn');
+                if (btns[parseInt(e.key, 10) - 1] && !btns[parseInt(e.key, 10) - 1].classList.contains('locked')) btns[parseInt(e.key, 10) - 1].click();
+                return;
+            }
+            var modKey = getModifierKey(currentCell);
+            var mod = modKey ? MODIFIER_REGISTRY[modKey] : null;
+            if (mod && mod.special === 'flip') {
+                if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=' ||
+                    e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') {
+                    e.preventDefault(); flipSelectedScore(); return;
+                }
+                return;
+            }
+            var val = Math.abs(parseInt(scoreInput.value, 10)) || 0;
+            if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=') { e.preventDefault(); adjustRoundScore(+val); return; }
+            if (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') { e.preventDefault(); adjustRoundScore(-val); return; }
+        }
+        return;
+    }
+    if (!gameScreen.classList.contains('active')) return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); if (currentRound > 0) goToRound(currentRound - 1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); nextRound(); }
+});
+
+btnAddGame.addEventListener('click', addNewGame);
+btnMenuFullscreen.addEventListener('click', toggleFullscreen);
+btnFullscreen.addEventListener('click', toggleFullscreen);
+btnBackToMenu.addEventListener('click', backToMenu);
+btnReset.addEventListener('click', resetGame);
+btnGameEditor.addEventListener('click', function() { if (currentGameId) openEditor(currentGameId); });
+prevRoundBtn.addEventListener('click', function() { if (currentRound > 0) goToRound(currentRound - 1); });
+nextRoundBtn.addEventListener('click', nextRound);
+
+adjustMinus.addEventListener('click', function() { var val = Math.abs(parseInt(scoreInput.value, 10)) || 0; adjustRoundScore(-val); });
+adjustPlus.addEventListener('click', function() { var val = Math.abs(parseInt(scoreInput.value, 10)) || 0; adjustRoundScore(+val); });
+adjustFlip.addEventListener('click', flipSelectedScore);
+
+finalAdjustMinus.addEventListener('click', function() { var val = Math.abs(parseInt(finalScoreInput.value, 10)) || 0; adjustFinalScore(-val); });
+finalAdjustPlus.addEventListener('click', function() { var val = Math.abs(parseInt(finalScoreInput.value, 10)) || 0; adjustFinalScore(+val); });
+
+editorSave.addEventListener('click', saveEditor);
+editorClose.addEventListener('click', closeEditor);
+
+var IS_PUBLIC = (new URLSearchParams(location.search).get('mode') === 'public');
+var BC = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('svoya-igra-sync') : null;
+var PUBLIC_STATE_KEY = 'svoya-public-state';
+var PUBLIC_STATE_TS = 'svoya-public-state-ts';
+
+function buildPublicState() {
+    return {
+        screen: gameScreen.classList.contains('active') ? 'game' : 'menu',
+        gameId: currentGameId,
+        round: currentRound,
+        roundScores: roundScores,
+        answeredCells: Array.from(answeredCells),
+        selectedScoringPi: selectedScoringPi,
+        modalOpen: modalOverlay.classList.contains('open'),
+        modalState: modalState,
+        currentCell: currentCell ? {
+            key: currentCell.dataset.key || '',
+            topic: currentCell.dataset.topic || '',
+            points: currentCell.dataset.points || '',
+            question: currentCell.dataset.question || '',
+            answer: currentCell.dataset.answer || '',
+            image: currentCell.dataset.image || '',
+            type: currentCell.dataset.type || '',
+            modifier: currentCell.dataset.modifier || '',
+            modTitle: currentCell.dataset.modTitle || '',
+            modDesc: currentCell.dataset.modDesc || '',
+            modIcon: currentCell.dataset.modIcon || '',
+            modValue: currentCell.dataset.modValue || ''
+        } : null,
+        catReceiverPi: catReceiverPi,
+        auctionWinnerPi: auctionWinnerPi,
+        passReceiverPi: passReceiverPi,
+        passValue: passValue,
+        secretModifierKey: secretModifierKey,
+        breakOpen: breakOverlay.classList.contains('open'),
+        breakMode: breakOverlay.dataset.mode || '',
+        breakLabel: breakLabel.textContent,
+        breakTitle: breakTitle.textContent,
+        breakSubtitle: breakSubtitle.textContent,
+        breakScoresHtml: breakScores.innerHTML,
+        finalOpen: finalOverlay.classList.contains('open'),
+        finalState: finalState,
+        finalRemaining: finalRemaining,
+        finalCurrentTopic: finalCurrentTopic,
+        finalists: finalists,
+        finalScores: finalScores,
+        finalEliminated: finalEliminated,
+        finalRevealTitle: finalRevealTitle.textContent
+    };
+}
+
+var _bcTimer = null;
+function broadcast() {
+    if (IS_PUBLIC) return;
+    // Мгновенная отправка без задержки
+    var state = buildPublicState();
+    try {
+        localStorage.setItem(PUBLIC_STATE_KEY, JSON.stringify(state));
+        localStorage.setItem(PUBLIC_STATE_TS, String(Date.now()));
+    } catch (e) {}
+    if (BC) { try { BC.postMessage({ type: 'state', state: state }); } catch (e) {} }
+}
+
+function applyPublicState(state) {
+    if (!state) return;
+    if (state.gameId) {
+        currentGameId = state.gameId;
+        currentGame = getGame(state.gameId);
+    } else { currentGameId = null; currentGame = null; }
+
+    currentRound = state.round || 0;
+    roundScores = state.roundScores || {};
+    answeredCells = new Set(state.answeredCells || []);
+    selectedScoringPi = state.selectedScoringPi;
+    modalState = state.modalState || 'question';
+    catReceiverPi = state.catReceiverPi;
+    auctionWinnerPi = state.auctionWinnerPi;
+    passReceiverPi = state.passReceiverPi;
+    passValue = state.passValue || 0;
+    secretModifierKey = state.secretModifierKey;
+    finalState = state.finalState || 'select';
+    finalRemaining = state.finalRemaining || [];
+    finalCurrentTopic = state.finalCurrentTopic;
+    finalists = state.finalists || [];
+    finalScores = state.finalScores || {};
+    finalEliminated = state.finalEliminated || 0;
+
+    if (state.screen === 'menu') {
+        showScreen('menuScreen');
+        modalOverlay.classList.remove('open');
+        breakOverlay.classList.remove('open');
+        finalOverlay.classList.remove('open');
+        return;
+    }
+    showScreen('gameScreen');
+    if (!currentGame) return;
+
+    gameTitleEl.textContent = currentGame.title || 'Своя игра';
+    gameSubtitleEl.textContent = currentGame.subtitle || '';
+    renderBoard();
+    renderScorePanel();
+    hideAllModalPanels();
+            // Принудительно закрываем модалку, если ведущий её закрыл
+    if (!state.modalOpen) {
+        modalOverlay.classList.remove('open');
+    }
+
+    if (state.modalOpen && state.currentCell) {
+        var c = state.currentCell;
+        var fake = document.createElement('div');
+        ['key','topic','points','question','answer','image','type','modifier','modTitle','modDesc','modIcon','modValue'].forEach(function(k) {
+            if (c[k]) fake.dataset[k] = c[k];
+        });
+        currentCell = fake;
+        if (modalState === 'modifier-intro') {
+            modifierIntro.style.display = 'flex';
+            modalOverlay.classList.add('open');
+        } else if (modalState === 'modifier') {
+            modifierPanel.style.display = 'flex';
+            modifierIcon.textContent = fake.dataset.modIcon || '✨';
+            modifierTitle.textContent = fake.dataset.modTitle || 'МОДИФИКАТОР';
+            modifierDesc.textContent = fake.dataset.modDesc || '';
+            modalOverlay.classList.add('open');
+        } else if (modalState === 'question') {
+            showQuestionPanel();
+            modalOverlay.classList.add('open');
+        } else if (modalState === 'answer') {
+            showQuestionPanel();
+            modalQuestion.style.display = 'none';
+            modalImage.style.display = 'none';
+            if (fake.dataset.type !== 'manual') modalAnswer.classList.add('visible');
+            modalOverlay.classList.add('open');
+        } else { 
+            currentCell = null; 
+            modalOverlay.classList.remove('open'); 
+        }
+    } else { 
+        currentCell = null; 
+        modalOverlay.classList.remove('open'); 
+    }
+
+    if (state.breakOpen) {
+        breakLabel.textContent = state.breakLabel || '';
+        breakTitle.textContent = state.breakTitle || '';
+        breakSubtitle.textContent = state.breakSubtitle || '';
+        breakScores.innerHTML = state.breakScoresHtml || '';
+        breakOverlay.dataset.mode = state.breakMode || '';
+        breakOverlay.classList.add('open');
+    } else { breakOverlay.classList.remove('open'); }
+
+    if (state.finalOpen) {
+        finalSelectView.style.display = 'none';
+        finalRevealView.style.display = 'none';
+        finalQuestionView.style.display = 'none';
+        finalAnswerText.classList.remove('visible');
+        finalScoringPanel.classList.remove('visible');
+        if (state.finalState === 'select') {
+            finalSelectView.style.display = 'flex';
+            finalTurn.textContent = 'Ход игрока ' + ((state.finalEliminated % 3) + 1);
+            finalTopicsEl.innerHTML = '';
+            finalRemaining.forEach(function(idx) {
+                var topic = currentGame.finalTopics[idx];
+                var card = document.createElement('div');
+                card.className = 'final-topic-card';
+                card.textContent = topic.title;
+                finalTopicsEl.appendChild(card);
+            });
+        } else if (state.finalState === 'reveal') {
+            finalRevealView.style.display = 'flex';
+            finalRevealTitle.textContent = state.finalRevealTitle || '';
+        } else if (state.finalState === 'question') {
+            finalQuestionView.style.display = 'flex';
+            finalTopicSmall.textContent = state.finalCurrentTopic ? state.finalCurrentTopic.title : '';
+            finalQuestionText.textContent = state.finalCurrentTopic ? state.finalCurrentTopic.question : '';
+            finalQuestionText.style.display = '';
+        } else if (state.finalState === 'answer') {
+            finalQuestionView.style.display = 'flex';
+            finalTopicSmall.textContent = state.finalCurrentTopic ? state.finalCurrentTopic.title : '';
+            finalQuestionText.style.display = 'none';
+            finalAnswerText.textContent = ((state.finalCurrentTopic && state.finalCurrentTopic.answer) || 'не указан');
+            finalAnswerText.classList.add('visible');
+        }
+        finalOverlay.classList.add('open');
+    } else { finalOverlay.classList.remove('open'); }
+}
+
+if (IS_PUBLIC) {
+    document.body.classList.add('public-mode');
+    if (BC) {
+        BC.onmessage = function(ev) { if (ev.data && ev.data.type === 'state') applyPublicState(ev.data.state); };
+        BC.postMessage({ type: 'public-ready' });
+    }
+    window.addEventListener('storage', function(e) {
+        if (e.key === PUBLIC_STATE_TS) {
+            try {
+                var s = JSON.parse(localStorage.getItem(PUBLIC_STATE_KEY));
+                if (s) applyPublicState(s);
+            } catch(err) {}
+        }
+        if (e.key === STORAGE_KEY) { appData = loadData(); }
+    });
+}
+
+if (!IS_PUBLIC) {
+    var btnPublicScreen = document.getElementById('btnPublicScreen');
+    if (btnPublicScreen) {
+        btnPublicScreen.addEventListener('click', function() {
+            var base = location.href.split('?')[0];
+            window.open(base + '?mode=public', '_blank');
+        });
+    }
+    [
+        'startGame','backToMenu','goToRound','nextRound',
+        'openQuestion','revealModifier','selectCatReceiver','selectAuctionWinner','selectPassReceiver',
+        'showAnswer','selectScoringPlayer','adjustRoundScore','flipSelectedScore',
+        'closeQuestion','endRound','showFinalIntro','startFinalRound',
+        'eliminateFinalTopic','showFinalQuestion','showFinalAnswer',
+        'selectFinalPlayer','adjustFinalScore','closeFinalRound',
+        'resetGame','saveEditor'
+    ].forEach(function(name) {
+        if (typeof window[name] === 'function' && !window['_wrapped_' + name]) {
+            window['_wrapped_' + name] = true;
+            var orig = window[name];
+            window[name] = function() {
+                var r = orig.apply(this, arguments);
+                broadcast();
+                return r;
+            };
+        }
+    });
+    if (BC) { BC.onmessage = function(ev) { if (ev.data && ev.data.type === 'public-ready') broadcast(); }; }
+    setTimeout(broadcast, 600);
+}
+
+renderMenu();
+showScreen('menuScreen');
+</script>
+
+</body>
+</html>
