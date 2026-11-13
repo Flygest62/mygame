@@ -156,10 +156,22 @@ body.public-mode .cell-points:hover{background:linear-gradient(180deg,var(--blue
 body.public-mode .scoring-panel{display:none!important;}
 body.public-mode .adjust-row{display:none!important;}
 body.public-mode .modal-answer-preview{display:none!important;}
+
+/* Стили для экрана телефона */
+#playerScreen { padding: 20px; text-align: center; }
+.player-input { padding: 15px; font-size: 20px; text-align: center; width: 100%; margin-bottom: 15px; border: 2px solid var(--gold); background: #06122c; color: #fff; border-radius: 8px; outline: none; }
+.player-btn { background: var(--gold); color: var(--bg-0); font-size: 22px; font-weight: bold; padding: 15px; width: 100%; border: none; border-radius: 8px; cursor: pointer; }
+.buzz-btn { background: var(--red); color: white; font-size: 28px; font-weight: bold; padding: 20px; border-radius: 50%; width: 200px; height: 200px; border: 6px solid var(--red-dark); box-shadow: 0 0 30px rgba(196,30,42,0.8); cursor: pointer; user-select: none; margin: 20px auto; display: none; }
+.player-topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; margin-top: 20px; }
+.player-topic-btn { background: rgba(26,58,138,.8); border: 2px solid var(--gold); color: #fff; padding: 15px 10px; border-radius: 8px; cursor: pointer; text-align: center; }
+.player-topic-btn .pt-title { font-size: 12px; color: var(--gold); text-transform: uppercase; }
+.player-topic-btn .pt-points { font-size: 22px; font-weight: bold; margin-top: 5px; }
+
 @media(max-width:900px){.final-topics{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:700px){body{padding:20px 10px;}.header{margin-bottom:16px;padding-bottom:16px;gap:14px;}.header-logo{height:56px;}.cell-topic{padding:14px 6px;min-height:52px;letter-spacing:.12em;}.cell-points{padding:22px 4px;}.modal{padding:30px 16px;}.break-content{padding:30px 20px;}.final-content{padding:30px 16px;}.final-topics{grid-template-columns:repeat(2,1fr);gap:8px;}.editor-content{padding:16px;}.round-nav-label{letter-spacing:.2em;min-width:160px;}.round-nav{gap:12px;}.player-select-row,.select-players{gap:6px;}.player-select-btn,.select-player-btn{padding:10px 4px;}.psb-name,.select-player-name{font-size:12px;}.psb-score,.select-player-score{font-size:20px;}.adjust-btn{padding:10px 16px;font-size:16px;min-width:60px;}.score-input{width:80px;font-size:18px;padding:8px;}.adjust-btn.flip{min-width:220px;font-size:14px;}.bid-input{font-size:24px;padding:8px 12px;}.bid-btn{width:44px;height:44px;font-size:20px;}.modifier-icon{font-size:64px;}.modal-answer{padding:16px 20px;text-align:left;}}
 @media(max-width:480px){.header h1{letter-spacing:.14em;}.header-logo{height:46px;}.header .subtitle{letter-spacing:.25em;font-size:10px;}.board{grid-template-columns:1.2fr repeat(5,1fr);}.score-panel{grid-template-columns:1fr;}}
 </style>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body>
 
@@ -309,6 +321,28 @@ body.public-mode .modal-answer-preview{display:none!important;}
     </div>
 </div>
 
+<!-- ЭКРАН ДЛЯ ТЕЛЕФОНОВ (ИГРОКИ) -->
+<div class="screen" id="playerScreen" style="padding: 20px; text-align: center;">
+    <div id="playerLobby" style="max-width: 400px; margin: 40px auto;">
+        <h2 style="color: var(--gold); margin-bottom: 20px; font-size: 28px;">Подключение</h2>
+        <input type="text" id="playerRoomInput" placeholder="Код комнаты" class="player-input">
+        <input type="text" id="playerNameInput" placeholder="Твоё имя" class="player-input">
+        <button onclick="connectPlayer()" class="player-btn">Войти в игру</button>
+    </div>
+
+    <div id="playerGame" style="display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; margin: 0 auto;">
+        <h2 id="playerNameDisplay" style="color: var(--gold); font-size: 26px; margin-bottom: 10px;"></h2>
+        <p id="playerStatus" style="font-size: 20px; margin-bottom: 30px; color: #fff;">Ожидание...</p>
+        
+        <button id="buzzBtn" onclick="buzz()" class="buzz-btn">ЖАТЬ!</button>
+
+        <div id="playerBoard" style="display: none; flex-direction: column; gap: 10px; width: 100%;">
+            <h3 style="color: var(--gold); font-size: 22px; margin-bottom: 10px;">Твой ход! Выбери тему:</h3>
+            <div id="playerTopics" class="player-topic-grid"></div>
+        </div>
+    </div>
+</div>
+
 <script>
 var MODIFIER_REGISTRY = {
     x2:      { label: '×2', sign: 'pos', apply: function(b) { return b * 2; } },
@@ -328,17 +362,17 @@ var DEFAULT_DATA = {
         title: 'Своя игра КДМ',
         subtitle: 'Комитет по делам молодёжи · 1999',
         finalQuestionValue: 1000,
-        players: ['Мадина','Абдулбасир','Мурат','Джавад','Гайдар','Хадижат','Мурад','Мадина М','Камиль'],
+        players: ['Амина','Испай','Шавла'],
         rounds: [
             {
                 title: "Раунд 1", points: [100,200,300,400,500], playerIndices: [0,1,2],
                 topics: [
                     { title: "Кино", questions: [
-                        { points: 100, question: "Фильм про мальчика, которого забыли на Рождество, и он защищает свой дом от грабителей", answer: "Один дома"},
+                        { points: 100, type: "modifier", modIcon: "×2", modTitle: "Удвоение", modDesc: "Очки удваиваются", modValue: 200 },
                         { points: 200, question: "Фильм про человека, который случайно попал в прошлое и изменил будущее. В названии есть направление движения.", answer: "«Назад в будущее»" },
-                        { points: 300, question: "Какой фильм считается самым кассовым в истории кино с учётом перевыпусков?", answer: "«Аватар»" },
-                        { points: 400, question: "Какой фильм получил «Оскар» за лучший фильм на церемонии 2020 года и стал первым неанглоязычным лауреатом в этой категории?", answer: "«Паразиты»" },
-                        { points: 500, question: "Какой фильм Андрея Тарковского снят по повести братьев Стругацких о Зоне?", answer: "«Сталкер»" }
+                        { points: 300, question: "Фильм про группу друзей, которые решили ограбить казино. В названии есть число и имя главного героя.", answer: "«Одиннадцать друзей Оушена»" },
+                        { points: 400, question: "Фильм про парня, который не может выспаться, потому что его преследует маньяк. В названии есть улица и дерево.", answer: "«Кошмар на улице Вязов»" },
+                        { points: 500, question: "Фильм про то, как мужик ищет свою машину, но в итоге спасает мир. В названии — скорость и драйв.", answer: "«Форсаж»" }
                     ]},
                     { title: "Цитаты и кадры", questions: [
                         { points: 100, question: "«Я вернусь».", answer: "Терминатор" },
@@ -351,129 +385,129 @@ var DEFAULT_DATA = {
                         { points: 100, question: "Крупнейший песчаный бархан Европы. Здесь снимали «Белое солнце пустыни».", answer: "Бархан Сарыкум" },
                         { points: 200, question: "Самый глубокий каньон Европы. Визитная карточка Дагестана.", answer: "Сулакский каньон" },
                         { points: 300, question: "Древнее село-призрак на горе Гамсутльмеэр. Последний житель умер в 2015 году.", answer: "Гамсутль" },
-                        { points: 400, question: "В Махачкале есть место, где можно найти всё: от брендовых вещей до бабушкиных носков. Здесь торгуются так, что базарный шум заглушает любой трек. Где местные делают «шопинг-челлендж»?", answer: "Второй рынок" },
-                        { points: 500, question: "В Махачкале есть бульвар, который местные называют главным местом для «чилл-аут» прогулок. Там назначают встречи, катаются на самокатах и едят мороженое. Как он называется?", answer: "Родопский бульвар." }
+                        { points: 400, question: "Заброшенная крепость на высоте 2000 метров. Столица Кайтагского уцмийства.", answer: "Кала-Корейш" },
+                        { points: 500, question: "Ущелье в Лакском районе. Около 4000 наскальных рисунков.", answer: "Ущелье Виттурзивалу" }
                     ]},
                     { title: "Кошачьи", questions: [
                         { points: 100, question: "Как звали кота из Простоквашино?", answer: "Матроскин" },
                         { points: 200, question: "Какая большая кошка самая быстрая на суше?", answer: "Гепард" },
-                        { points: 300, question: "Сколько усов у кошки в среднем?", answer: "24 (по 12 с каждой стороны)" },
+                        { points: 300, question: "Сколько усов у кошки в среднем?", answer: "24" },
                         { points: 400, question: "Какое животное из семейства кошачьих самое крупное?", answer: "Тигр" },
                         { points: 500, question: "Почему кошка сидит на компьютере?", answer: "Потому что там мышка" }
                     ]},
                     { title: "ДГУ", questions: [
-                        { points: 100, question: "В каком году был основан Дагестанский государственный университет, если считать от открытия его предшественника — агро-педагогического института?", answer: "В 1931 году" },
-                        { points: 200, question: "Чьё имя носил педагогический институт — предшественник ДГУ — до 1957 года?", answer: "Сулеймана Стальского, народного поэта Дагестана" },
-                        { points: 300, question: "лавный босс в игре под названием «Студенческая жизнь». Именно это слово заставляет сердце биться чаще, а сон — исчезать. То, во что превращается жизнь студента два раза в год. Что это?", answer: "Сессия" },
-                        { points: 400, question: "Этот выпускник ДГУ — известный российский предприниматель и государственный деятель, чья супруга также окончила ДГУ. Назовите его.", answer: "Сулейман Керимов" },
-                        { points: 500, question: "Где студенты ДГУ проходят главный курс выживания, делят одну розетку на пятерых, учат матанализ в 3 часа ночи и заводят лучших друзей на всю жизнь?", answer: "Общага" }
+                        { points: 100, question: "В каком году был основан ДГУ?", answer: "В 1931 году" },
+                        { points: 200, question: "Чьё имя носил педагогический институт до 1957 года?", answer: "Сулеймана Стальского" },
+                        { points: 300, question: "Сколько студентов было принято на первый курс в 1931 году?", answer: "75 студентов" },
+                        { points: 400, question: "Этот выпускник ДГУ — известный предприниматель. Назовите его.", answer: "Сулейман Керимов" },
+                        { points: 500, question: "Назовите хотя бы двух глав РД, выпускников ДГУ.", answer: "Магомедали Магомедов и Муху Алиев" }
                     ]}
                 ]
             },
             {
-                title: "Раунд 2", points: [100,200,300,400,500], playerIndices: [3,4,5],
+                title: "Раунд 2", points: [200,400,600,800,1000], playerIndices: [0,1,2],
                 topics: [
                     { title: "Алиэкспресс", questions: [
-                        { points: 100, question: "«Не дай своему лицу замёрзнуть и запылиться. Имеет ушки, резинку и надпись Fashion. Носится на лице.»", answer: "Маска для лица" },
-                        { points: 200, question: "«Если ты сидишь как вопросительный знак — это для тебя. Выглядит как ремни, которые надеваются на плечи.»", answer: "Корректор осанки" },
-                        { points: 300, question: "«Если ты замерз и проголодался одновременно - завернись в лепешку. Круглый, мягкий, с реалистичным принтом подгоревшего теста.»", answer: "Плед-лаваш" },
-                        { points: 400, question: "«Преврати свой смартфон в домашний кинотеатр! Крепится к телефону, имеет линзу и иногда пульт.»", answer: "Мини-проектор для смартфона" },
-                        { points: 500, question: "«Умная лампа с Bluetooth и музыкой! Меняет цвет, мигает под ритм, управляется с телефона.»", answer: "Светодиодная лампа с Bluetooth-колонкой" }
+                        { points: 200, question: "«Имеет ушки, резинку и надпись Fashion. Носится на лице.»", answer: "Маска для лица" },
+                        { points: 400, question: "«Если ты сидишь как вопросительный знак — это для тебя.»", answer: "Корректор осанки" },
+                        { points: 600, question: "«Magic massager! Расслабляет все мышцы.»", answer: "Вибромассажёр" },
+                        { points: 800, question: "«Преврати смартфон в кинотеатр! Крепится к телефону.»", answer: "Мини-проектор" },
+                        { points: 1000, question: "«Умная лампа с Bluetooth и музыкой!»", answer: "Светодиодная лампа" }
                     ]},
                     { title: "Самая самая", questions: [
-                        { points: 100, question: "Самое глубокое место на планете. Глубина — почти 11 километров.", answer: "Марианская впадина" },
-                        { points: 200, question: "Все думают, что самая большая пустыня — это Сахара с её песком и верблюдами. Но это полный кринж. На самом деле самая огромная пустыня на Земле — это целый ледяной континент с пингвинами. Назовите её.", answer: "Антарктическая пустыня" },
-                        { points: 300, question: "Абсолютный рекордсмен по скорости. В пикирующем полете он разгоняется быстрее, чем студент, бегущий в столовую на большой перемене (более 300 км/ч). Что это за птица?", answer: "Сапсан" },
-                        { points: 400, question: "Это здание — главный герой всех фоток из отпуска. Оно настолько высокое, что на его вершине можно встретить рассвет дважды за день, пока остальные люди спят. Самое высокое здание в мире. Что это?.", answer: "Бурдж-Халифа" },
-                        { points: 500, question: "Самое скачиваемое приложение в мире за последние годы. Именно оно подарило нам «brain rot» (гниение мозга), бесконечный скроллинг и танцы под треки, которые застревают в голове на неделю. Что это?", answer: "TikTok" }
+                        { points: 200, question: "Самое глубокое место на планете.", answer: "Марианская впадина" },
+                        { points: 400, question: "Самая большая страна в мире по площади.", answer: "Россия" },
+                        { points: 600, question: "Самое старое действующее высшее учебное заведение.", answer: "Университет «Аль-Карауин»" },
+                        { points: 800, question: "Самое длинное сооружение в мире.", answer: "Большой мост Даньян-Куньшань" },
+                        { points: 1000, question: "Самое старое живое дерево в мире.", answer: "Сосна Мафусаил" }
                     ]},
                     { title: "Вспомни 5", questions: [
-                        { points: 100, type: "manual", question: "Назовите 5 фруктов." },
-                        { points: 200, type: "manual", question: "Назовите 5 пород собак." },
-                        { points: 300, type: "manual", question: "Назовите 5 вещей, которые жизненно необходимо брать в универ?" },
-                        { points: 400, type: "manual", question: "Назовите 5 фильмов, в названии которых есть число." },
-                        { points: 500, type: "manual", question: "Назовите 5 отговорок, чтобы не идти на пару." }
+                        { points: 200, type: "manual", question: "Назовите 5 фруктов." },
+                        { points: 400, type: "manual", question: "Назовите 5 пород собак." },
+                        { points: 600, type: "manual", question: "Назовите 5 вещей, которые есть почти в каждой квартире." },
+                        { points: 800, type: "manual", question: "Назовите 5 фильмов с числом в названии." },
+                        { points: 1000, type: "manual", question: "Назовите 5 отговорок, чтобы не идти на пару." }
                     ]},
                     { title: "Женский цитатник", questions: [
-                        { points: 100, question: "Закончите фразу Симоны де Бовуар: «Женщиной не рождаются, …»", answer: "…женщиной становятся." },
-                        { points: 200, question: "Закончите фразу Коко Шанель: «Мода проходит, …»", answer: "…стиль остаётся." },
-                        { points: 300, question: "Закончите фразу Элеоноры Рузвельт: «Никто не может заставить вас чувствовать себя неполноценным без …»", answer: "…вашего согласия." },
-                        { points: 400, question: "Закончите фразу Майи Энджелоу: «Люди забудут, что вы говорили, люди забудут, что вы делали, но они никогда не забудут …»", answer: "…что вы заставили их почувствовать." },
-                        { points: 500, question: "Закончите фразу Маргарет Тэтчер: «Если хочешь, чтобы что-то было сказано, попроси мужчину; если хочешь, чтобы что-то было сделано, …»", answer: "…попроси женщину." }
+                        { points: 200, question: "«Женщиной не рождаются, …»", answer: "…женщиной становятся." },
+                        { points: 400, question: "«Мода проходит, …»", answer: "…стиль остаётся." },
+                        { points: 600, question: "«Никто не может заставить вас чувствовать себя неполноценным без …»", answer: "…вашего согласия." },
+                        { points: 800, question: "«…они никогда не забудут, что вы заставили их почувствовать»", answer: "Майя Энджелоу" },
+                        { points: 1000, question: "«Если хочешь, чтобы что-то было сделано, …»", answer: "…попроси женщину." }
                     ]},
-                    { title: "Аниме и Манга: Твой бекграунд", questions: [
-                        { points: 100, question: "Главный герой этого аниме — парень в соломенной шляпе, который растягивается как резиновый и хочет стать Королем пиратов.", answer: "Луффи из «One Piece»" },
-                        { points: 200, question: "Как в аниме-культуре называют красивую девушку-персонажа, в которую фанаты безответно влюбляются?", answer: "Вайфу" },
-                        { points: 300, question: "Главный герой аниме «Наруто» мечтает стать главой своей деревни и получить этот титул. Как он называется?", answer: "Хокаге" },
-                        { points: 400, question: "В аниме «Тетрадь смерти» нужно сделать две вещи, чтобы убить человека с помощью тетради. Первое — написать его имя. А что нужно сделать второе?", answer: "Представить его лицо в воображении" },
-                        { points: 500, question: "Какое аниме считается абсолютным долгожителем и выходит до сих пор, начавшись еще в 1999 году (про пиратов)?", answer: "One Piece" }
-                    ]},
+                    { title: "Русский человек", questions: [
+                        { points: 200, question: "Что делает русский человек, когда садится за стол с гостями?", answer: "Накладывает полную тарелку" },
+                        { points: 400, question: "Что делает русский человек на «Заходи на минутку»?", answer: "Остаётся на три часа" },
+                        { points: 600, question: "Что делает русский человек на улице −25°C?", answer: "Расстёгивает куртку" },
+                        { points: 800, question: "Что делает русский человек на «А слабо?»", answer: "Делает, даже если опасно" },
+                        { points: 1000, question: "Что делает русский человек, когда всё пошло не по плану?", answer: "Ставит чайник" }
+                    ]}
                 ]
             },
             {
-                title: "Раунд 3", points: [100,200,300,400,500], playerIndices: [6,7,8],
+                title: "Раунд 3", points: [300,600,900,1200,1500], playerIndices: [0,1,2],
                 topics: [
                     { title: "Лучше 5", questions: [
-                        { points: 100,  type: "manual", question: "Назовите 5 вещей, которые лучше не делать в кинотеатре.»" },
-                        { points: 200,  type: "manual", question: "Назовите 5 вещей, которые лучше не делать в чужом доме." },
-                        { points: 300,  type: "manual", question: "Назовите 5 вещей, которые лучше не писать в общий чат." },
-                        { points: 400, type: "manual", question: "Назовите 5 вещей, которые лучше не говорить на первом свидании." },
-                        { points: 500, type: "manual", question: "Назовите 5 вещей, которые лучше не делать в лифте с незнакомцем." }
+                        { points: 300,  type: "manual", question: "Назовите 5 вещей, которые лучше не говорить девушке на «я поправилась?»" },
+                        { points: 600,  type: "manual", question: "Назовите 5 вещей, которые лучше не делать в чужом доме." },
+                        { points: 900,  type: "manual", question: "Назовите 5 вещей, которые лучше не писать в общий чат." },
+                        { points: 1200, type: "manual", question: "Назовите 5 вещей, которые лучше не говорить на первом свидании." },
+                        { points: 1500, type: "manual", question: "Назовите 5 вещей, которые лучше не делать в лифте с незнакомцем." }
                     ]},
                     { title: "Интернет-сленг", questions: [
-                        { points: 100, question: "Этим словом зумеры называют что-то очень смешное. Пришло из английского, означает «смеяться вслух».", answer: "LOL" },
-                        { points: 200, question: "Этим словом зумеры называют чувство неловкости и стыда за чьи-то действия.", answer: "Кринж" },
-                        { points: 300, question: "Это слово означает «разбираться в чём-то», «быть в теме».", answer: "Шарить" },
-                        { points: 400, question: "Это слово пришло из английского и означает «доставлять удовольствие», «быть приятным».", answer: "Вайб" },
-                        { points: 500, question: "Это слово означает «человек, который всё время ноет и жалуется».", answer: "Нытик" }
+                        { points: 300, question: "Смеяться вслух.", answer: "LOL" },
+                        { points: 600, question: "Чувство неловкости и стыда за действия.", answer: "Кринж" },
+                        { points: 900, question: "Разбираться в чём-то, быть в теме.", answer: "Шарить" },
+                        { points: 1200, question: "Доставлять удовольствие, быть приятным.", answer: "Вайб" },
+                        { points: 1500, question: "Человек, который всё время ноет и жалуется.", answer: "Нытик / душнила" }
                     ]},
                     { title: "Студенческая жизнь", questions: [
-                        { points: 100, question: "Это слово студенты используют, когда говорят про учёбу. Оно означает «зубрить», «учить до посинения».", answer: "Грызть гранит науки" },
-                        { points: 200, question: "Это время суток, когда студент начинает готовиться к экзамену, который завтра.", answer: "Ночь" },
-                        { points: 300, question: "Это слово означает «списать».", answer: "Сдуть" },
-                        { points: 400, question: "Это состояние, когда студент не спал всю ночь, но всё равно пришёл на пару.", answer: "Зомби / овощ" },
-                        { points: 500, question: "Это фраза, которую студент говорит преподавателю, когда не готов.", answer: "«Я не готов»" }
+                        { points: 300, question: "Зубрить, учить до посинения.", answer: "Грызть гранит науки" },
+                        { points: 600, question: "Время суток, когда студент начинает готовиться к экзамену.", answer: "Ночь" },
+                        { points: 900, question: "Списать.", answer: "Сдуть / слизать" },
+                        { points: 1200, question: "Состояние после бессонной ночи.", answer: "Зомби / овощ" },
+                        { points: 1500, question: "Фраза, которую говорит студент, когда не готов.", answer: "«Можно пересдачу?»" }
                     ]},
                     { title: "Смешарики", questions: [
-                        { points: 100,  question: "«Это только кажется, что море большое. На самом деле оно маленькое, бесследно в нём ничего не исчезает». Чья цитата?", answer: "Крош (серия «Маленькое большое море»)" },
-                        { points: 200,  question: "«Очень трудно жить, думая о каждой ошибке, которую ты совершил, поэтому всё плохое забываешь, а помнишь только хорошее — очень удобно, но от себя не уйдёшь». Чья цитата?", answer: "Кар-Карыч" },
-                        { points: 300,  question: "«Иногда случается, что вещи теряют свой смысл. Вот смысл окна, например, чтобы в него смотреть. А порой смотришь в него, а смотреть там нечего… И непонятно, то ли жизнь всегда была бессмысленной, а ты просто не замечал этого, то ли смысл был, но куда-то затерялся». Чья цитата?", answer: "Бараш" },
-                        { points: 400, question: "«Такой вот парадокс: мы совершаем подвиги для тех, кому до нас уже нет никакого дела, а любят нас те, кому мы нужны и без всяких подвигов». Чья цитата?", answer: "Лосяш (серия «Торжество разума»)" },
-                        { points: 500, question: "«Всё станет пылью, и воюющий с нею превратится в пыль…» Чья цитата?", answer: "Лосяш" }
+                        { points: 300,  question: "«Это только кажется, что море большое. На самом деле оно маленькое…» Чья цитата?", answer: "Крош" },
+                        { points: 600,  question: "«Очень трудно жить, думая о каждой ошибке, которую ты совершил…» Чья цитата?", answer: "Кар-Карыч" },
+                        { points: 900,  question: "«Иногда случается, что вещи теряют свой смысл. Вот смысл окна — чтобы в него смотреть…» Чья цитата?", answer: "Бараш" },
+                        { points: 1200, question: "«Такой вот парадокс: мы совершаем подвиги для тех, кому до нас уже нет никакого дела…» Чья цитата?", answer: "Лосяш" },
+                        { points: 1500, question: "«Всё станет пылью, и воюющий с нею превратится в пыль…» Чья цитата?", answer: "Лосяш" }
                     ]},
-                    { title: "Зуммер-студент: учёба и деньги", questions: [
-                        { points: 100, question: "Что такое «дедлайн» и почему он иногда «паника»?", answer: "Крайний срок; паника — когда всё делается в последний момент" },
-                        { points: 200, question: "Стипендия 4 000 ₽. Подработка 600 ₽/час, 10 часов в неделю. Сколько за 4 недели вместе со стипендией?", answer: "28 000 ₽: 600 × 10 × 4 + 4 000" },
-                        { points: 300, question: "Курс стоит 12 000 ₽. Скидка 25%, затем промокод ещё 10% от новой цены. Сколько итого?", answer: "8 100 ₽: 12 000 × 0,75 × 0,9" },
-                        { points: 400, question: "3 задачи по 45 минут, между ними перерывы по 10 минут. Сколько всего времени?", answer: "155 минут = 2 ч 35 мин" },
-                        { points: 500, question: "Тест: 30 вопросов. Верный +2, неверный −0,5, пропуск 0. Студент: 20 верно, 5 неверно, 5 пропуск. Итог?", answer: "37,5 балла: 40 − 2,5" }
+                    { title: "Зуммер-студент", questions: [
+                        { points: 300, question: "Что такое «дедлайн»?", answer: "Крайний срок" },
+                        { points: 600, question: "Стипендия 4000 ₽. Подработка 600 ₽/час, 10 ч/нед. Сколько за 4 недели?", answer: "28 000 ₽" },
+                        { points: 900, question: "Курс 12000 ₽. Скидка 25%, затем промокод ещё 10%. Сколько итого?", answer: "8 100 ₽" },
+                        { points: 1200, question: "3 задачи по 45 мин, перерывы по 10 мин. Сколько всего?", answer: "155 минут" },
+                        { points: 1500, question: "Тест: 30 вопросов. +2 за верный, -0.5 за неверный. 20 верно, 5 неверно, 5 пропуск. Итог?", answer: "37,5 балла" }
                     ]}
                 ]
             }
         ],
         finalTopics: [
-            { title: "Анатомия",       question: "Какой внутренний орган человека способен полностью восстанавливаться (регенерировать), даже если удалить до 70% его тканей?", answer: "Печень" },
-            { title: "Кулинария",     question: "Главный ингредиент популярного мексиканского соуса гуакамоле, сытным и очень полезным. Что ЭТО", answer: "Авокадо" },
+            { title: "Космос",       question: "«Красная планета»?", answer: "Марс" },
+            { title: "Животные",     question: "Самое крупное животное Земли?", answer: "Синий кит" },
             { title: "Изобретения",  question: "Кто изобрёл лампу накаливания?", answer: "Томас Эдисон" },
-            { title: "Камушки", question: "Какой природный минерал считается самым твердым на планете Земля?", answer: "Алмаз" },
-            { title: "Кавказская война",       question: "Как звали первого имама Дагестана", answer: "Гази-Муххамад" },
-            { title: "Рандом",    question: "Назовите любимое число ведущего( от 1 до 9)?", answer: "7" },
-            { title: "Фастфуд",   question: "В какой стране появился в мире первый ресторан МАКДОНАЛЬС за пределами США?", answer: "Канада" },
-            { title: "Город",          question: "Назовите город: Этот Город ветров и Город небоскрёбов стоит на озере Мичиган. В этом городе в 1920-1930-х годах действовал самый знаменитый гангстер Аль Капоне.?", answer: "Чикаго" },
+            { title: "Русский язык", question: "Сколько букв в русском алфавите?", answer: "33" },
+            { title: "Лидеры",       question: "Кто возглавил Советское государство в 1917?", answer: "Владимир Ленин" },
+            { title: "Олимпиады",    question: "Город первых ОИ 1896?", answer: "Афины" },
+            { title: "Технологии",   question: "Что значит WWW?", answer: "World Wide Web" },
+            { title: "Еда",          question: "Родина пиццы?", answer: "Италия" },
             { title: "Кинематограф", question: "Первый «Оскар» 1929?", answer: "«Крылья» (Wings)" },
-            { title: "Интернет",      question: "Какая функция в современных браузерах и текстовых редакторах обязана своим появлением программисту Ларри Теслеру, который в 1970-х годах заменил сложные команды перемещения текста простым сочетанием двух действий?", answer: "Копировать-вставить (Copy & Paste/Вырезать-вставить)" }
+            { title: "Природа",      question: "Самое высокое дерево мира?", answer: "Секвойя" }
         ]
     }]
 };
 
-var STORAGE_KEY = 'svoya-igra-v31';
-var OLD_KEYS = ['svoya-igra-v26','svoya-igra-v25','svoya-igra-v24','svoya-igra-v23','svoya-igra-v22','svoya-igra-v21','svoya-igra-v20','svoya-igra-v19','svoya-igra-v18','svoya-igra-v17','svoya-igra-v16','svoya-igra-v15','svoya-igra-v14','svoya-igra-v13','svoya-igra-v12','svoya-igra-v11','svoya-igra-v10','svoya-igra-v9','svoya-igra-v8','svoya-igra-v7','svoya-igra-v6','svoya-igra-v5','svoya-igra-v4','svoya-igra-v3','svoya-igra-v2','svoya-igra-config-v1'];
+var STORAGE_KEY = 'svoya-igra-v34';
+var OLD_KEYS = ['svoya-igra-v33','svoya-igra-v32','svoya-igra-v31','svoya-igra-v30','svoya-igra-v29','svoya-igra-v28','svoya-igra-v27','svoya-igra-v26','svoya-igra-v25','svoya-igra-v24','svoya-igra-v23','svoya-igra-v22','svoya-igra-v21','svoya-igra-v20','svoya-igra-v19','svoya-igra-v18','svoya-igra-v17','svoya-igra-v16','svoya-igra-v15','svoya-igra-v14','svoya-igra-v13','svoya-igra-v12','svoya-igra-v11','svoya-igra-v10','svoya-igra-v9','svoya-igra-v8','svoya-igra-v7','svoya-igra-v6','svoya-igra-v5','svoya-igra-v4','svoya-igra-v3','svoya-igra-v2','svoya-igra-config-v1'];
 var deepClone = function(o) { return JSON.parse(JSON.stringify(o)); };
 var generateId = function() { return 'g' + Date.now() + '-' + Math.random().toString(36).slice(2, 8); };
 
 function migrateGame(game) {
     if (!Array.isArray(game.players)) {
-        game.players = ['Игрок 1','Игрок 2','Игрок 3','Игрок 4','Игрок 5','Игрок 6','Игрок 7','Игрок 8','Игрок 9'];
+        game.players = ['Амина','Испай','Шавла'];
     }
     if (typeof game.finalQuestionValue !== 'number') game.finalQuestionValue = 1000;
     if (!Array.isArray(game.rounds)) game.rounds = [];
@@ -502,9 +536,6 @@ function loadData() {
                 try {
                     var old = JSON.parse(legacy);
                     if (old && Array.isArray(old.games)) { old.games.forEach(migrateGame); return old; }
-                    if (old && Array.isArray(old.rounds)) {
-                        return { games: [migrateGame({ id: 'migrated-1', title: 'Игра (миграция)', subtitle: '', rounds: old.rounds, finalTopics: old.finalTopics || [] })] };
-                    }
                 } catch (e) {}
             }
         }
@@ -530,7 +561,7 @@ var finalCurrentTopic = null, finalists = [], finalScores = {};
 var selectedScoringPi = null, selectedFinalPi = null;
 
 function $(id) { return document.getElementById(id); }
-var menuScreen = $('menuScreen'), gameScreen = $('gameScreen');
+var menuScreen = $('menuScreen'), gameScreen = $('gameScreen'), playerScreen = $('playerScreen');
 var gamesGrid = $('gamesGrid'), btnAddGame = $('btnAddGame'), btnMenuFullscreen = $('btnMenuFullscreen');
 var board = $('board'), modalOverlay = $('modalOverlay');
 var modifierIntro = $('modifierIntro'), modifierPanel = $('modifierPanel'), modifierIcon = $('modifierIcon'), modifierTitle = $('modifierTitle'), modifierDesc = $('modifierDesc');
@@ -596,7 +627,7 @@ function renderMenu() {
 function addNewGame() {
     var newGame = {
         id: generateId(), title: 'Новая игра', subtitle: '', finalQuestionValue: 1000,
-        players: ['Игрок 1','Игрок 2','Игрок 3','Игрок 4','Игрок 5','Игрок 6','Игрок 7','Игрок 8','Игрок 9'],
+        players: ['Амина','Испай','Шавла'],
         rounds: [{
             title: "Раунд 1", points: [100,200,300,400,500], playerIndices: [0,1,2],
             topics: [1,2,3,4,5].map(function(n) {
@@ -650,6 +681,9 @@ function startGame(gameId) {
     gameTitleEl.textContent = game.title || 'Своя игра';
     gameSubtitleEl.textContent = game.subtitle || '';
     renderBoard(); renderScorePanel(); showScreen('gameScreen');
+    
+    // Мультиплеер: инициализация ведущего
+    if (!IS_PUBLIC && !playerMode && typeof initMQTT === 'function') initMQTT(true, roomCode);
 }
 
 function backToMenu() {
@@ -782,6 +816,11 @@ function openQuestion(cell) {
     passReceiverPi = null; passValue = 0;
     hideAllModalPanels();
     var type = cell.dataset.type || 'normal';
+    
+    if (mqttClient && !playerMode) {
+        mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'question_opened' }));
+    }
+    
     if (type === 'modifier') {
         modalState = 'modifier-intro';
         modifierIntro.style.display = 'flex';
@@ -1144,8 +1183,11 @@ function closeQuestion() {
     renderScorePanel();
     var remaining = board.querySelectorAll('.cell-points:not(.answered)').length;
     if (remaining === 0) endRound();
-
-    if (typeof broadcast === 'function') broadcast();
+    
+    // Мультиплеер: Закрываем вопрос на телефонах
+    if (mqttClient && !playerMode) {
+        mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'question_closed' }));
+    }
 }
 
 function endRound() {
@@ -1402,196 +1444,188 @@ function saveEditor() {
     }
 }
 
-document.addEventListener('keydown', function(e) {
-    if (editorOverlay.classList.contains('open')) return;
+// ==========================================
+// СИСТЕМА МУЛЬТИПЛЕЕРА (ТЕЛЕФОНЫ ИГРОКОВ)
+// ==========================================
+var IS_PUBLIC = (new URLSearchParams(location.search).get('mode') === 'public');
+var playerMode = (new URLSearchParams(location.search).get('mode') === 'player');
+var mqttClient = null;
+var roomCode = "";
+var myName = "";
+var currentTurnName = "";
+var buzzerQueue = [];
 
-    var isInput = (e.target && e.target.tagName === 'INPUT');
+if (!playerMode && !IS_PUBLIC) {
+    roomCode = Math.floor(1000 + Math.random() * 9000).toString();
+    var codeDisplay = document.createElement('div');
+    codeDisplay.style.cssText = 'position:fixed;top:20px;left:20px;background:var(--gold);color:#000;padding:15px;font-weight:bold;font-size:24px;z-index:1000;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.5);font-family:Georgia,serif;';
+    codeDisplay.innerHTML = 'Код для игроков: ' + roomCode;
+    document.body.appendChild(codeDisplay);
+}
 
-    if (!isInput) {
-        if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') { e.preventDefault(); toggleFullscreen(); return; }
-        if (e.key === 'h' || e.key === 'H' || e.key === 'р' || e.key === 'Р') { e.preventDefault(); toggleScoringPanel(); return; }
-    }
+function initMQTT(isHost, code) {
+    var clientId = "svoya_" + Math.random().toString(16).substr(2, 8);
+    var host = "wss://broker.emqx.io:8084/mqtt";
+    
+    mqttClient = mqtt.connect(host, { clientId: clientId });
+    var topic = "svoya_game_" + code;
 
-    if (isInput) {
-        if (e.key === 'Enter' || e.key === 'Escape') { e.target.blur(); return; }
-        if (e.key === ' ' || e.code === 'Space') {
-            e.preventDefault(); e.target.blur();
-            if (finalOverlay.classList.contains('open') && finalState === 'answer') closeFinalRound();
-            else if (modalState === 'answer') closeQuestion();
-            else if (modalState === 'question') showAnswer();
-            return;
+    mqttClient.on('connect', function () {
+        mqttClient.subscribe(topic);
+        if (!isHost) {
+            document.getElementById('playerLobby').style.display = 'none';
+            document.getElementById('playerGame').style.display = 'flex';
+            document.getElementById('playerNameDisplay').textContent = myName;
+            document.getElementById('playerStatus').textContent = "Подключено! Ждем остальных...";
         }
-        if (e.key === '+' || e.code === 'Equal' || e.key === '=') {
-            e.preventDefault(); var val = Math.abs(parseInt(e.target.value, 10)) || 0;
-            if (finalOverlay.classList.contains('open') && finalState === 'answer') adjustFinalScore(+val);
-            else if (modalOverlay.classList.contains('open')) adjustRoundScore(+val);
-            return;
-        }
-        if (e.key === '-' || e.key === '_' || e.code === 'Minus') {
-            e.preventDefault(); var val = Math.abs(parseInt(e.target.value, 10)) || 0;
-            if (finalOverlay.classList.contains('open') && finalState === 'answer') adjustFinalScore(-val);
-            else if (modalOverlay.classList.contains('open')) adjustRoundScore(-val);
-            return;
-        }
-        return;
-    }
+    });
 
-    if (finalOverlay.classList.contains('open')) {
-        if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space') {
-            e.preventDefault();
-            if (finalState === 'reveal') showFinalQuestion();
-            else if (finalState === 'question') showFinalAnswer();
-            else if (finalState === 'answer') closeFinalRound();
-            return;
-        }
-        if (finalState !== 'answer') return;
-        if (e.key === '1' || e.key === '2' || e.key === '3') {
-            e.preventDefault();
-            var btns = finalPlayerSelectRow.querySelectorAll('.player-select-btn');
-            if (btns[parseInt(e.key, 10) - 1]) btns[parseInt(e.key, 10) - 1].click();
-            return;
-        }
-        if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=') {
-            e.preventDefault(); 
-            var val = Math.abs(parseInt(finalScoreInput.value, 10)) || 0;
-            adjustFinalScore(+val); 
-            return;
-        }
-        if (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') {
-            e.preventDefault(); 
-            var val = Math.abs(parseInt(finalScoreInput.value, 10)) || 0;
-            adjustFinalScore(-val); 
-            return;
-        }
-        return;
-    }
-    if (breakOverlay.classList.contains('open')) {
-        if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space') {
-            e.preventDefault();
-            var mode = breakOverlay.dataset.mode;
-            if (mode === 'final-intro') { breakOverlay.classList.remove('open'); breakOverlay.dataset.mode = ''; startFinalRound(); }
-            else if (mode === 'finish') resetGame();
-            else if (mode === 'round-results') {
-                breakOverlay.classList.remove('open'); breakOverlay.dataset.mode = '';
-                if (currentRound === currentGame.rounds.length - 1) showFinalIntro(); else goToRound(currentRound + 1);
-            }
-        }
-        return;
-    }
-    if (modalOverlay.classList.contains('open')) {
-        if (modalState === 'modifier-intro') {
-            if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space') { e.preventDefault(); revealModifier(); }
-            return;
-        }
-        if (modalState === 'modifier') {
-            if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space') { e.preventDefault(); closeQuestion(); return; }
-            if (e.key === '1' || e.key === '2' || e.key === '3') {
-                e.preventDefault();
-                var btns = playerSelectRow.querySelectorAll('.player-select-btn');
-                if (btns[parseInt(e.key, 10) - 1] && !btns[parseInt(e.key, 10) - 1].classList.contains('locked')) btns[parseInt(e.key, 10) - 1].click();
-                return;
-            }
-            var val = Math.abs(parseInt(scoreInput.value, 10)) || 0;
-            if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=') { e.preventDefault(); adjustRoundScore(+val); return; }
-            if (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') { e.preventDefault(); adjustRoundScore(-val); return; }
-            return;
-        }
-        if (modalState === 'cat-select') {
-            if (e.key === '1' || e.key === '2' || e.key === '3') {
-                e.preventDefault();
-                var btns = catSelectRow.querySelectorAll('.select-player-btn');
-                if (btns[parseInt(e.key, 10) - 1]) btns[parseInt(e.key, 10) - 1].click();
-            }
-            return;
-        }
-        if (modalState === 'auction') {
-            if (e.key === '1' || e.key === '2' || e.key === '3') {
-                e.preventDefault();
-                var btns = auctionSelectRow.querySelectorAll('.select-player-btn');
-                if (btns[parseInt(e.key, 10) - 1]) btns[parseInt(e.key, 10) - 1].click();
-                return;
-            }
-            if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=') { e.preventDefault(); bidPlus.click(); return; }
-            if (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') { e.preventDefault(); bidMinus.click(); return; }
-            return;
-        }
-        if (modalState === 'pass') {
-            if (e.key === '1' || e.key === '2' || e.key === '3') {
-                e.preventDefault();
-                var btns = passSelectRow.querySelectorAll('.select-player-btn');
-                var idx = parseInt(e.key, 10) - 1;
-                if (btns[idx]) btns[idx].click();
-                return;
-            }
-            if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=') {
-                e.preventDefault(); passValuePlus.click(); return;
-            }
-            if (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') {
-                e.preventDefault(); passValueMinus.click(); return;
-            }
-            return;
-        }
-        if (modalState === 'question') {
-            if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space') { e.preventDefault(); showAnswer(); return; }
-            if (e.key === '1' || e.key === '2' || e.key === '3') {
-                e.preventDefault();
-                var btns = playerSelectRow.querySelectorAll('.player-select-btn');
-                if (btns[parseInt(e.key, 10) - 1] && !btns[parseInt(e.key, 10) - 1].classList.contains('locked')) btns[parseInt(e.key, 10) - 1].click();
-                return;
-            }
-            var val = Math.abs(parseInt(scoreInput.value, 10)) || 0;
-            if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=') { e.preventDefault(); adjustRoundScore(+val); return; }
-            if (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') { e.preventDefault(); adjustRoundScore(-val); return; }
-            return;
-        }
-        if (modalState === 'answer') {
-            if (e.key === ' ' || e.key === 'Enter' || e.code === 'Space') { e.preventDefault(); closeQuestion(); return; }
-            if (e.key === '1' || e.key === '2' || e.key === '3') {
-                e.preventDefault();
-                var btns = playerSelectRow.querySelectorAll('.player-select-btn');
-                if (btns[parseInt(e.key, 10) - 1] && !btns[parseInt(e.key, 10) - 1].classList.contains('locked')) btns[parseInt(e.key, 10) - 1].click();
-                return;
-            }
-            var modKey = getModifierKey(currentCell);
-            var mod = modKey ? MODIFIER_REGISTRY[modKey] : null;
-            if (mod && mod.special === 'flip') {
-                if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=' ||
-                    e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') {
-                    e.preventDefault(); flipSelectedScore(); return;
+    mqttClient.on('message', function (topic, message) {
+        var data = JSON.parse(message.toString());
+        
+        // --- ЛОГИКА ВЕДУЩЕГО ---
+        if (isHost) {
+            if (data.type === 'buzz') {
+                if (!buzzerQueue.includes(data.name)) {
+                    buzzerQueue.push(data.name);
+                    updateHostBuzzerUI();
                 }
-                return;
             }
-            var val = Math.abs(parseInt(scoreInput.value, 10)) || 0;
-            if (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=') { e.preventDefault(); adjustRoundScore(+val); return; }
-            if (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-' || e.key === '_') { e.preventDefault(); adjustRoundScore(-val); return; }
+            if (data.type === 'select_topic') {
+                var cell = document.querySelector('.cell-points[data-key="' + data.key + '"]');
+                if (cell && !cell.classList.contains('answered')) {
+                    openQuestion(cell);
+                }
+            }
+        } 
+        // --- ЛОГИКА ИГРОКА ---
+        else {
+            if (data.type === 'turn') {
+                currentTurnName = data.name;
+                if (myName === currentTurnName) {
+                    document.getElementById('playerStatus').textContent = "Твой ход!";
+                    document.getElementById('playerBoard').style.display = 'flex';
+                    renderPlayerBoard();
+                } else {
+                    document.getElementById('playerStatus').textContent = "Ход игрока: " + currentTurnName;
+                    document.getElementById('playerBoard').style.display = 'none';
+                }
+            }
+            if (data.type === 'question_opened') {
+                document.getElementById('buzzBtn').style.display = 'block';
+                document.getElementById('playerBoard').style.display = 'none';
+                document.getElementById('playerStatus').textContent = "ВНИМАНИЕ, ВОПРОС!";
+            }
+            if (data.type === 'question_closed') {
+                document.getElementById('buzzBtn').style.display = 'none';
+            }
+            if (data.type === 'reset_buzzers') {
+                document.getElementById('buzzBtn').style.display = 'block';
+            }
         }
-        return;
+    });
+}
+
+function connectPlayer() {
+    var room = document.getElementById('playerRoomInput').value.trim();
+    myName = document.getElementById('playerNameInput').value.trim();
+    if (!room || !myName) { alert("Введите код и имя!"); return; }
+    roomCode = room;
+    initMQTT(false, room);
+}
+
+function buzz() {
+    if (!mqttClient) return;
+    mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'buzz', name: myName }));
+    document.getElementById('buzzBtn').style.display = 'none';
+    document.getElementById('playerStatus').textContent = "Ждём решения ведущего...";
+}
+
+function renderPlayerBoard() {
+    var container = document.getElementById('playerTopics');
+    container.innerHTML = '';
+    var round = currentGame.rounds[currentRound];
+    round.topics.forEach(function(topic, ti) {
+        topic.questions.forEach(function(q, qi) {
+            var key = currentRound + '-' + ti + '-' + qi;
+            if (!answeredCells.has(key)) {
+                var btn = document.createElement('button');
+                btn.className = 'player-topic-btn';
+                btn.innerHTML = '<div class="pt-title">' + topic.title + '</div><div class="pt-points">' + q.points + '</div>';
+                btn.onclick = function() {
+                    if (!mqttClient) return;
+                    mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'select_topic', key: key }));
+                    document.getElementById('playerBoard').style.display = 'none';
+                };
+                container.appendChild(btn);
+            }
+        });
+    });
+}
+
+function updateHostBuzzerUI() {
+    var buzzerContainer = document.getElementById('hostBuzzerContainer');
+    if (!buzzerContainer) {
+        buzzerContainer = document.createElement('div');
+        buzzerContainer.id = 'hostBuzzerContainer';
+        buzzerContainer.style.cssText = 'position:fixed;bottom:20px;left:20px;background:rgba(6,18,44,0.95);border:3px solid var(--gold);padding:20px;z-index:1000;border-radius:10px;min-width:250px;';
+        document.body.appendChild(buzzerContainer);
     }
-    if (!gameScreen.classList.contains('active')) return;
-    if (e.key === 'ArrowLeft') { e.preventDefault(); if (currentRound > 0) goToRound(currentRound - 1); }
-    else if (e.key === 'ArrowRight') { e.preventDefault(); nextRound(); }
+    var html = '<h3 style="color:var(--gold);margin-bottom:10px;font-size:20px;">Кто нажал первым:</h3>';
+    if (buzzerQueue.length === 0) html += '<div style="color:#9aa8d0;">Пока никто...</div>';
+    buzzerQueue.forEach(function(name, i) { 
+        html += '<div style="font-size:20px;color:#fff;margin-top:5px;font-weight:bold;">' + (i+1) + '. ' + name + '</div>'; 
+    });
+    html += '<div style="font-size:12px;color:#9aa8d0;margin-top:15px;">Нажмите "T", чтобы дать ход первому нажавшему</div>';
+    buzzerContainer.innerHTML = html;
+}
+
+function resetBuzzers() {
+    buzzerQueue = [];
+    updateHostBuzzerUI();
+    if (mqttClient) mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'reset_buzzers' }));
+}
+
+document.addEventListener('keydown', function(e) {
+    if ((e.key === 't' || e.key === 'е') && buzzerQueue.length > 0 && !playerMode) {
+        var nextPlayer = buzzerQueue[0];
+        currentTurnName = nextPlayer;
+        if (mqttClient) mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'turn', name: nextPlayer }));
+        alert("Ход передан игроку: " + nextPlayer + " (Он может выбрать тему)");
+        resetBuzzers();
+    }
 });
 
-btnAddGame.addEventListener('click', addNewGame);
-btnMenuFullscreen.addEventListener('click', toggleFullscreen);
-btnFullscreen.addEventListener('click', toggleFullscreen);
-btnBackToMenu.addEventListener('click', backToMenu);
-btnReset.addEventListener('click', resetGame);
-btnGameEditor.addEventListener('click', function() { if (currentGameId) openEditor(currentGameId); });
-prevRoundBtn.addEventListener('click', function() { if (currentRound > 0) goToRound(currentRound - 1); });
-nextRoundBtn.addEventListener('click', nextRound);
+var originalOpenQuestion = openQuestion;
+openQuestion = function(cell) {
+    originalOpenQuestion(cell);
+    if (mqttClient && !playerMode) {
+        mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'question_opened' }));
+    }
+};
 
-adjustMinus.addEventListener('click', function() { var val = Math.abs(parseInt(scoreInput.value, 10)) || 0; adjustRoundScore(-val); });
-adjustPlus.addEventListener('click', function() { var val = Math.abs(parseInt(scoreInput.value, 10)) || 0; adjustRoundScore(+val); });
-adjustFlip.addEventListener('click', flipSelectedScore);
+var originalCloseQuestion = closeQuestion;
+closeQuestion = function() {
+    originalCloseQuestion();
+    resetBuzzers(); 
+    if (mqttClient && !playerMode) {
+        mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'question_closed' }));
+    }
+};
 
-finalAdjustMinus.addEventListener('click', function() { var val = Math.abs(parseInt(finalScoreInput.value, 10)) || 0; adjustFinalScore(-val); });
-finalAdjustPlus.addEventListener('click', function() { var val = Math.abs(parseInt(finalScoreInput.value, 10)) || 0; adjustFinalScore(+val); });
+var originalStartGame = startGame;
+startGame = function(gameId) {
+    originalStartGame(gameId);
+    if (!playerMode) initMQTT(true, roomCode);
+};
 
-editorSave.addEventListener('click', saveEditor);
-editorClose.addEventListener('click', closeEditor);
+if (playerMode) {
+    showScreen('playerScreen');
+}
 
-var IS_PUBLIC = (new URLSearchParams(location.search).get('mode') === 'public');
+// ==========================================
+// ЭКРАН ЗРИТЕЛЯ (PUBLIC MODE)
+// ==========================================
 var BC = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('svoya-igra-sync') : null;
 var PUBLIC_STATE_KEY = 'svoya-public-state';
 var PUBLIC_STATE_TS = 'svoya-public-state-ts';
@@ -1645,7 +1679,6 @@ function buildPublicState() {
 var _bcTimer = null;
 function broadcast() {
     if (IS_PUBLIC) return;
-    // Мгновенная отправка без задержки
     var state = buildPublicState();
     try {
         localStorage.setItem(PUBLIC_STATE_KEY, JSON.stringify(state));
@@ -1693,11 +1726,6 @@ function applyPublicState(state) {
     renderBoard();
     renderScorePanel();
     hideAllModalPanels();
-            // Принудительно закрываем модалку, если ведущий её закрыл
-    if (!state.modalOpen) {
-        modalOverlay.classList.remove('open');
-    }
-
     if (state.modalOpen && state.currentCell) {
         var c = state.currentCell;
         var fake = document.createElement('div');
@@ -1794,7 +1822,7 @@ if (IS_PUBLIC) {
     });
 }
 
-if (!IS_PUBLIC) {
+if (!IS_PUBLIC && !playerMode) {
     var btnPublicScreen = document.getElementById('btnPublicScreen');
     if (btnPublicScreen) {
         btnPublicScreen.addEventListener('click', function() {
