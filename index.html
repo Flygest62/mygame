@@ -3,219 +3,160 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Своя игра КДМ</title>
+<title>Своя игра — Турнир (3 раунда + Финал)</title>
 <style>
 :root{--bg-0:#06122c;--blue:#1a3a8a;--blue-deep:#122a5c;--green:#1e6b3a;--green-dark:#145028;--red:#c41e2a;--red-dark:#8e141d;--gold:#f0c419;--text:#e8eefc;--muted:#7a89b0;--purple:#8a4dff;--purple-light:#b98bff;}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg-0);background-image:radial-gradient(ellipse at 50% 0%,#122a5c 0%,#06122c 65%);min-height:100vh;color:var(--text);padding:40px 20px;letter-spacing:.02em;-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg-0);background-image:radial-gradient(ellipse at 50% 0%,#122a5c 0%,#06122c 65%);min-height:100vh;color:var(--text);padding:30px 20px;letter-spacing:.02em;-webkit-font-smoothing:antialiased;}
 .screen{display:none;}.screen.active{display:block;}
-.header{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;max-width:1200px;margin:0 auto 24px;padding-bottom:24px;}
+.header{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;max-width:1200px;margin:0 auto 20px;padding-bottom:16px;border-bottom:1px solid rgba(240,196,25,.15);}
 .header-brand{display:flex;align-items:center;gap:20px;}
-.header-logo{height:78px;filter:drop-shadow(0 0 14px rgba(240,196,25,.35));}
-.header-title{display:flex;flex-direction:column;gap:6px;}
-.header h1{font-family:Georgia,serif;font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);line-height:1.1;text-shadow:0 2px 12px rgba(240,196,25,.25);}
-.header .subtitle{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#9aa8d0;}
-.header-actions{display:flex;gap:20px;flex-wrap:wrap;align-items:center;}
-.btn-reset{background:transparent;color:var(--gold);border:none;padding:10px 4px;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:color .2s,opacity .2s;}
-.btn-reset:hover{color:#fff;opacity:.85;}
-.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;max-width:1200px;margin:0 auto;}
-.game-card{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);padding:24px;display:flex;flex-direction:column;gap:14px;}
-.game-card-title{font-family:Georgia,serif;font-size:20px;font-weight:700;color:var(--gold);letter-spacing:.08em;}
-.game-card-subtitle{font-size:12px;color:#9aa8d0;letter-spacing:.15em;text-transform:uppercase;min-height:15px;}
-.game-card-meta{font-size:11px;color:var(--muted);letter-spacing:.1em;margin-top:auto;}
-.game-card-actions{display:flex;gap:10px;align-items:center;margin-top:8px;}
-.btn-play{flex:1;background:var(--gold);color:var(--bg-0);border:none;padding:12px 16px;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;}
-.btn-play:hover{opacity:.9;}
-.icon-btn{background:transparent;color:var(--gold);border:1px solid rgba(240,196,25,.4);width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.icon-btn:hover{background:var(--gold);color:var(--bg-0);}
-.icon-btn svg{width:18px;height:18px;}
-.add-game-wrap{max-width:1200px;margin:28px auto 0;display:flex;justify-content:center;}
-.btn-add-game{background:transparent;color:var(--gold);border:2px dashed rgba(240,196,25,.5);padding:18px 40px;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;}
-.btn-add-game:hover{border-color:var(--gold);background:rgba(240,196,25,.08);}
-.menu-empty{max-width:1200px;margin:40px auto;text-align:center;color:var(--muted);font-size:14px;}
-.round-nav{max-width:1200px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;gap:20px;}
-.round-nav-btn{background:transparent;color:var(--gold);border:1px solid rgba(240,196,25,.4);width:40px;height:40px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.header-title{display:flex;flex-direction:column;gap:4px;}
+.header h1{font-family:Georgia,serif;font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);line-height:1.1;text-shadow:0 2px 12px rgba(240,196,25,.25);}
+.header .subtitle{font-size:11px;letter-spacing:.35em;text-transform:uppercase;color:#9aa8d0;}
+.header-actions{display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
+.btn-reset{background:transparent;color:var(--gold);border:1px solid rgba(240,196,25,.35);border-radius:6px;padding:8px 14px;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-reset:hover{background:var(--gold);color:var(--bg-0);}
+
+.round-nav{max-width:1200px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;gap:20px;}
+.round-nav-btn{background:transparent;color:var(--gold);border:1px solid rgba(240,196,25,.4);width:40px;height:40px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:6px;}
 .round-nav-btn:hover:not(:disabled){background:var(--gold);color:var(--bg-0);}
 .round-nav-btn:disabled{opacity:.3;cursor:not-allowed;}
-.round-nav-label{font-family:Georgia,serif;font-size:clamp(14px,1.6vw,18px);font-weight:700;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);min-width:220px;text-align:center;}
-.score-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:1200px;margin:0 auto 16px;}
-.score-card{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px;border:2px solid transparent;}
-.score-card.leader{background:linear-gradient(180deg,var(--green) 0%,var(--green-dark) 100%);box-shadow:0 0 0 2px var(--gold) inset;}
-.score-card.answering{border-color:var(--gold);}
-.score-card-name{font-family:Georgia,serif;font-size:15px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;}
+.round-nav-label{font-family:Georgia,serif;font-size:clamp(15px,1.8vw,20px);font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);min-width:260px;text-align:center;}
+
+.score-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:1200px;margin:0 auto 18px;}
+.score-card{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px;border:2px solid rgba(255,255,255,.1);border-radius:8px;}
+.score-card.leader{background:linear-gradient(180deg,var(--green) 0%,var(--green-dark) 100%);border-color:var(--gold);}
+.score-card.answering{box-shadow:0 0 20px rgba(240,196,25,.5);border-color:var(--gold);}
+.score-card-name{font-family:Georgia,serif;font-size:16px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;font-weight:700;}
 .score-card-score{font-family:Georgia,serif;font-size:28px;font-weight:700;color:#fff;}
 .score-card.negative .score-card-score{color:#ff8b8b;}
-.board{display:grid;grid-template-columns:1.4fr repeat(5,1fr);gap:4px;max-width:1200px;margin:0 auto;}
-.cell-topic{background:linear-gradient(180deg,var(--green) 0%,var(--green-dark) 100%);padding:22px 12px;font-family:Georgia,serif;font-size:clamp(11px,1.4vw,14px);font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);text-align:center;display:flex;align-items:center;justify-content:center;min-height:64px;}
-.cell-points{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);color:var(--gold);font-family:Georgia,serif;font-size:clamp(18px,2.2vw,26px);font-weight:700;padding:32px 8px;text-align:center;cursor:pointer;user-select:none;}
-.cell-points:hover{background:linear-gradient(180deg,#2a52b8 0%,var(--blue) 100%);color:#fff;}
-.cell-points.answered{background:linear-gradient(180deg,var(--red) 0%,var(--red-dark) 100%);color:transparent;cursor:default;pointer-events:none;}
-.modal-overlay{position:fixed;inset:0;background:var(--bg-0);background-image:radial-gradient(ellipse at 50% 40%,#122a5c 0%,#06122c 70%);display:none;z-index:100;}
+
+.board{display:grid;grid-template-columns:1.5fr repeat(5,1fr);gap:6px;max-width:1200px;margin:0 auto;}
+.cell-topic{background:linear-gradient(180deg,var(--green) 0%,var(--green-dark) 100%);padding:20px 12px;font-family:Georgia,serif;font-size:clamp(11px,1.3vw,14px);font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);text-align:center;display:flex;align-items:center;justify-content:center;min-height:64px;border-radius:6px;}
+.cell-points{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);color:var(--gold);font-family:Georgia,serif;font-size:clamp(18px,2.2vw,26px);font-weight:700;padding:28px 8px;text-align:center;cursor:pointer;user-select:none;border-radius:6px;transition:transform .1s, background .2s;}
+.cell-points:hover{background:linear-gradient(180deg,#2a52b8 0%,var(--blue) 100%);color:#fff;transform:scale(1.02);}
+.cell-points.answered{background:rgba(18,42,92,.3);color:transparent;cursor:default;pointer-events:none;border:1px solid rgba(255,255,255,.05);}
+
+/* МОДАЛЬНОЕ ОКНО ВОПРОСА И ЗАСТАВКИ ТЕМЫ */
+.modal-overlay{position:fixed;inset:0;background:var(--bg-0);background-image:radial-gradient(ellipse at 50% 40%,#122a5c 0%,#06122c 75%);display:none;z-index:100;}
 .modal-overlay.open{display:flex;}
 .modal{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px;text-align:center;overflow-y:auto;}
-.modal-topic{font-size:clamp(13px,1.4vw,15px);letter-spacing:.35em;text-transform:uppercase;color:#f0c419;margin-bottom:12px;font-weight:700;}
-.modal-points{font-family:Georgia,serif;font-size:clamp(24px,2.6vw,34px);color:var(--bg-0);background:var(--gold);padding:8px 28px;margin-bottom:16px;font-weight:700;display:inline-flex;align-items:baseline;gap:10px;}
-.modal-points.pos{background:#7ed996;}
-.modal-points.neg{background:#ff8b8b;}
-.modal-points .mod-badge{font-size:.6em;letter-spacing:.15em;}
-.modal-points .base-val{font-size:.6em;opacity:.55;text-decoration:line-through;}
-.modal-question{font-family:Georgia,serif;font-size:clamp(24px,3.5vw,44px);line-height:1.4;color:#fff;max-width:1000px;margin:0 auto 32px;}
-.modal img{max-width:80vw;max-height:38vh;object-fit:contain;margin-bottom:24px;}
-.modal-answer{display:none;font-family:Georgia,serif;font-size:clamp(20px,2.6vw,34px);line-height:1.35;color:var(--gold);max-width:1000px;padding:20px 40px;margin-bottom:24px;font-weight:700;white-space:pre-line;text-align:left;}
+
+/* Заставка темы на весь экран */
+.topic-splash{display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;animation:fadeIn .3s ease;}
+.topic-splash-label{font-size:14px;letter-spacing:.45em;text-transform:uppercase;color:#9aa8d0;}
+.topic-splash-title{font-family:Georgia,serif;font-size:clamp(36px,6.5vw,88px);font-weight:700;text-transform:uppercase;color:var(--gold);letter-spacing:.08em;text-shadow:0 6px 40px rgba(240,196,25,.35);line-height:1.15;}
+.topic-splash-points{font-family:Georgia,serif;font-size:clamp(28px,4vw,52px);font-weight:700;background:var(--blue);border:2px solid var(--gold);color:#fff;padding:10px 36px;border-radius:12px;}
+.topic-splash-hint{margin-top:30px;font-size:13px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);animation:pulseText 1.5s infinite;}
+@keyframes fadeIn{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:scale(1);}}
+@keyframes pulseText{0%,100%{opacity:.4;}50%{opacity:1;}}
+
+.modal-topic{font-size:clamp(14px,1.5vw,18px);letter-spacing:.35em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;font-weight:700;}
+.modal-points{font-family:Georgia,serif;font-size:clamp(24px,2.6vw,34px);color:var(--bg-0);background:var(--gold);padding:8px 28px;margin-bottom:24px;font-weight:700;border-radius:8px;}
+.modal-question{font-family:Georgia,serif;font-size:clamp(24px,3.4vw,44px);line-height:1.4;color:#fff;max-width:1000px;margin:0 auto 30px;}
+.modal-answer{display:none;font-family:Georgia,serif;font-size:clamp(22px,2.8vw,36px);line-height:1.35;color:var(--gold);max-width:1000px;padding:24px 40px;margin-bottom:24px;font-weight:700;background:rgba(30,107,58,.25);border:2px solid var(--green);border-radius:12px;}
 .modal-answer.visible{display:block;}
-.modal-answer-preview{display:block;font-family:Georgia,serif;font-size:clamp(13px,1.5vw,18px);line-height:1.4;color:#9aa8d0;max-width:1000px;margin:-20px auto 24px;padding:12px 24px;border-left:3px solid var(--gold);text-align:left;white-space:pre-line;font-style:italic;opacity:.75;}
-.modal-score-panel{display:none;gap:10px;width:100%;max-width:720px;margin-top:24px;flex-wrap:wrap;justify-content:center;}
-body.public-mode .modal-score-panel{display:flex;}
-.modal-score-panel .score-card{flex:1;min-width:120px;padding:10px 14px;background:rgba(26,58,138,.6);}
-.modal-score-panel .score-card-name{font-size:14px;}
-.modal-score-panel .score-card-score{font-size:24px;}
-.modifier-intro{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;width:100%;max-width:100%;padding:0 20px;}
-.modifier-intro-word{font-family:Georgia,serif;font-size:clamp(28px,7vw,100px);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--purple-light);text-shadow:0 6px 50px rgba(138,77,255,.8);line-height:1.1;text-align:center;max-width:100%;word-break:break-word;}
-.modifier-panel{display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:720px;margin-bottom:24px;}
-.modifier-icon{font-size:90px;line-height:1;}
-.modifier-title{font-family:Georgia,serif;font-size:clamp(30px,5vw,60px);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-light);}
-.modifier-desc{font-family:Georgia,serif;font-size:clamp(16px,2vw,24px);color:#fff;letter-spacing:.05em;max-width:700px;line-height:1.5;}
-.pass-panel{display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:720px;}
-.modal-select{display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:720px;}
-.select-players{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;}
-.select-player-btn{background:rgba(26,58,138,.5);border:2px solid transparent;color:#fff;padding:20px 12px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:8px;}
-.select-player-btn:hover{background:rgba(42,82,184,.65);border-color:var(--gold);}
-.select-player-name{font-family:Georgia,serif;font-size:16px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;}
-.select-player-score{font-family:Georgia,serif;font-size:22px;font-weight:700;color:#fff;}
-.auction-panel{display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:720px;}
-.bid-row{display:flex;align-items:center;justify-content:center;gap:16px;width:100%;max-width:420px;}
-.bid-btn{background:transparent;border:2px solid var(--gold);color:var(--gold);width:54px;height:54px;font-size:24px;font-weight:700;cursor:pointer;font-family:Georgia,serif;}
-.bid-btn:hover{background:var(--gold);color:var(--bg-0);}
-.bid-input{flex:1;background:rgba(26,58,138,.5);border:2px solid var(--gold);color:#fff;font-family:Georgia,serif;font-size:32px;font-weight:700;padding:12px 20px;text-align:center;outline:none;}
-.bid-presets{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
-.bid-preset{background:transparent;border:1px solid rgba(240,196,25,.5);color:var(--gold);padding:8px 16px;font-family:inherit;font-size:12px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;}
-.bid-preset:hover{background:rgba(240,196,25,.15);}
-.scoring-panel{display:none;flex-direction:column;gap:20px;width:100%;max-width:720px;margin-top:8px;}
+.modal-answer-preview{display:block;font-size:16px;color:#9aa8d0;margin-bottom:20px;padding:10px 20px;border-left:3px solid var(--gold);font-style:italic;}
+body.public-mode .modal-answer-preview, body.public-mode .header-actions, body.public-mode .round-nav-btn, body.public-mode .scoring-panel, body.public-mode #hostPanel, body.public-mode #roomCodeBadge{display:none!important;}
+
+.scoring-panel{display:none;flex-direction:column;gap:16px;width:100%;max-width:720px;margin-top:10px;}
 .scoring-panel.visible{display:flex;}
 .player-select-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-.player-select-btn{background:rgba(26,58,138,.5);border:2px solid transparent;color:#fff;padding:16px 10px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:6px;}
-.player-select-btn:hover:not(.locked){background:rgba(42,82,184,.65);}
-.player-select-btn.selected{border-color:var(--gold);background:rgba(240,196,25,.18);box-shadow:0 0 0 1px var(--gold) inset;}
-.player-select-btn.locked{opacity:.35;cursor:not-allowed;}
-.psb-name{font-family:Georgia,serif;font-size:16px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;text-align:center;word-break:break-word;}
-.psb-score{font-family:Georgia,serif;font-size:26px;font-weight:700;color:#fff;}
-.psb-score.negative{color:#ff8b8b;}
+.player-select-btn{background:rgba(26,58,138,.5);border:2px solid transparent;color:#fff;padding:14px 10px;cursor:pointer;border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.player-select-btn.selected{border-color:var(--gold);background:rgba(240,196,25,.2);}
+.psb-name{font-family:Georgia,serif;font-size:15px;color:var(--gold);text-transform:uppercase;}
+.psb-score{font-family:Georgia,serif;font-size:24px;font-weight:700;}
 .adjust-row{display:flex;justify-content:center;align-items:center;gap:12px;}
-.adjust-btn{background:transparent;border:2px solid;padding:14px 28px;font-family:Georgia,serif;font-size:20px;font-weight:700;letter-spacing:.08em;cursor:pointer;min-width:80px;}
+.adjust-btn{background:transparent;border:2px solid;padding:12px 24px;font-family:Georgia,serif;font-size:20px;font-weight:700;cursor:pointer;border-radius:8px;}
 .adjust-btn.minus{color:#ff8b8b;border-color:var(--red);}
-.adjust-btn.minus:hover:not(:disabled){background:var(--red);color:#fff;}
 .adjust-btn.plus{color:#7ed996;border-color:var(--green);}
-.adjust-btn.plus:hover:not(:disabled){background:var(--green);color:#fff;}
-.adjust-btn:disabled{opacity:.35;cursor:not-allowed;}
-.adjust-btn.flip{color:var(--purple-light);border-color:var(--purple);min-width:320px;}
-.adjust-btn.flip:hover:not(:disabled){background:var(--purple);color:#fff;}
-.score-input{width:120px;background:#06122c;border:2px solid var(--gold);color:#fff;font-family:Georgia,serif;font-size:24px;font-weight:700;text-align:center;padding:10px;outline:none;}
-.break-overlay{position:fixed;inset:0;background:var(--bg-0);background-image:radial-gradient(ellipse at 50% 40%,#122a5c 0%,#06122c 70%);display:none;z-index:200;}
-.break-overlay.open{display:flex;}
-.break-content{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 40px;text-align:center;overflow-y:auto;}
-.break-label{font-family:Georgia,serif;font-size:clamp(12px,1.4vw,15px);letter-spacing:.5em;text-transform:uppercase;color:#9aa8d0;margin-bottom:24px;font-weight:700;}
-.break-title{font-family:Georgia,serif;font-size:clamp(40px,7vw,100px);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);line-height:1;margin-bottom:32px;}
-.break-subtitle{font-family:Georgia,serif;font-size:clamp(18px,2.4vw,30px);color:#fff;letter-spacing:.1em;margin-bottom:40px;}
-.break-scores{width:100%;max-width:600px;margin:0 auto 40px;display:flex;flex-direction:column;gap:8px;}
-.break-score-row{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;background:rgba(26,58,138,.45);font-family:Georgia,serif;font-size:20px;}
-.break-score-row.winner{background:linear-gradient(180deg,var(--green) 0%,var(--green-dark) 100%);font-size:22px;font-weight:700;box-shadow:0 0 0 2px var(--gold) inset;}
-.break-score-row.loser{opacity:.8;}
-.break-score-name{color:var(--gold);text-transform:uppercase;}
-.break-score-value{color:#fff;font-weight:700;}
-.final-overlay{position:fixed;inset:0;background:var(--bg-0);background-image:radial-gradient(ellipse at 50% 40%,#122a5c 0%,#06122c 70%);display:none;z-index:250;}
-.final-overlay.open{display:flex;}
-.final-content{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px;text-align:center;overflow-y:auto;}
-.final-label{font-family:Georgia,serif;font-size:clamp(12px,1.4vw,15px);letter-spacing:.5em;text-transform:uppercase;color:#9aa8d0;margin-bottom:20px;font-weight:700;}
-.final-turn{font-family:Georgia,serif;font-size:clamp(22px,3vw,38px);font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:40px;}
-.final-topics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:1200px;width:100%;margin-bottom:40px;}
-.final-topic-card{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);color:var(--gold);font-family:Georgia,serif;font-size:clamp(12px,1.4vw,18px);font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:28px 12px;text-align:center;cursor:pointer;user-select:none;min-height:100px;display:flex;align-items:center;justify-content:center;}
-.final-topic-card:hover{background:linear-gradient(180deg,#2a52b8 0%,var(--blue) 100%);color:#fff;}
-.final-reveal-title{font-family:Georgia,serif;font-size:clamp(48px,10vw,140px);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);line-height:1.05;margin:20px 0 60px;padding:0 20px;}
-.final-question-text{font-family:Georgia,serif;font-size:clamp(24px,3.5vw,44px);line-height:1.4;color:#fff;max-width:1000px;margin:0 auto 30px;}
-.final-topic-small{font-family:Georgia,serif;font-size:clamp(13px,1.4vw,15px);letter-spacing:.35em;text-transform:uppercase;color:#f0c419;margin-bottom:20px;font-weight:700;}
-.final-answer-text{display:none;font-family:Georgia,serif;font-size:clamp(20px,2.8vw,38px);line-height:1.35;color:var(--gold);max-width:1000px;padding:20px 40px;font-weight:700;margin-bottom:20px;white-space:pre-line;text-align:left;}
-.final-answer-text.visible{display:block;}
-.editor-overlay{position:fixed;inset:0;background:rgba(6,18,44,.97);display:none;z-index:400;}
-.editor-overlay.open{display:flex;}
-.editor-content{width:100%;height:100%;display:flex;flex-direction:column;padding:24px 32px;}
-.editor-header{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:12px;}
-.editor-title-wrap{display:flex;flex-direction:column;gap:4px;}
-.editor-header h2{font-family:Georgia,serif;color:var(--gold);font-size:20px;letter-spacing:.2em;text-transform:uppercase;}
-.editor-game-title{font-size:12px;color:#9aa8d0;letter-spacing:.15em;text-transform:uppercase;}
-.editor-actions{display:flex;gap:16px;flex-wrap:wrap;}
-#editorTextarea{flex:1;background:#0b1a3e;color:#e8eefc;border:1px solid rgba(240,196,25,.3);padding:16px;font-family:'Consolas','Monaco',monospace;font-size:13px;line-height:1.55;resize:none;outline:none;}
-#editorTextarea:focus{border-color:var(--gold);}
-.editor-status{margin-top:12px;min-height:20px;font-size:13px;}
-.editor-status.ok{color:#5cd07a;}.editor-status.err{color:#ff6b6b;}
-body.public-mode .header-actions{display:none!important;}
-body.fullscreen-mode .header-actions{display:none!important;}
-body.public-mode .round-nav-btn{display:none!important;}
-body.public-mode .round-nav{gap:0;}
-body.public-mode .cell-points{pointer-events:none!important;cursor:default!important;}
-body.public-mode .cell-points:hover{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);color:var(--gold);}
-body.public-mode .scoring-panel{display:none!important;}
-body.public-mode .adjust-row{display:none!important;}
-body.public-mode .modal-answer-preview{display:none!important;}
+.score-input{width:120px;background:#06122c;border:2px solid var(--gold);color:#fff;font-family:Georgia,serif;font-size:24px;font-weight:700;text-align:center;padding:10px;border-radius:8px;}
 
-/* СТИЛИ ДЛЯ ТЕЛЕФОНОВ И ПАНЕЛИ ВЕДУЩЕГО */
-#playerScreen { padding: 20px; text-align: center; }
-.player-input { padding: 15px; font-size: 20px; text-align: center; width: 100%; margin-bottom: 15px; border: 2px solid var(--gold); background: #06122c; color: #fff; border-radius: 8px; outline: none; }
-.player-btn { background: var(--gold); color: var(--bg-0); font-size: 22px; font-weight: bold; padding: 15px; width: 100%; border: none; border-radius: 8px; cursor: pointer; }
-.buzz-btn { background: var(--red); color: white; font-size: 28px; font-weight: bold; padding: 20px; border-radius: 50%; width: 200px; height: 200px; border: 6px solid var(--red-dark); box-shadow: 0 0 30px rgba(196,30,42,0.8); cursor: pointer; user-select: none; margin: 20px auto; display: none; animation: pulse 1s infinite; }
-@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-.player-topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; margin-top: 20px; }
-.player-topic-btn { background: rgba(26,58,138,.8); border: 2px solid var(--gold); color: #fff; padding: 15px 10px; border-radius: 8px; cursor: pointer; text-align: center; }
-.player-topic-btn .pt-title { font-size: 12px; color: var(--gold); text-transform: uppercase; }
-.player-topic-btn .pt-points { font-size: 22px; font-weight: bold; margin-top: 5px; }
-#hostPanel { display: none; position: fixed; top: 20px; right: 20px; background: rgba(6,18,44,0.95); border: 2px solid var(--gold); padding: 20px; z-index: 1000; border-radius: 10px; min-width: 300px; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-.host-player-list { display: flex; flex-direction: column; gap: 5px; max-height: 200px; overflow-y: auto; margin-bottom: 15px; }
-.host-player-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 5px; font-size: 16px; color: #fff; }
-.give-turn-btn { background: var(--blue); color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+/* ПЕРЕРЫВ И ФИНАЛ */
+.break-overlay,.final-overlay{position:fixed;inset:0;background:var(--bg-0);background-image:radial-gradient(ellipse at 50% 40%,#122a5c 0%,#06122c 75%);display:none;z-index:200;}
+.break-overlay.open,.final-overlay.open{display:flex;}
+.break-content,.final-content{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px;text-align:center;overflow-y:auto;}
+.break-label,.final-label{font-size:14px;letter-spacing:.45em;text-transform:uppercase;color:#9aa8d0;margin-bottom:20px;font-weight:700;}
+.break-title{font-family:Georgia,serif;font-size:clamp(38px,6vw,90px);font-weight:700;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
+.break-subtitle{font-family:Georgia,serif;font-size:clamp(18px,2.2vw,28px);color:#fff;margin-bottom:32px;}
+.break-scores{width:100%;max-width:600px;display:flex;flex-direction:column;gap:10px;}
+.break-score-row{display:flex;justify-content:space-between;padding:16px 24px;background:rgba(26,58,138,.45);font-family:Georgia,serif;font-size:20px;border-radius:8px;}
+.break-score-row.winner{background:linear-gradient(180deg,var(--green) 0%,var(--green-dark) 100%);border:2px solid var(--gold);font-weight:700;}
 
-@media(max-width:900px){.final-topics{grid-template-columns:repeat(3,1fr);}}
-@media(max-width:700px){body{padding:20px 10px;}.header{margin-bottom:16px;padding-bottom:16px;gap:14px;}.header-logo{height:56px;}.cell-topic{padding:14px 6px;min-height:52px;letter-spacing:.12em;}.cell-points{padding:22px 4px;}.modal{padding:30px 16px;}.break-content{padding:30px 20px;}.final-content{padding:30px 16px;}.final-topics{grid-template-columns:repeat(2,1fr);gap:8px;}.editor-content{padding:16px;}.round-nav-label{letter-spacing:.2em;min-width:160px;}.round-nav{gap:12px;}.player-select-row,.select-players{gap:6px;}.player-select-btn,.select-player-btn{padding:10px 4px;}.psb-name,.select-player-name{font-size:12px;}.psb-score,.select-player-score{font-size:20px;}.adjust-btn{padding:10px 16px;font-size:16px;min-width:60px;}.score-input{width:80px;font-size:18px;padding:8px;}.adjust-btn.flip{min-width:220px;font-size:14px;}.bid-input{font-size:24px;padding:8px 12px;}.bid-btn{width:44px;height:44px;font-size:20px;}.modifier-icon{font-size:64px;}.modal-answer{padding:16px 20px;text-align:left;}.buzz-btn{width:150px;height:150px;font-size:22px;}}
-@media(max-width:480px){.header h1{letter-spacing:.14em;}.header-logo{height:46px;}.header .subtitle{letter-spacing:.25em;font-size:10px;}.board{grid-template-columns:1.2fr repeat(5,1fr);}.score-panel{grid-template-columns:1fr;}}
+.final-turn{font-family:Georgia,serif;font-size:clamp(22px,3vw,36px);font-weight:700;text-transform:uppercase;color:var(--gold);margin-bottom:32px;}
+.final-topics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:1100px;width:100%;}
+.final-topic-card{background:linear-gradient(180deg,var(--blue) 0%,var(--blue-deep) 100%);color:var(--gold);font-family:Georgia,serif;font-size:clamp(13px,1.4vw,17px);font-weight:700;text-transform:uppercase;padding:26px 12px;cursor:pointer;border-radius:8px;border:1px solid rgba(240,196,25,.3);display:flex;align-items:center;justify-content:center;min-height:95px;}
+.final-topic-card:hover{background:#2a52b8;color:#fff;}
+.final-reveal-title{font-family:Georgia,serif;font-size:clamp(42px,8vw,110px);font-weight:700;text-transform:uppercase;color:var(--gold);margin:20px 0 40px;}
+
+/* ТЕЛЕФОН ИГРОКА */
+#playerScreen{min-height:100vh;display:none;flex-direction:column;justify-content:center;align-items:center;padding:20px;text-align:center;}
+#playerScreen.active{display:flex;}
+.player-card{width:100%;max-width:440px;background:rgba(18,42,92,.65);border:2px solid rgba(240,196,25,.35);border-radius:16px;padding:28px 20px;box-shadow:0 15px 40px rgba(0,0,0,.6);}
+.player-input{padding:16px;font-size:20px;text-align:center;width:100%;margin-bottom:14px;border:2px solid var(--gold);background:#06122c;color:#fff;border-radius:10px;outline:none;}
+.player-btn{background:var(--gold);color:var(--bg-0);font-size:20px;font-weight:800;padding:16px;width:100%;border:none;border-radius:10px;cursor:pointer;text-transform:uppercase;letter-spacing:.1em;}
+
+/* ОГРОМНАЯ КРАСНАЯ КНОПКА */
+.buzz-btn{
+    background:radial-gradient(circle at 35% 35%, #ff4b58, var(--red) 60%, var(--red-dark));
+    color:#fff;
+    font-size:34px;
+    font-weight:900;
+    letter-spacing:.08em;
+    border-radius:50%;
+    width:250px;
+    height:250px;
+    border:8px solid #fff;
+    box-shadow:0 0 45px rgba(196,30,42,.95), inset 0 -10px 20px rgba(0,0,0,.4);
+    cursor:pointer;
+    user-select:none;
+    margin:24px auto;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    text-transform:uppercase;
+    animation:pulseRed 0.9s infinite;
+    -webkit-tap-highlight-color:transparent;
+}
+.buzz-btn:active{transform:scale(0.93);}
+@keyframes pulseRed{0%{transform:scale(1);box-shadow:0 0 30px rgba(196,30,42,.8);}50%{transform:scale(1.06);box-shadow:0 0 60px rgba(255,75,88,1);}100%{transform:scale(1);box-shadow:0 0 30px rgba(196,30,42,.8);}}
+
+.player-topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:16px;max-height:60vh;overflow-y:auto;}
+.player-topic-btn{background:linear-gradient(180deg,var(--blue),var(--blue-deep));border:2px solid var(--gold);color:#fff;padding:14px 8px;border-radius:10px;cursor:pointer;text-align:center;}
+.player-topic-btn:active{background:var(--gold);color:#000;}
+.player-topic-btn .pt-title{font-size:12px;color:var(--gold);text-transform:uppercase;font-weight:700;}
+.player-topic-btn .pt-points{font-size:22px;font-weight:800;margin-top:4px;}
+.player-topic-btn.final-elim{background:linear-gradient(180deg,#5a1622,#380b13);border-color:#ff6b6b;}
+
+/* ПАНЕЛЬ ВЕДУЩЕГО (РАСПРЕДЕЛЕНИЕ 9 ИГРОКОВ И УПРАВЛЕНИЕ) */
+#hostPanel{position:fixed;bottom:20px;right:20px;background:rgba(6,18,44,.96);border:2px solid var(--gold);padding:18px;z-index:1000;border-radius:12px;width:360px;box-shadow:0 10px 35px rgba(0,0,0,.85);}
+.host-player-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;margin-bottom:12px;}
+.host-player-item{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.08);padding:7px 10px;border-radius:6px;font-size:14px;color:#fff;gap:6px;}
+.r-assign-group{display:flex;gap:4px;}
+.r-btn{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);padding:4px 7px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:700;}
+.r-btn.active{background:var(--gold);color:#000;border-color:var(--gold);}
+.give-turn-btn{background:var(--green);color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:700;}
+
+@media(max-width:900px){.final-topics{grid-template-columns:repeat(2,1fr);}}
 </style>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body>
 
-<!-- ЭКРАН МЕНЮ -->
-<div class="screen active" id="menuScreen">
+<!-- ЭКРАН ВЕДУЩЕГО -->
+<div class="screen active" id="gameScreen">
     <header class="header">
         <div class="header-brand">
-            <img src="logo.png.jpg" alt="Герб КДМ" class="header-logo">
             <div class="header-title">
-                <h1>Мои игры</h1>
-                <span class="subtitle">Своя игра · КДМ · 1999</span>
+                <h1 id="gameTitle">Своя игра · Турнир</h1>
+                <span class="subtitle" id="gameSubtitle">3 раунда по 3 игрока · Финал победителей</span>
             </div>
         </div>
         <div class="header-actions">
-            <button class="btn-reset" id="btnMenuFullscreen">На весь экран (F)</button>
-        </div>
-    </header>
-    <div class="games-grid" id="gamesGrid"></div>
-    <div class="add-game-wrap">
-        <button class="btn-add-game" id="btnAddGame">+ Новая игра</button>
-    </div>
-</div>
-
-<!-- ЭКРАН ВЕДУЩЕГО (ИГРА) -->
-<div class="screen" id="gameScreen">
-    <header class="header">
-        <div class="header-brand">
-            <img src="logo.png.jpg" alt="Герб КДМ" class="header-logo">
-            <div class="header-title">
-                <h1 id="gameTitle">Своя игра</h1>
-                <span class="subtitle" id="gameSubtitle"></span>
-            </div>
-        </div>
-        <div class="header-actions">
-            <button class="btn-reset" id="btnBackToMenu">◀ Меню</button>
-            <button class="btn-reset" id="btnGameEditor">Редактор</button>
-            <button class="btn-reset" id="btnReset">Начать заново</button>
-            <button class="btn-reset" id="btnPublicScreen">Открыть экран зрителя</button>
-            <button class="btn-reset" id="btnFullscreen">На весь экран (F)</button>
+            <button class="btn-reset" id="btnPublicScreen">Экран зрителя</button>
+            <button class="btn-reset" id="btnReset">Сброс игры</button>
+            <button class="btn-reset" id="btnFullscreen">Полный экран (F)</button>
         </div>
     </header>
     <div class="round-nav">
@@ -227,95 +168,95 @@ body.public-mode .modal-answer-preview{display:none!important;}
     <main class="board" id="board"></main>
 </div>
 
-<!-- МОДАЛЬНОЕ ОКНО ВОПРОСА -->
+<!-- МОДАЛЬНОЕ ОКНО: ЗАСТАВКА ТЕМЫ + ВОПРОС -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-        <div class="modifier-intro" id="modifierIntro" style="display:none;"><div class="modifier-intro-word">МОДИФИКАТОР</div></div>
-        <div class="modifier-panel" id="modifierPanel" style="display:none;">
-            <div class="modifier-icon" id="modifierIcon">✨</div><div class="modifier-title" id="modifierTitle"></div><div class="modifier-desc" id="modifierDesc"></div>
+        <!-- ЭТАП 1: НАЗВАНИЕ ТЕМЫ НА ВЕСЬ ЭКРАН -->
+        <div class="topic-splash" id="topicSplash">
+            <div class="topic-splash-label">Выбрана тема</div>
+            <div class="topic-splash-title" id="splashTopicTitle">КИНО</div>
+            <div class="topic-splash-points" id="splashTopicPoints">300</div>
+            <div class="topic-splash-hint">Нажмите ПРОБЕЛ, чтобы открыть вопрос и кнопки игроков</div>
         </div>
-        <div class="modal-select" id="catSelectPanel" style="display:none;"><div class="modal-topic" id="catTopicLabel"></div><div class="select-players" id="catSelectRow"></div></div>
-        <div class="auction-panel" id="auctionPanel" style="display:none;">
-            <div class="modal-topic" id="auctionTopicLabel"></div>
-            <div class="bid-row"><button class="bid-btn" id="bidMinus">−</button><input type="number" class="bid-input" id="bidInput" value="100" min="0" step="100"><button class="bid-btn" id="bidPlus">+</button></div>
-            <div class="bid-presets" id="bidPresets"></div>
-            <div class="select-players" id="auctionSelectRow"></div>
-        </div>
-        <div class="pass-panel" id="passPanel" style="display:none;">
-            <div class="modal-topic" id="passTopicLabel"></div>
-            <div class="bid-row"><button class="bid-btn" id="passValueMinus">−</button><input type="number" class="bid-input" id="passValueInput" value="500" min="200" max="1000" step="100"><button class="bid-btn" id="passValuePlus">+</button></div>
-            <div class="bid-presets" id="passPresets"></div>
-            <div class="select-players" id="passSelectRow"></div>
-        </div>
+
+        <!-- ЭТАП 2: САМ ВОПРОС -->
         <div class="modal-topic" id="modalTopic" style="display:none;"></div>
-        <div class="modal-points" id="modalPoints" style="display:none;">
-            <span class="base-val" id="modalPointsBase" style="display:none;"></span><span id="modalPointsVal"></span><span class="mod-badge" id="modalPointsMod" style="display:none;"></span>
-        </div>
+        <div class="modal-points" id="modalPoints" style="display:none;"></div>
         <div class="modal-question" id="modalQuestion" style="display:none;"></div>
-        <img id="modalImage" src="" alt="" style="display:none;">
         <div class="modal-answer" id="modalAnswer"></div>
         <div class="modal-answer-preview" id="modalAnswerPreview"></div>
-        
+
         <div class="scoring-panel" id="scoringPanel">
             <div class="player-select-row" id="playerSelectRow"></div>
-            <div class="adjust-row" id="adjustRow">
+            <div class="adjust-row">
                 <button class="adjust-btn minus" id="adjustMinus" disabled>−</button>
-                <input type="text" inputmode="numeric" class="score-input" id="scoreInput" value="0">
+                <input type="number" class="score-input" id="scoreInput" value="0">
                 <button class="adjust-btn plus" id="adjustPlus" disabled>+</button>
             </div>
-            <div class="adjust-row" id="flipRow" style="display:none;"><button class="adjust-btn flip" id="adjustFlip" disabled>⇄ Перевернуть счёт</button></div>
         </div>
-        <div class="modal-score-panel" id="modalScorePanel"></div>
     </div>
 </div>
 
-<!-- ЭКРАНЫ ПЕРЕРЫВОВ И ФИНАЛА -->
-<div class="break-overlay" id="breakOverlay"><div class="break-content"><div class="break-label" id="breakLabel"></div><div class="break-title" id="breakTitle"></div><div class="break-subtitle" id="breakSubtitle"></div><div class="break-scores" id="breakScores"></div></div></div>
+<!-- ПЕРЕРЫВ МЕЖДУ РАУНДАМИ -->
+<div class="break-overlay" id="breakOverlay">
+    <div class="break-content">
+        <div class="break-label" id="breakLabel"></div>
+        <div class="break-title" id="breakTitle"></div>
+        <div class="break-subtitle" id="breakSubtitle"></div>
+        <div class="break-scores" id="breakScores"></div>
+        <div style="margin-top:30px;font-size:13px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;">Нажмите в любое место экрана, чтобы продолжить</div>
+    </div>
+</div>
+
+<!-- ФИНАЛ (10 ТЕМ НА ВЫЧЁРКИВАНИЕ) -->
 <div class="final-overlay" id="finalOverlay">
     <div class="final-content">
         <div id="finalSelectView" style="display:flex;flex-direction:column;align-items:center;width:100%;">
-            <div class="final-label">Финальный раунд</div><div class="final-turn" id="finalTurn">Ход игрока 1</div><div class="final-topics" id="finalTopics"></div>
+            <div class="final-label">Финал победителей · Вычёркивание тем</div>
+            <div class="final-turn" id="finalTurn">Убирает тему: Игрок 1</div>
+            <div class="final-topics" id="finalTopics"></div>
         </div>
         <div id="finalRevealView" style="display:none;flex-direction:column;align-items:center;width:100%;">
-            <div class="final-label">Тема финального раунда</div><div class="final-reveal-title" id="finalRevealTitle"></div>
+            <div class="final-label">Единственная оставшаяся тема финала</div>
+            <div class="final-reveal-title" id="finalRevealTitle"></div>
+            <div style="font-size:14px;letter-spacing:.25em;color:var(--muted);text-transform:uppercase;">Нажмите ПРОБЕЛ, чтобы открыть финальный вопрос</div>
         </div>
         <div id="finalQuestionView" style="display:none;flex-direction:column;align-items:center;width:100%;">
-            <div class="final-topic-small" id="finalTopicSmall"></div><div class="final-question-text" id="finalQuestionText"></div><div class="final-answer-text" id="finalAnswerText"></div>
+            <div class="modal-topic" id="finalTopicSmall"></div>
+            <div class="modal-question" id="finalQuestionText"></div>
+            <div class="modal-answer" id="finalAnswerText"></div>
             <div class="scoring-panel" id="finalScoringPanel">
                 <div class="player-select-row" id="finalPlayerSelectRow"></div>
                 <div class="adjust-row">
-                    <button class="adjust-btn minus" id="finalAdjustMinus" disabled>−</button><input type="text" inputmode="numeric" class="score-input" id="finalScoreInput" value="0"><button class="adjust-btn plus" id="finalAdjustPlus" disabled>+</button>
+                    <button class="adjust-btn minus" id="finalAdjustMinus" disabled>−</button>
+                    <input type="number" class="score-input" id="finalScoreInput" value="1000">
+                    <button class="adjust-btn plus" id="finalAdjustPlus" disabled>+</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- РЕДАКТОР -->
-<div class="editor-overlay" id="editorOverlay">
-    <div class="editor-content">
-        <div class="editor-header">
-            <div class="editor-title-wrap"><h2>Редактор игры</h2><div class="editor-game-title" id="editorGameTitle"></div></div>
-            <div class="editor-actions"><button class="btn-reset" id="editorSave">Сохранить</button><button class="btn-reset" id="editorClose">Закрыть</button></div>
-        </div>
-        <textarea id="editorTextarea" spellcheck="false"></textarea><div class="editor-status" id="editorStatus"></div>
-    </div>
-</div>
-
-<!-- ЭКРАН ИГРОКА (ТЕЛЕФОН) -->
-<div class="screen" id="playerScreen" style="padding: 20px; text-align: center;">
-    <div id="playerLobby" style="max-width: 400px; margin: 40px auto;">
-        <h2 style="color: var(--gold); margin-bottom: 20px; font-size: 28px;">Вход в игру</h2>
-        <input type="text" id="playerRoomInput" placeholder="Код комнаты" class="player-input">
+<!-- ЭКРАН ТЕЛЕФОНА ИГРОКА -->
+<div class="screen" id="playerScreen">
+    <div class="player-card" id="playerLobby">
+        <h2 style="color:var(--gold);margin-bottom:8px;font-family:Georgia,serif;letter-spacing:.1em;text-transform:uppercase;">Своя Игра</h2>
+        <p style="color:#9aa8d0;font-size:13px;margin-bottom:22px;">Вход участника</p>
+        <input type="text" id="playerRoomInput" placeholder="Код комнаты (4 цифры)" inputmode="numeric" class="player-input">
         <input type="text" id="playerNameInput" placeholder="Твоё имя" class="player-input">
-        <button onclick="connectPlayer()" class="player-btn">Войти</button>
+        <button onclick="connectPlayer()" class="player-btn">Войти в игру</button>
     </div>
-    <div id="playerGame" style="display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; margin: 0 auto;">
-        <h2 id="playerNameDisplay" style="color: var(--gold); font-size: 26px; margin-bottom: 10px;"></h2>
-        <p id="playerStatus" style="font-size: 22px; margin-bottom: 30px; color: #fff; font-weight: bold;">Ожидание...</p>
+
+    <div class="player-card" id="playerGame" style="display:none;flex-direction:column;align-items:center;">
+        <div id="playerRoundBadge" style="background:rgba(240,196,25,.15);color:var(--gold);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Ожидание распределения</div>
+        <h2 id="playerNameDisplay" style="color:#fff;font-size:26px;margin-bottom:12px;font-family:Georgia,serif;"></h2>
+        <p id="playerStatus" style="font-size:18px;margin-bottom:16px;color:var(--gold);font-weight:600;line-height:1.4;">Ждём начала...</p>
+
+        <!-- ОГРОМНАЯ КРАСНАЯ КНОПКА -->
         <button id="buzzBtn" onclick="buzz()" class="buzz-btn">ЖАТЬ!</button>
-        <div id="playerBoard" style="display: none; flex-direction: column; gap: 10px; width: 100%;">
-            <h3 style="color: var(--gold); font-size: 22px; margin-bottom: 10px;">Выбери тему:</h3>
+
+        <!-- СЕТКА ТЕМ ДЛЯ ВЫБОРА (В РАУНДЕ ИЛИ В ФИНАЛЕ) -->
+        <div id="playerBoard" style="display:none;flex-direction:column;width:100%;">
             <div id="playerTopics" class="player-topic-grid"></div>
         </div>
     </div>
@@ -323,620 +264,707 @@ body.public-mode .modal-answer-preview{display:none!important;}
 
 <!-- ПАНЕЛЬ ВЕДУЩЕГО -->
 <div id="hostPanel">
-    <h3 style="color: var(--gold); margin-bottom: 15px; font-size: 20px; border-bottom: 1px solid #333; padding-bottom: 5px;">Панель ведущего</h3>
-    
-    <div style="margin-bottom: 15px;">
-        <div style="font-size: 14px; color: #9aa8d0; margin-bottom: 5px;">Игроки:</div>
-        <div id="hostPlayerList" class="host-player-list"><div style="color:#666;">Пока никого...</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:8px;margin-bottom:10px;">
+        <span style="color:var(--gold);font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.1em;">Панель ведущего</span>
+        <span id="roomCodeText" style="background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-weight:800;font-size:15px;">Код: ----</span>
     </div>
 
-    <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 15px;">
-        <div style="font-size: 14px; color: var(--gold); margin-bottom: 5px;">Статус:</div>
-        <div id="hostStatusText" style="font-size: 18px; color: #fff; font-weight: bold;">Ожидание...</div>
+    <div style="font-size:12px;color:#9aa8d0;margin-bottom:6px;">Участники (распределите по раундам Р1 / Р2 / Р3):</div>
+    <div id="hostPlayerList" class="host-player-list"><div style="color:#666;font-size:13px;">Никто ещё не вошёл с телефона...</div></div>
+
+    <div style="background:rgba(0,0,0,.35);padding:10px;border-radius:8px;margin-bottom:10px;border-left:3px solid var(--gold);">
+        <div id="hostStatusText" style="font-size:14px;color:#fff;font-weight:600;">Ожидание игроков...</div>
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button id="hostStartBuzzBtn" onclick="hostStartBuzz()" style="background: var(--gold); color: #000; padding: 10px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; display: none; width:100%;">Открыть кнопки ответа</button>
-        <div id="hostEvaluationBtns" style="display: none; gap: 10px;">
-            <button onclick="hostEvaluate(true)" style="flex: 1; background: var(--green); color: #fff; padding: 15px; font-size: 18px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer;">+ Верно</button>
-            <button onclick="hostEvaluate(false)" style="flex: 1; background: var(--red); color: #fff; padding: 15px; font-size: 18px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer;">- Неверно</button>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+        <button id="hostStartBuzzBtn" onclick="hostOpenQuestionAndBuzz()" style="background:var(--gold);color:#000;padding:12px;font-weight:800;border:none;border-radius:6px;cursor:pointer;display:none;width:100%;text-transform:uppercase;">Открыть вопрос и кнопки (Пробел)</button>
+        <div id="hostEvaluationBtns" style="display:none;gap:8px;">
+            <button onclick="hostEvaluate(true)" style="flex:1;background:var(--green);color:#fff;padding:12px;font-size:15px;font-weight:700;border:none;border-radius:6px;cursor:pointer;">+ Верно</button>
+            <button onclick="hostEvaluate(false)" style="flex:1;background:var(--red);color:#fff;padding:12px;font-size:15px;font-weight:700;border:none;border-radius:6px;cursor:pointer;">− Неверно</button>
         </div>
     </div>
 </div>
 
 <script>
-var MODIFIER_REGISTRY = {
-    x2: { label: '×2', sign: 'pos', apply: function(b) { return b * 2; } },
-    x3: { label: '×3', sign: 'pos', apply: function(b) { return b * 3; } },
-    plus500: { label: '+500', sign: 'pos', apply: function(b) { return b + 500; } },
-    plus1000: { label: '+1000', sign: 'pos', apply: function(b) { return b + 1000; } },
-    half: { label: '÷2', sign: 'neg', apply: function(b) { return Math.round(b / 2); } },
-    minus500: { label: '−500', sign: 'neg', apply: function(b) { return Math.max(0, b - 500); } },
-    zero: { label: '×0', sign: 'neg', apply: function() { return 0; } },
-    flip: { label: '⇄', sign: 'neg', special: 'flip', apply: null }
-};
-var SECRET_MODIFIER_POOL = ['x2','x3','plus500','plus1000','half','minus500','zero','flip'];
-
-var DEFAULT_DATA = {
-    games: [{
-        id: 'default-1',
-        title: 'Своя игра КДМ',
-        subtitle: 'Комитет по делам молодёжи · 1999',
-        finalQuestionValue: 1000,
-        players: ['Игрок 1','Игрок 2','Игрок 3'],
-        rounds: [
-            {
-                title: "Раунд 1", points: [100,200,300,400,500], playerIndices: [0,1,2],
-                topics: [
-                    { title: "Кино", questions: [
-                        { points: 100, type: "modifier", modIcon: "×2", modTitle: "Удвоение", modDesc: "Очки удваиваются", modValue: 200 },
-                        { points: 200, question: "Фильм про человека, который случайно попал в прошлое и изменил будущее. В названии есть направление движения.", answer: "«Назад в будущее»" },
-                        { points: 300, question: "Фильм про группу друзей, которые решили ограбить казино. В названии есть число и имя главного героя.", answer: "«Одиннадцать друзей Оушена»" },
-                        { points: 400, question: "Фильм про парня, который не может выспаться, потому что его преследует маньяк. В названии есть улица и дерево.", answer: "«Кошмар на улице Вязов»" },
-                        { points: 500, question: "Фильм про то, как мужик ищет свою машину, но в итоге спасает мир. В названии — скорость и драйв.", answer: "«Форсаж»" }
-                    ]},
-                    { title: "Цитаты и кадры", questions: [
-                        { points: 100, question: "«Я вернусь».", answer: "Терминатор" },
-                        { points: 200, question: "«Да пребудет с тобой Сила».", answer: "«Звёздные войны»" },
-                        { points: 300, question: "«Я — твой отец».", answer: "«Звёздные войны»" },
-                        { points: 400, question: "«Зачем ты такой серьёзный?»", answer: "«Тёмный рыцарь» (Джокер)" },
-                        { points: 500, question: "«Я — Грут».", answer: "«Стражи Галактики»" }
-                    ]},
-                    { title: "Адреса Дагестана", questions: [
-                        { points: 100, question: "Крупнейший песчаный бархан Европы. Здесь снимали «Белое солнце пустыни».", answer: "Бархан Сарыкум" },
-                        { points: 200, question: "Самый глубокий каньон Европы. Визитная карточка Дагестана.", answer: "Сулакский каньон" },
-                        { points: 300, question: "Древнее село-призрак на горе Гамсутльмеэр. Последний житель умер в 2015 году.", answer: "Гамсутль" },
-                        { points: 400, question: "Заброшенная крепость на высоте 2000 метров. Столица Кайтагского уцмийства.", answer: "Кала-Корейш" },
-                        { points: 500, question: "Ущелье в Лакском районе. Около 4000 наскальных рисунков.", answer: "Ущелье Виттурзивалу" }
-                    ]},
-                    { title: "Кошачьи", questions: [
-                        { points: 100, question: "Как звали кота из Простоквашино?", answer: "Матроскин" },
-                        { points: 200, question: "Какая большая кошка самая быстрая на суше?", answer: "Гепард" },
-                        { points: 300, question: "Сколько усов у кошки в среднем?", answer: "24" },
-                        { points: 400, question: "Какое животное из семейства кошачьих самое крупное?", answer: "Тигр" },
-                        { points: 500, question: "Почему кошка сидит на компьютере?", answer: "Потому что там мышка" }
-                    ]},
-                    { title: "ДГУ", questions: [
-                        { points: 100, question: "В каком году был основан ДГУ?", answer: "В 1931 году" },
-                        { points: 200, question: "Чьё имя носил педагогический институт до 1957 года?", answer: "Сулеймана Стальского" },
-                        { points: 300, question: "Сколько студентов было принято на первый курс в 1931 году?", answer: "75 студентов" },
-                        { points: 400, question: "Этот выпускник ДГУ — известный предприниматель. Назовите его.", answer: "Сулейман Керимов" },
-                        { points: 500, question: "Назовите хотя бы двух глав РД, выпускников ДГУ.", answer: "Магомедали Магомедов и Муху Алиев" }
-                    ]}
-                ]
-            },
-            {
-                title: "Раунд 2", points: [200,400,600,800,1000], playerIndices: [0,1,2],
-                topics: [
-                    { title: "Алиэкспресс", questions: [
-                        { points: 200, question: "«Имеет ушки, резинку и надпись Fashion. Носится на лице.»", answer: "Маска для лица" },
-                        { points: 400, question: "«Если ты сидишь как вопросительный знак — это для тебя.»", answer: "Корректор осанки" },
-                        { points: 600, question: "«Magic massager! Расслабляет все мышцы.»", answer: "Вибромассажёр" },
-                        { points: 800, question: "«Преврати смартфон в кинотеатр! Крепится к телефону.»", answer: "Мини-проектор" },
-                        { points: 1000, question: "«Умная лампа с Bluetooth и музыкой!»", answer: "Светодиодная лампа" }
-                    ]},
-                    { title: "Самая самая", questions: [
-                        { points: 200, question: "Самое глубокое место на планете.", answer: "Марианская впадина" },
-                        { points: 400, question: "Самая большая страна в мире по площади.", answer: "Россия" },
-                        { points: 600, question: "Самое старое действующее высшее учебное заведение.", answer: "Университет «Аль-Карауин»" },
-                        { points: 800, question: "Самое длинное сооружение в мире.", answer: "Большой мост Даньян-Куньшань" },
-                        { points: 1000, question: "Самое старое живое дерево в мире.", answer: "Сосна Мафусаил" }
-                    ]},
-                    { title: "Вспомни 5", questions: [
-                        { points: 200, type: "manual", question: "Назовите 5 фруктов." },
-                        { points: 400, type: "manual", question: "Назовите 5 пород собак." },
-                        { points: 600, type: "manual", question: "Назовите 5 вещей, которые есть почти в каждой квартире." },
-                        { points: 800, type: "manual", question: "Назовите 5 фильмов с числом в названии." },
-                        { points: 1000, type: "manual", question: "Назовите 5 отговорок, чтобы не идти на пару." }
-                    ]},
-                    { title: "Женский цитатник", questions: [
-                        { points: 200, question: "«Женщиной не рождаются, …»", answer: "…женщиной становятся." },
-                        { points: 400, question: "«Мода проходит, …»", answer: "…стиль остаётся." },
-                        { points: 600, question: "«Никто не может заставить вас чувствовать себя неполноценным без …»", answer: "…вашего согласия." },
-                        { points: 800, question: "«…они никогда не забудут, что вы заставили их почувствовать»", answer: "Майя Энджелоу" },
-                        { points: 1000, question: "«Если хочешь, чтобы что-то было сделано, …»", answer: "…попроси женщину." }
-                    ]},
-                    { title: "Русский человек", questions: [
-                        { points: 200, question: "Что делает русский человек, когда садится за стол с гостями?", answer: "Накладывает полную тарелку" },
-                        { points: 400, question: "Что делает русский человек на «Заходи на минутку»?", answer: "Остаётся на три часа" },
-                        { points: 600, question: "Что делает русский человек на улице −25°C?", answer: "Расстёгивает куртку" },
-                        { points: 800, question: "Что делает русский человек на «А слабо?»", answer: "Делает, даже если опасно" },
-                        { points: 1000, question: "Что делает русский человек, когда всё пошло не по плану?", answer: "Ставит чайник" }
-                    ]}
-                ]
-            }
-        ],
-        finalTopics: [
-            { title: "Космос",       question: "«Красная планета»?", answer: "Марс" },
-            { title: "Животные",     question: "Самое крупное животное Земли?", answer: "Синий кит" },
-            { title: "Изобретения",  question: "Кто изобрёл лампу накаливания?", answer: "Томас Эдисон" },
-            { title: "Русский язык", question: "Сколько букв в русском алфавите?", answer: "33" },
-            { title: "Лидеры",       question: "Кто возглавил Советское государство в 1917?", answer: "Владимир Ленин" },
-            { title: "Олимпиады",    question: "Город первых ОИ 1896?", answer: "Афины" },
-            { title: "Технологии",   question: "Что значит WWW?", answer: "World Wide Web" },
-            { title: "Еда",          question: "Родина пиццы?", answer: "Италия" },
-            { title: "Кинематограф", question: "Первый «Оскар» 1929?", answer: "«Крылья» (Wings)" },
-            { title: "Природа",      question: "Самое высокое дерево мира?", answer: "Секвойя" }
-        ]
-    }]
-};
-
-var STORAGE_KEY = 'svoya-igra-v40';
-var deepClone = function(o) { return JSON.parse(JSON.stringify(o)); };
-var generateId = function() { return 'g' + Date.now() + '-' + Math.random().toString(36).slice(2, 8); };
-
-function migrateGame(game) {
-    if (!Array.isArray(game.players)) game.players = ['Игрок 1','Игрок 2','Игрок 3'];
-    if (typeof game.finalQuestionValue !== 'number') game.finalQuestionValue = 1000;
-    if (!Array.isArray(game.rounds)) game.rounds = [];
-    if (!Array.isArray(game.finalTopics)) game.finalTopics = [];
-    return game;
-}
-
-function loadData() {
-    try {
-        var saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            var parsed = JSON.parse(saved);
-            if (parsed && Array.isArray(parsed.games) && parsed.games.length) {
-                parsed.games.forEach(migrateGame);
-                return parsed;
-            }
+// ==========================================
+// БАЗА ВОПРОСОВ: 3 РАУНДА ПО 5 ТЕМ + 10 ФИНАЛЬНЫХ
+// ==========================================
+var GAME_DATA = {
+    title: 'Своя игра · Турнир',
+    subtitle: '3 раунда по 3 игрока · Финал победителей',
+    finalQuestionValue: 1000,
+    rounds: [
+        {
+            title: "Раунд 1", points: [100, 200, 300, 400, 500],
+            topics: [
+                { title: "Кино и сериалы", questions: [
+                    { points: 100, question: "В каком фильме главный герой оставляет послание «Я вернусь»?", answer: "«Терминатор»" },
+                    { points: 200, question: "Как называется вымышленная школа чародейства и волшебства в книгах о Гарри Поттере?", answer: "Хогвартс" },
+                    { points: 300, question: "В этом сериале учитель химии начинает варить запрещённые вещества, чтобы обеспечить семью.", answer: "«Во все тяжкие» (Breaking Bad)" },
+                    { points: 400, question: "Какой фильм Кристофера Нолана рассказывает о проникновении в сны людей?", answer: "«Начало» (Inception)" },
+                    { points: 500, question: "Назовите имя режиссёра фильмов «Криминальное чтиво» и «Бесславные ублюдки».", answer: "Квентин Тарантино" }
+                ]},
+                { title: "География", questions: [
+                    { points: 100, question: "На каком материке расположена пустыня Сахара?", answer: "Африка" },
+                    { points: 200, question: "Столица Японии?", answer: "Токио" },
+                    { points: 300, question: "Какая река считается самой полноводной в мире?", answer: "Амазонка" },
+                    { points: 400, question: "Какой пролив разделяет Азию и Северную Америку?", answer: "Берингов пролив" },
+                    { points: 500, question: "В какой стране находится самое высокогорное судоходное озеро Титикака?", answer: "Перу и Боливия" }
+                ]},
+                { title: "Кавказ и Дагестан", questions: [
+                    { points: 100, question: "Как называется самый глубокий каньон Европы, расположенный в Дагестане?", answer: "Сулакский каньон" },
+                    { points: 200, question: "Древний город на юге Дагестана, которому более 2000 лет, с крепостью Нарын-Кала.", answer: "Дербент" },
+                    { points: 300, question: "Высокогорное село-призрак в Гунибском районе, покинутое жителями в XXI веке.", answer: "Гамсутль" },
+                    { points: 400, question: "Крупнейший песчаный бархан Европы недалеко от Махачкалы.", answer: "Сарыкум" },
+                    { points: 500, question: "Название традиционного дагестанского блюда из варёных кусочков теста с мясом и чесночным соусом.", answer: "Хинкал" }
+                ]},
+                { title: "Спорт", questions: [
+                    { points: 100, question: "Сколько игроков одной команды одновременно находится на поле в классическом футболе?", answer: "11 игроков" },
+                    { points: 200, question: "В каком виде спорта используются термины «эйс», «брейк-пойнт» и «тай-брейк»?", answer: "Большой теннис" },
+                    { points: 300, question: "Какая страна является родиной Олимпийских игр?", answer: "Греция" },
+                    { points: 400, question: "Сколько колец изображено на олимпийском флаге?", answer: "5 колец" },
+                    { points: 500, question: "Какой российский боец UFC завершил карьеру с рекордом 29–0?", answer: "Хабиб Нурмагомедов" }
+                ]},
+                { title: "Логика и факты", questions: [
+                    { points: 100, question: "Что тяжелее: килограмм железа или килограмм пуха?", answer: "Одинаково (по 1 кг)" },
+                    { points: 200, question: "Сколько месяцев в году имеют 28 дней?", answer: "Все 12 месяцев" },
+                    { points: 300, question: "Какой химический элемент обозначается в таблице Менделеева буквой «O»?", answer: "Кислород" },
+                    { points: 400, question: "Какая планета Солнечной системы самая большая?", answer: "Юпитер" },
+                    { points: 500, question: "Сколько граней у стандартного кубика Рубика 3×3?", answer: "6 граней" }
+                ]}
+            ]
+        },
+        {
+            title: "Раунд 2", points: [200, 400, 600, 800, 1000],
+            topics: [
+                { title: "Технологии и IT", questions: [
+                    { points: 200, question: "Как расшифровывается аббревиатура Wi-Fi в быту, и для чего она нужна?", answer: "Беспроводная передача данных (Wireless Fidelity)" },
+                    { points: 400, question: "Кто является сооснователем компании Apple вместе со Стивом Джобсом?", answer: "Стив Возняк" },
+                    { points: 600, question: "Какой язык программирования назван в честь британского комедийного шоу «Летающий цирк Монти ...»?", answer: "Python" },
+                    { points: 800, question: "Что означает ошибка 404 в браузере?", answer: "Страница не найдена (Not Found)" },
+                    { points: 1000, question: "В каком году был запущен первый искусственный спутник Земли?", answer: "В 1957 году" }
+                ]},
+                { title: "История", questions: [
+                    { points: 200, question: "Кто стал первым космонавтом в истории человечества?", answer: "Юрий Гагарин" },
+                    { points: 400, question: "В каком году началась Вторая мировая война?", answer: "В 1939 году" },
+                    { points: 600, question: "Какое чудо света единственное сохранилось до наших дней?", answer: "Пирамида Хеопса" },
+                    { points: 800, question: "Как назывался корабль, на котором Чарльз Дарвин совершил кругосветное путешествие?", answer: "«Бигль»" },
+                    { points: 1000, question: "Какой город был столицей Российской империи до 1918 года?", answer: "Санкт-Петербург (Петроград)" }
+                ]},
+                { title: "Музыка", questions: [
+                    { points: 200, question: "Сколько нот в классической музыкальной октаве?", answer: "7 нот" },
+                    { points: 400, question: "Какой музыкальный инструмент имеет 88 клавиш?", answer: "Рояль / Фортепиано" },
+                    { points: 600, question: "Какую группу прославили Джон Леннон и Пол Маккартни?", answer: "The Beatles" },
+                    { points: 800, question: "Кто написал музыку к балету «Щелкунчик» и «Лебединое озеро»?", answer: "Пётр Ильич Чайковский" },
+                    { points: 1000, question: "Какой итальянский город считается столицей оперного искусства с театром «Ла Скала»?", answer: "Милан" }
+                ]},
+                { title: "Животный мир", questions: [
+                    { points: 200, question: "Какое сухопутное животное развивает самую высокую скорость?", answer: "Гепард" },
+                    { points: 400, question: "Какая птица не умеет летать, но отлично плавает и живёт в Антарктиде?", answer: "Пингвин" },
+                    { points: 600, question: "Сколько сердец у осьминога?", answer: "3 сердца" },
+                    { points: 800, question: "Какое млекопитающее способно к полноценному машущему полёту?", answer: "Летучая мышь" },
+                    { points: 1000, question: "У какого животного самый длинный язык относительно тела, позволяющий чистить им уши?", answer: "Жираф" }
+                ]},
+                { title: "Литература", questions: [
+                    { points: 200, question: "Кто написал роман-эпопею «Война и мир»?", answer: "Лев Николаевич Толстой" },
+                    { points: 400, question: "Как звали верного друга и биографа Шерлока Холмса?", answer: "Доктор Джон Ватсон" },
+                    { points: 600, question: "Какой русский поэт погиб на дуэли у подножия горы Машук в Пятигорске?", answer: "Михаил Юрьевич Лермонтов" },
+                    { points: 800, question: "Кто автор романа «Мастер и Маргарита»?", answer: "Михаил Булгаков" },
+                    { points: 1000, question: "Как назывался меч короля Артура?", answer: "Экскалибур" }
+                ]}
+            ]
+        },
+        {
+            title: "Раунд 3", points: [300, 600, 900, 1200, 1500],
+            topics: [
+                { title: "Наука и открытия", questions: [
+                    { points: 300, question: "Какой закон физики открыл Исаак Ньютон, согласно легенде, благодаря упавшему яблоку?", answer: "Закон всемирного тяготения" },
+                    { points: 600, question: "Какой металл остаётся жидким при комнатной температуре?", answer: "Ртуть" },
+                    { points: 900, question: "Чему примерно равна скорость света в вакууме?", answer: "300 000 км/с" },
+                    { points: 1200, question: "Какой газ составляет около 78% атмосферы Земли?", answer: "Азот" },
+                    { points: 1500, question: "Кто сформулировал специальную и общую теорию относительности?", answer: "Альберт Эйнштейн" }
+                ]},
+                { title: "Еда и кухня мира", questions: [
+                    { points: 300, question: "Из какого растения получают какао-порошок и шоколад?", answer: "Какао-бобы (шоколадное дерево)" },
+                    { points: 600, question: "Какая страна является родиной суши и роллов?", answer: "Япония" },
+                    { points: 900, question: "Какой сыр традиционно используют для приготовления классического тирамису?", answer: "Маскарпоне" },
+                    { points: 1200, question: "Какая специя считается самой дорогой в мире и добывается из цветков крокуса?", answer: "Шафран" },
+                    { points: 1500, question: "Как называется холодный испанский суп из протёртых томатов?", answer: "Гаспачо" }
+                ]},
+                { title: "Искусство", questions: [
+                    { points: 300, question: "Кто написал знаменитую картину «Мона Лиза» (Джоконда)?", answer: "Леонардо да Винчи" },
+                    { points: 600, question: "В каком городе находится знаменитый музей Эрмитаж?", answer: "Санкт-Петербург" },
+                    { points: 900, question: "Какой художник отрезал себе мочку уха и написал «Звёздную ночь»?", answer: "Винсент Ван Гог" },
+                    { points: 1200, question: "Как называется вид живописи водяными красками по сырой штукатурке?", answer: "Фреска" },
+                    { points: 1500, question: "Кто создал мраморную скульптуру «Давид» во Флоренции?", answer: "Микеланджело" }
+                ]},
+                { title: "Космос", questions: [
+                    { points: 300, question: "Как называется наша галактика?", answer: "Млечный Путь" },
+                    { points: 600, question: "Какую планету называют «Красной планетой»?", answer: "Марс" },
+                    { points: 900, question: "У какой планеты Солнечной системы самые заметные кольца?", answer: "Сатурн" },
+                    { points: 1200, question: "Как называется ближайшая к Земле звезда?", answer: "Солнце" },
+                    { points: 1500, question: "Как назывался космический корабль Юрия Гагарина?", answer: "«Восток-1»" }
+                ]},
+                { title: "Обо всём на свете", questions: [
+                    { points: 300, question: "Сколько цветов у классической радуги?", answer: "7 цветов" },
+                    { points: 600, question: "Какая валюта используется в Великобритании?", answer: "Фунт стерлингов" },
+                    { points: 900, question: "Сколько зубов у взрослого человека в норме?", answer: "32 зуба" },
+                    { points: 1200, question: "Какой самый твёрдый природный минерал на Земле?", answer: "Алмаз" },
+                    { points: 1500, question: "В каком году состоялись летние Олимпийские игры в Москве?", answer: "В 1980 году" }
+                ]}
+            ]
         }
-    } catch (e) {}
-    return deepClone(DEFAULT_DATA);
-}
-
-function saveData() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); } catch (e) {} }
-
-var appData = loadData();
-var currentGameId = null, currentGame = null, currentRound = 0;
-var answeredCells = new Set(), currentCell = null, gameFinished = false, editingGameId = null;
-var modalState = 'question';
-var catReceiverPi = null, auctionWinnerPi = null, auctionBid = 0, secretModifierKey = null;
-var passReceiverPi = null, passValue = 0;
-var roundScores = {}, roundWinners = {};
-var finalState = 'select', finalRemaining = [], finalEliminated = 0;
-var finalCurrentTopic = null, finalists = [], finalScores = {};
-var selectedScoringPi = null, selectedFinalPi = null;
-
-function $(id) { return document.getElementById(id); }
-var menuScreen = $('menuScreen'), gameScreen = $('gameScreen'), playerScreen = $('playerScreen');
-var gamesGrid = $('gamesGrid'), btnAddGame = $('btnAddGame'), btnMenuFullscreen = $('btnMenuFullscreen');
-var board = $('board'), modalOverlay = $('modalOverlay');
-var modifierIntro = $('modifierIntro'), modifierPanel = $('modifierPanel'), modifierIcon = $('modifierIcon'), modifierTitle = $('modifierTitle'), modifierDesc = $('modifierDesc');
-var catSelectPanel = $('catSelectPanel'), catTopicLabel = $('catTopicLabel'), catSelectRow = $('catSelectRow');
-var auctionPanel = $('auctionPanel'), auctionTopicLabel = $('auctionTopicLabel');
-var bidInput = $('bidInput'), bidMinus = $('bidMinus'), bidPlus = $('bidPlus'), bidPresets = $('bidPresets'), auctionSelectRow = $('auctionSelectRow');
-var passPanel = $('passPanel'), passTopicLabel = $('passTopicLabel');
-var passValueInput = $('passValueInput'), passValueMinus = $('passValueMinus'), passValuePlus = $('passValuePlus');
-var passPresets = $('passPresets'), passSelectRow = $('passSelectRow');
-var modalTopic = $('modalTopic'), modalPoints = $('modalPoints'), modalPointsBase = $('modalPointsBase'), modalPointsVal = $('modalPointsVal'), modalPointsMod = $('modalPointsMod');
-var modalQuestion = $('modalQuestion'), modalImage = $('modalImage'), modalAnswer = $('modalAnswer'), modalAnswerPreview = $('modalAnswerPreview');
-var scoringPanel = $('scoringPanel'), playerSelectRow = $('playerSelectRow');
-var adjustRow = $('adjustRow'), adjustMinus = $('adjustMinus'), adjustPlus = $('adjustPlus'), scoreInput = $('scoreInput');
-var flipRow = $('flipRow'), adjustFlip = $('adjustFlip');
-var modalScorePanel = $('modalScorePanel');
-var breakOverlay = $('breakOverlay'), breakLabel = $('breakLabel'), breakTitle = $('breakTitle'), breakSubtitle = $('breakSubtitle'), breakScores = $('breakScores');
-var finalOverlay = $('finalOverlay');
-var finalSelectView = $('finalSelectView'), finalRevealView = $('finalRevealView'), finalQuestionView = $('finalQuestionView');
-var finalTurn = $('finalTurn'), finalTopicsEl = $('finalTopics'), finalRevealTitle = $('finalRevealTitle'), finalTopicSmall = $('finalTopicSmall');
-var finalQuestionText = $('finalQuestionText'), finalAnswerText = $('finalAnswerText');
-var finalScoringPanel = $('finalScoringPanel'), finalPlayerSelectRow = $('finalPlayerSelectRow');
-var finalAdjustMinus = $('finalAdjustMinus'), finalAdjustPlus = $('finalAdjustPlus'), finalScoreInput = $('finalScoreInput');
-var roundIndicator = $('roundIndicator'), prevRoundBtn = $('prevRound'), nextRoundBtn = $('nextRound'), scorePanel = $('scorePanel');
-var gameTitleEl = $('gameTitle'), gameSubtitleEl = $('gameSubtitle');
-var btnBackToMenu = $('btnBackToMenu'), btnGameEditor = $('btnGameEditor'), btnReset = $('btnReset'), btnFullscreen = $('btnFullscreen');
-var editorOverlay = $('editorOverlay'), editorTextarea = $('editorTextarea'), editorStatus = $('editorStatus'), editorGameTitle = $('editorGameTitle');
-var editorSave = $('editorSave'), editorClose = $('editorClose');
-
-function showScreen(id) {
-    var screens = document.querySelectorAll('.screen');
-    for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
-    $(id).classList.add('active');
-    window.scrollTo(0, 0);
-}
-
-function renderMenu() {
-    gamesGrid.innerHTML = '';
-    if (!appData.games.length) {
-        var e = document.createElement('div');
-        e.className = 'menu-empty'; e.textContent = 'Пока нет ни одной игры.';
-        e.style.gridColumn = '1 / -1'; gamesGrid.appendChild(e); return;
-    }
-    appData.games.forEach(function(game) {
-        var card = document.createElement('div');
-        card.className = 'game-card';
-        card.innerHTML = '<div class="game-card-title"></div><div class="game-card-subtitle"></div><div class="game-card-meta"></div><div class="game-card-actions"><button class="btn-play">Играть</button><button class="icon-btn" data-act="edit" title="Редактор"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button><button class="icon-btn" data-act="del" title="Удалить"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg></button></div>';
-        card.querySelector('.game-card-title').textContent = game.title || 'Без названия';
-        card.querySelector('.game-card-subtitle').textContent = game.subtitle || '';
-        var rc = Array.isArray(game.rounds) ? game.rounds.length : 0;
-        var fc = Array.isArray(game.finalTopics) ? game.finalTopics.length : 0;
-        var pc = Array.isArray(game.players) ? game.players.length : 0;
-        card.querySelector('.game-card-meta').textContent = rc + ' раунд(а) · ' + pc + ' игроков · ' + fc + ' финальных тем';
-        card.querySelector('.btn-play').addEventListener('click', function() { startGame(game.id); });
-        card.querySelector('[data-act="edit"]').addEventListener('click', function() { openEditor(game.id); });
-        card.querySelector('[data-act="del"]').addEventListener('click', function() { deleteGame(game.id, game.title); });
-        gamesGrid.appendChild(card);
-    });
-}
-
-function addNewGame() {
-    var newGame = {
-        id: generateId(), title: 'Новая игра', subtitle: '', finalQuestionValue: 1000,
-        players: ['Игрок 1','Игрок 2','Игрок 3'],
-        rounds: [{ title: "Раунд 1", points: [100,200,300,400,500], playerIndices: [0,1,2], topics: [1,2,3,4,5].map(function(n) { return { title: 'Тема ' + n, questions: [100,200,300,400,500].map(function(p, i) { return { points: p, question: 'Вопрос ' + n + '-' + (i+1), answer: 'Ответ' }; }) }; }) }],
-        finalTopics: Array.from({ length: 10 }, function(_, i) { return { title: 'Тема ' + (i+1), question: 'Вопрос финала ' + (i+1), answer: 'Ответ' }; })
-    };
-    appData.games.push(newGame); saveData(); renderMenu(); openEditor(newGame.id);
-}
-
-function deleteGame(id, title) { if (!confirm('Удалить игру «' + (title || 'Без названия') + '»?')) return; appData.games = appData.games.filter(function(g) { return g.id !== id; }); saveData(); renderMenu(); }
-function getGame(id) { for (var i = 0; i < appData.games.length; i++) if (appData.games[i].id === id) return appData.games[i]; return null; }
-
-function startGame(gameId) {
-    var game = getGame(gameId);
-    if (!game) return;
-    migrateGame(game);
-    currentGameId = gameId; currentGame = game; currentRound = 0;
-    answeredCells = new Set(); currentCell = null; gameFinished = false;
-    modalState = 'question';
-    catReceiverPi = null; auctionWinnerPi = null; auctionBid = 0; secretModifierKey = null;
-    passReceiverPi = null; passValue = 0;
-    
-    // Если уже есть подключившиеся по телефону игроки, подставляем их имена
-    if (connectedPlayers.length > 0) {
-        syncConnectedPlayersToGame();
-    } else {
-        roundScores = {};
-        game.rounds.forEach(function(r, idx) {
-            roundScores[idx] = {};
-            (r.playerIndices || []).forEach(function(pi) { roundScores[idx][pi] = 0; });
-        });
-    }
-    
-    roundWinners = {}; finalists = []; finalScores = {};
-    gameTitleEl.textContent = game.title || 'Своя игра';
-    gameSubtitleEl.textContent = game.subtitle || '';
-    renderBoard(); renderScorePanel(); showScreen('gameScreen');
-    
-    if (!IS_PUBLIC && !playerMode && !mqttClient) {
-        initMQTT(true, roomCode);
-    }
-}
-
-function backToMenu() {
-    modalOverlay.classList.remove('open'); breakOverlay.classList.remove('open'); breakOverlay.dataset.mode = ''; finalOverlay.classList.remove('open');
-    currentGameId = null; currentGame = null; passReceiverPi = null; passValue = 0;
-    renderMenu(); showScreen('menuScreen');
-}
-
-function renderBoard() {
-    board.innerHTML = ''; if (!currentGame) return;
-    var round = currentGame.rounds[currentRound]; if (!round) return;
-    var corner = document.createElement('div'); corner.className = 'cell-topic'; corner.textContent = 'Темы / Баллы'; board.appendChild(corner);
-    round.points.forEach(function(p) { var el = document.createElement('div'); el.className = 'cell-topic'; el.textContent = p; board.appendChild(el); });
-    round.topics.forEach(function(topic, ti) {
-        var title = document.createElement('div'); title.className = 'cell-topic'; title.textContent = topic.title; board.appendChild(title);
-        topic.questions.forEach(function(q, qi) {
-            var cell = document.createElement('div'); cell.className = 'cell-points'; cell.textContent = q.points;
-            var key = currentRound + '-' + ti + '-' + qi;
-            if (answeredCells.has(key)) cell.classList.add('answered');
-            cell.dataset.key = key; cell.dataset.topic = topic.title; cell.dataset.points = q.points;
-            cell.dataset.question = q.question || ''; cell.dataset.answer = q.answer || '';
-            if (q.image) cell.dataset.image = q.image;
-            if (q.type) cell.dataset.type = q.type;
-            if (q.modifier) cell.dataset.modifier = q.modifier;
-            if (q.modTitle) cell.dataset.modTitle = q.modTitle;
-            if (q.modDesc) cell.dataset.modDesc = q.modDesc;
-            if (q.modIcon) cell.dataset.modIcon = q.modIcon;
-            if (typeof q.modValue === 'number') cell.dataset.modValue = q.modValue;
-            if (typeof q.minValue === 'number') cell.dataset.minValue = q.minValue;
-            if (typeof q.maxValue === 'number') cell.dataset.maxValue = q.maxValue;
-            cell.addEventListener('click', function() { openQuestion(cell); });
-            board.appendChild(cell);
-        });
-    });
-    updateRoundNav();
-}
-
-function updateRoundNav() { var total = currentGame.rounds.length; roundIndicator.textContent = 'Раунд ' + (currentRound + 1) + ' из ' + total; prevRoundBtn.disabled = currentRound === 0; nextRoundBtn.disabled = false; }
-function goToRound(idx) { if (idx < 0 || idx >= currentGame.rounds.length) return; currentRound = idx; if (!roundScores[idx]) { roundScores[idx] = {}; (currentGame.rounds[idx].playerIndices || []).forEach(function(pi) { roundScores[idx][pi] = 0; }); } renderBoard(); renderScorePanel(); }
-function nextRound() { var total = currentGame.rounds.length; if (currentRound < total - 1) goToRound(currentRound + 1); else showFinalIntro(); }
-
-function renderScorePanel() {
-    scorePanel.innerHTML = ''; if (modalScorePanel) modalScorePanel.innerHTML = '';
-    if (!currentGame) return;
-    var round = currentGame.rounds[currentRound]; if (!round) return;
-    var playerIndices = round.playerIndices || [];
-    
-    // Адаптируем сетку карточек под количество игроков
-    scorePanel.style.gridTemplateColumns = 'repeat(' + Math.max(1, playerIndices.length) + ', 1fr)';
-    
-    var maxScore = -Infinity, leaderPi = null;
-    playerIndices.forEach(function(pi) { var s = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0; if (s > maxScore) { maxScore = s; leaderPi = pi; } });
-    var hasLeader = maxScore > 0;
-    playerIndices.forEach(function(pi) {
-        var name = currentGame.players[pi] || ('Игрок ' + (pi + 1));
-        var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0;
-        var card = document.createElement('div'); card.className = 'score-card';
-        if (hasLeader && pi === leaderPi) card.classList.add('leader');
-        if (selectedScoringPi === pi) card.classList.add('answering');
-        if (score < 0) card.classList.add('negative');
-        card.innerHTML = '<div class="score-card-name"></div><div class="score-card-score"></div>';
-        card.querySelector('.score-card-name').textContent = name; card.querySelector('.score-card-score').textContent = score;
-        scorePanel.appendChild(card);
-        if (modalScorePanel) { var mc = card.cloneNode(true); modalScorePanel.appendChild(mc); }
-    });
-}
-
-function getModifierKey(cell) { if (!cell) return null; if (cell.dataset.type === 'secret') return secretModifierKey; return cell.dataset.modifier || null; }
-function computeValue(cell) { var base = parseInt(cell.dataset.points, 10) || 0; var key = getModifierKey(cell); if (!key || !MODIFIER_REGISTRY[key]) return base; var m = MODIFIER_REGISTRY[key]; if (m.special === 'flip' || !m.apply) return base; return Math.max(0, Math.round(m.apply(base))); }
-
-function openQuestion(cell) {
-    currentCell = cell; catReceiverPi = null; auctionWinnerPi = null; auctionBid = 0; secretModifierKey = null; passReceiverPi = null; passValue = 0;
-    buzzedPlayer = null;
-    hideAllModalPanels(); var type = cell.dataset.type || 'normal';
-    
-    // Показываем ведущему кнопку открытия баззеров на телефонах
-    if (!playerMode && !IS_PUBLIC && mqttClient) {
-        document.getElementById('hostStartBuzzBtn').style.display = 'block';
-        document.getElementById('hostEvaluationBtns').style.display = 'none';
-        document.getElementById('hostStatusText').textContent = "Вопрос открыт. Нажмите кнопку или Пробел, чтобы разрешить ответ.";
-    }
-    
-    if (type === 'modifier') { modalState = 'modifier-intro'; modifierIntro.style.display = 'flex'; modalOverlay.classList.add('open'); return; }
-    if (type === 'secret') { var pool = SECRET_MODIFIER_POOL.slice(); secretModifierKey = pool[Math.floor(Math.random() * pool.length)]; }
-    if (type === 'cat') { modalState = 'cat-select'; catTopicLabel.textContent = cell.dataset.topic; buildCatSelectRow(); catSelectPanel.style.display = 'flex'; modalOverlay.classList.add('open'); return; }
-    if (type === 'auction') { modalState = 'auction'; auctionTopicLabel.textContent = cell.dataset.topic; var base = parseInt(cell.dataset.points, 10) || 100; bidInput.value = base; bidInput.step = base; buildAuctionPresets(base); buildAuctionSelectRow(); auctionPanel.style.display = 'flex'; modalOverlay.classList.add('open'); return; }
-    if (type === 'pass') { modalState = 'pass'; buildPassPanel(); passPanel.style.display = 'flex'; modalOverlay.classList.add('open'); return; }
-    showQuestionPanel(); modalState = 'question'; modalOverlay.classList.add('open');
-}
-
-function revealModifier() {
-    modifierIntro.style.display = 'none'; modalState = 'modifier'; var cell = currentCell;
-    modifierPanel.style.display = 'flex'; modifierIcon.textContent = cell.dataset.modIcon || '✨'; modifierTitle.textContent = cell.dataset.modTitle || 'МОДИФИКАТОР'; modifierDesc.textContent = cell.dataset.modDesc || '';
-    buildScoringPanel(true); scoringPanel.classList.add('visible');
-}
-
-function hideAllModalPanels() {
-    modifierIntro.style.display = 'none'; modifierPanel.style.display = 'none'; catSelectPanel.style.display = 'none'; auctionPanel.style.display = 'none'; passPanel.style.display = 'none';
-    modalTopic.style.display = 'none'; modalPoints.style.display = 'none'; modalPointsBase.style.display = 'none'; modalPointsMod.style.display = 'none';
-    modalQuestion.style.display = 'none'; modalImage.style.display = 'none'; modalAnswer.classList.remove('visible');
-    if (modalAnswerPreview) modalAnswerPreview.textContent = '';
-    scoringPanel.classList.remove('visible'); adjustRow.style.display = 'flex'; flipRow.style.display = 'none';
-}
-
-function showQuestionPanel() {
-    var cell = currentCell; var base = parseInt(cell.dataset.points, 10) || 0; var final = computeValue(cell);
-    var modKey = getModifierKey(cell); var mod = modKey ? MODIFIER_REGISTRY[modKey] : null;
-    var isPass = (cell.dataset.type === 'pass' && passReceiverPi != null);
-    if (isPass) { final = passValue; base = passValue; mod = null; }
-    modalTopic.style.display = ''; modalPoints.style.display = 'inline-flex'; modalQuestion.style.display = '';
-    modalTopic.textContent = cell.dataset.topic; modalPoints.classList.remove('pos', 'neg');
-    if (mod && mod.sign === 'pos') modalPoints.classList.add('pos'); else if (mod && mod.sign === 'neg') modalPoints.classList.add('neg');
-    if (!isPass && mod && mod.apply && final !== base) { modalPointsBase.style.display = ''; modalPointsBase.textContent = base; } else modalPointsBase.style.display = 'none';
-    modalPointsVal.textContent = final;
-    if (mod) { modalPointsMod.style.display = ''; modalPointsMod.textContent = mod.label; } else modalPointsMod.style.display = 'none';
-    modalQuestion.textContent = cell.dataset.question;
-    if (cell.dataset.type === 'manual') modalAnswer.textContent = ''; else modalAnswer.textContent = cell.dataset.answer || 'не указан';
-    if (modalAnswerPreview) { var a = cell.dataset.answer || ''; modalAnswerPreview.textContent = a ? ('Ответ для ведущего:\n' + a) : ''; }
-    if (cell.dataset.image) { modalImage.src = cell.dataset.image; modalImage.style.display = ''; } else { modalImage.src = ''; modalImage.style.display = 'none'; }
-    buildScoringPanel(false); scoringPanel.classList.add('visible');
-}
-
-function buildCatSelectRow() {
-    catSelectRow.innerHTML = ''; var round = currentGame.rounds[currentRound];
-    (round.playerIndices || []).forEach(function(pi) {
-        var name = currentGame.players[pi] || ('Игрок ' + (pi + 1)); var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0;
-        var btn = document.createElement('button'); btn.className = 'select-player-btn';
-        btn.innerHTML = '<div class="select-player-name"></div><div class="select-player-score"></div>';
-        btn.querySelector('.select-player-name').textContent = name; btn.querySelector('.select-player-score').textContent = score;
-        btn.addEventListener('click', function() { selectCatReceiver(pi); }); catSelectRow.appendChild(btn);
-    });
-}
-function selectCatReceiver(pi) { catReceiverPi = pi; catSelectPanel.style.display = 'none'; showQuestionPanel(); modalState = 'question'; }
-
-function buildAuctionPresets(base) {
-    bidPresets.innerHTML = ''; [1,2,3,4,5].forEach(function(m) { var b = document.createElement('button'); b.className = 'bid-preset'; b.textContent = base * m; b.addEventListener('click', function() { bidInput.value = base * m; }); bidPresets.appendChild(b); });
-}
-function buildAuctionSelectRow() {
-    auctionSelectRow.innerHTML = ''; var round = currentGame.rounds[currentRound];
-    (round.playerIndices || []).forEach(function(pi) {
-        var name = currentGame.players[pi] || ('Игрок ' + (pi + 1)); var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0;
-        var btn = document.createElement('button'); btn.className = 'select-player-btn';
-        btn.innerHTML = '<div class="select-player-name"></div><div class="select-player-score"></div>';
-        btn.querySelector('.select-player-name').textContent = name; btn.querySelector('.select-player-score').textContent = score;
-        btn.addEventListener('click', function() { selectAuctionWinner(pi); }); auctionSelectRow.appendChild(btn);
-    });
-}
-function selectAuctionWinner(pi) { var bid = parseInt(bidInput.value, 10) || 0; if (bid <= 0) { alert('Введите ставку больше 0'); return; } auctionWinnerPi = pi; auctionBid = bid; auctionPanel.style.display = 'none'; showQuestionPanel(); modalState = 'question'; }
-
-function buildPassPanel() {
-    passTopicLabel.textContent = currentCell.dataset.topic || '';
-    var minVal = parseInt(currentCell.dataset.minValue, 10) || 200; var maxVal = parseInt(currentCell.dataset.maxValue, 10) || 1000;
-    passValueInput.min = minVal; passValueInput.max = maxVal; passValueInput.step = 100;
-    var def = Math.round(((minVal + maxVal) / 2) / 100) * 100; if (def < minVal) def = minVal; if (def > maxVal) def = maxVal; passValueInput.value = def;
-    passPresets.innerHTML = ''; [200, 400, 600, 800, 1000].forEach(function(v) { if (v < minVal || v > maxVal) return; var b = document.createElement('button'); b.className = 'bid-preset'; b.textContent = v; b.addEventListener('click', function() { passValueInput.value = v; }); passPresets.appendChild(b); });
-    passSelectRow.innerHTML = ''; var round = currentGame.rounds[currentRound];
-    (round.playerIndices || []).forEach(function(pi) {
-        var name = currentGame.players[pi] || ('Игрок ' + (pi + 1)); var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0;
-        var btn = document.createElement('button'); btn.className = 'select-player-btn';
-        btn.innerHTML = '<div class="select-player-name"></div><div class="select-player-score"></div>';
-        btn.querySelector('.select-player-name').textContent = name; btn.querySelector('.select-player-score').textContent = score;
-        btn.addEventListener('click', function() { selectPassReceiver(pi); }); passSelectRow.appendChild(btn);
-    });
-}
-function selectPassReceiver(pi) { var val = parseInt(passValueInput.value, 10) || 0; var minVal = parseInt(passValueInput.min, 10) || 200; var maxVal = parseInt(passValueInput.max, 10) || 1000; if (val < minVal || val > maxVal) { alert('Введите значение от ' + minVal + ' до ' + maxVal); return; } passReceiverPi = pi; passValue = val; passPanel.style.display = 'none'; showQuestionPanel(); modalState = 'question'; }
-
-bidMinus.addEventListener('click', function() { var step = parseInt(bidInput.step, 10) || 100; bidInput.value = Math.max(0, (parseInt(bidInput.value, 10) || 0) - step); });
-bidPlus.addEventListener('click', function() { var step = parseInt(bidInput.step, 10) || 100; bidInput.value = (parseInt(bidInput.value, 10) || 0) + step; });
-passValueMinus.addEventListener('click', function() { var step = parseInt(passValueInput.step, 10) || 100; var minVal = parseInt(passValueInput.min, 10) || 200; passValueInput.value = Math.max(minVal, (parseInt(passValueInput.value, 10) || minVal) - step); });
-passValuePlus.addEventListener('click', function() { var step = parseInt(passValueInput.step, 10) || 100; var maxVal = parseInt(passValueInput.max, 10) || 1000; passValueInput.value = Math.min(maxVal, (parseInt(passValueInput.value, 10) || 200) + step); });
-
-function showAnswer() { if (modalState === 'answer') return; modalState = 'answer'; modalQuestion.style.display = 'none'; modalImage.style.display = 'none'; if (currentCell.dataset.type !== 'manual') { modalAnswer.classList.add('visible'); } }
-
-function buildScoringPanel(isModifier) {
-    playerSelectRow.innerHTML = ''; selectedScoringPi = null; adjustMinus.disabled = true; adjustPlus.disabled = true; adjustFlip.disabled = true;
-    var round = currentGame.rounds[currentRound]; var playerIndices = round.playerIndices || []; var type = currentCell.dataset.type || 'normal';
-    playerSelectRow.style.gridTemplateColumns = 'repeat(' + Math.max(1, playerIndices.length) + ', 1fr)';
-    var modKey = getModifierKey(currentCell); var mod = modKey ? MODIFIER_REGISTRY[modKey] : null; var isFlip = !isModifier && mod && mod.special === 'flip'; var baseValue;
-    if (isModifier) { baseValue = parseInt(currentCell.dataset.modValue, 10) || parseInt(currentCell.dataset.points, 10) || 0; }
-    else if (type === 'auction' && auctionWinnerPi != null) baseValue = auctionBid;
-    else if (type === 'pass' && passReceiverPi != null) baseValue = passValue;
-    else baseValue = computeValue(currentCell);
-    if(scoreInput) scoreInput.value = baseValue;
-    if (isFlip) { adjustRow.style.display = 'none'; flipRow.style.display = 'flex'; } else { adjustRow.style.display = 'flex'; flipRow.style.display = 'none'; }
-    playerIndices.forEach(function(pi) {
-        var name = currentGame.players[pi] || ('Игрок ' + (pi + 1)); var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0;
-        var btn = document.createElement('button'); btn.className = 'player-select-btn'; btn.dataset.pi = pi;
-        if (!isModifier && ((type === 'cat' && catReceiverPi != null && pi !== catReceiverPi) || (type === 'auction' && auctionWinnerPi != null && pi !== auctionWinnerPi) || (type === 'pass' && passReceiverPi != null && pi !== passReceiverPi))) { btn.classList.add('locked'); }
-        btn.innerHTML = '<div class="psb-name"></div><div class="psb-score"></div>'; btn.querySelector('.psb-name').textContent = name;
-        var sEl = btn.querySelector('.psb-score'); sEl.textContent = score; if (score < 0) sEl.classList.add('negative');
-        if (!btn.classList.contains('locked')) { btn.addEventListener('click', function() { selectScoringPlayer(pi); }); }
-        playerSelectRow.appendChild(btn);
-    });
-    if (!isModifier) { if (type === 'cat' && catReceiverPi != null) selectScoringPlayer(catReceiverPi); else if (type === 'auction' && auctionWinnerPi != null) selectScoringPlayer(auctionWinnerPi); else if (type === 'pass' && passReceiverPi != null) selectScoringPlayer(passReceiverPi); }
-    renderScorePanel();
-}
-
-function selectScoringPlayer(pi) { selectedScoringPi = pi; var btns = playerSelectRow.querySelectorAll('.player-select-btn'); btns.forEach(function(b) { if (b.classList.contains('locked')) return; b.classList.toggle('selected', parseInt(b.dataset.pi, 10) === pi); }); adjustMinus.disabled = false; adjustPlus.disabled = false; adjustFlip.disabled = false; renderScorePanel(); }
-function updateScoringPanelScores() { var btns = playerSelectRow.querySelectorAll('.player-select-btn'); btns.forEach(function(btn) { var pi = parseInt(btn.dataset.pi, 10); var score = (roundScores[currentRound] && roundScores[currentRound][pi]) || 0; var el = btn.querySelector('.psb-score'); el.textContent = score; el.classList.toggle('negative', score < 0); }); }
-function adjustRoundScore(delta) { if (selectedScoringPi == null) return; roundScores[currentRound][selectedScoringPi] = (roundScores[currentRound][selectedScoringPi] || 0) + delta; updateScoringPanelScores(); renderScorePanel(); }
-function flipSelectedScore() { if (selectedScoringPi == null) return; var cur = roundScores[currentRound][selectedScoringPi] || 0; roundScores[currentRound][selectedScoringPi] = -cur; updateScoringPanelScores(); renderScorePanel(); }
-
-function closeQuestion() {
-    modalOverlay.classList.remove('open'); hideAllModalPanels(); selectedScoringPi = null; catReceiverPi = null; auctionWinnerPi = null; auctionBid = 0; secretModifierKey = null; passReceiverPi = null; passValue = 0; modalState = 'question';
-    if (currentCell) { var key = currentCell.dataset.key; if (key) answeredCells.add(key); currentCell.classList.add('answered'); currentCell = null; }
-    renderScorePanel(); 
-    if (!playerMode && !IS_PUBLIC) {
-        document.getElementById('hostStartBuzzBtn').style.display = 'none';
-        document.getElementById('hostEvaluationBtns').style.display = 'none';
-        if (mqttClient) mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'question_closed' }));
-    }
-    var remaining = board.querySelectorAll('.cell-points:not(.answered)').length; if (remaining === 0) endRound();
-}
-
-function endRound() {
-    var scores = roundScores[currentRound] || {}; var round = currentGame.rounds[currentRound]; var playerIndices = round.playerIndices || [];
-    var sorted = playerIndices.map(function(pi) { return { pi: pi, name: currentGame.players[pi] || ('Игрок ' + (pi + 1)), score: scores[pi] != null ? scores[pi] : 0 }; }).sort(function(a, b) { return b.score - a.score; });
-    roundWinners[currentRound] = sorted[0] ? sorted[0].pi : null; breakLabel.textContent = 'Раунд ' + (currentRound + 1) + ' завершён'; breakTitle.textContent = 'Итоги'; breakSubtitle.textContent = ''; breakScores.innerHTML = '';
-    sorted.forEach(function(p, i) { var row = document.createElement('div'); row.className = 'break-score-row ' + (i === 0 ? 'winner' : 'loser'); row.innerHTML = '<div class="break-score-name"></div><div class="break-score-value"></div>'; row.querySelector('.break-score-name').textContent = (i === 0 ? '🏆 ' : '') + p.name; row.querySelector('.break-score-value').textContent = p.score; breakScores.appendChild(row); });
-    breakOverlay.dataset.mode = 'round-results'; breakOverlay.classList.add('open');
-}
-
-function showFinalIntro() {
-    finalists = currentGame.rounds.map(function(r, idx) { var w = roundWinners[idx]; if (w != null) return w; return (r.playerIndices || [])[0]; }).filter(function(x) { return x != null; });
-    breakLabel.textContent = 'Основные раунды завершены'; breakTitle.textContent = 'Финал'; breakSubtitle.textContent = 'Играют: ' + finalists.map(function(pi) { return currentGame.players[pi] || ('Игрок ' + (pi + 1)); }).join(' · '); breakScores.innerHTML = '';
-    breakOverlay.dataset.mode = 'final-intro'; breakOverlay.classList.add('open');
-}
-
-function startFinalRound() {
-    finalState = 'select'; finalEliminated = 0; finalCurrentTopic = null; finalRemaining = (currentGame.finalTopics || []).map(function(_, i) { return i; }); finalScores = {};
-    finalists.forEach(function(pi) { finalScores[pi] = 0; }); selectedFinalPi = null;
-    finalSelectView.style.display = 'flex'; finalRevealView.style.display = 'none'; finalQuestionView.style.display = 'none'; finalAnswerText.classList.remove('visible'); finalScoringPanel.classList.remove('visible');
-    renderFinalTopics(); updateFinalTurn(); finalOverlay.classList.add('open');
-}
-function updateFinalTurn() { finalTurn.textContent = 'Ход игрока ' + ((finalEliminated % finalists.length) + 1); }
-function renderFinalTopics() { finalTopicsEl.innerHTML = ''; finalRemaining.forEach(function(idx) { var topic = currentGame.finalTopics[idx]; var card = document.createElement('div'); card.className = 'final-topic-card'; card.textContent = topic.title; card.addEventListener('click', function() { eliminateFinalTopic(idx); }); finalTopicsEl.appendChild(card); }); }
-function eliminateFinalTopic(idx) {
-    if (finalState !== 'select') return; finalRemaining = finalRemaining.filter(function(i) { return i !== idx; }); finalEliminated++;
-    if (finalRemaining.length === 1) { finalCurrentTopic = currentGame.finalTopics[finalRemaining[0]]; finalState = 'reveal'; finalSelectView.style.display = 'none'; finalRevealView.style.display = 'flex'; finalRevealTitle.textContent = finalCurrentTopic.title; }
-    else if (finalRemaining.length === 0) { finalState = 'reveal'; finalCurrentTopic = { title: '—', question: '—', answer: '—' }; finalSelectView.style.display = 'none'; finalRevealView.style.display = 'flex'; finalRevealTitle.textContent = finalCurrentTopic.title; }
-    else { renderFinalTopics(); updateFinalTurn(); }
-}
-
-function showFinalQuestion() { finalState = 'question'; finalRevealView.style.display = 'none'; finalQuestionView.style.display = 'flex'; finalTopicSmall.textContent = finalCurrentTopic.title; finalQuestionText.textContent = finalCurrentTopic.question; finalQuestionText.style.display = ''; finalAnswerText.textContent = finalCurrentTopic.answer || 'не указан'; finalAnswerText.classList.remove('visible'); finalScoringPanel.classList.remove('visible'); }
-function showFinalAnswer() { if (finalState === 'answer') return; finalState = 'answer'; finalQuestionText.style.display = 'none'; finalAnswerText.classList.add('visible'); buildFinalScoringPanel(); finalScoringPanel.classList.add('visible'); }
-function buildFinalScoringPanel() {
-    finalPlayerSelectRow.innerHTML = ''; selectedFinalPi = null; finalAdjustMinus.disabled = true; finalAdjustPlus.disabled = true; var value = currentGame.finalQuestionValue || 1000;
-    if(finalScoreInput) finalScoreInput.value = value;
-    finalists.forEach(function(pi) { var name = currentGame.players[pi] || ('Игрок ' + (pi + 1)); var score = finalScores[pi] || 0; var btn = document.createElement('button'); btn.className = 'player-select-btn'; btn.dataset.pi = pi; btn.innerHTML = '<div class="psb-name"></div><div class="psb-score"></div>'; btn.querySelector('.psb-name').textContent = name; var sEl = btn.querySelector('.psb-score'); sEl.textContent = score; if (score < 0) sEl.classList.add('negative'); btn.addEventListener('click', function() { selectFinalPlayer(pi); }); finalPlayerSelectRow.appendChild(btn); });
-}
-function selectFinalPlayer(pi) { selectedFinalPi = pi; var btns = finalPlayerSelectRow.querySelectorAll('.player-select-btn'); btns.forEach(function(b) { b.classList.toggle('selected', parseInt(b.dataset.pi, 10) === pi); }); finalAdjustMinus.disabled = false; finalAdjustPlus.disabled = false; }
-function updateFinalScoringScores() { var btns = finalPlayerSelectRow.querySelectorAll('.player-select-btn'); btns.forEach(function(btn) { var pi = parseInt(btn.dataset.pi, 10); var score = finalScores[pi] || 0; var el = btn.querySelector('.psb-score'); el.textContent = score; el.classList.toggle('negative', score < 0); }); }
-function adjustFinalScore(delta) { if (selectedFinalPi == null) return; finalScores[selectedFinalPi] = (finalScores[selectedFinalPi] || 0) + delta; updateFinalScoringScores(); }
-function closeFinalRound() { finalOverlay.classList.remove('open'); showFinalResults(); }
-
-function showFinalResults() {
-    var sorted = finalists.map(function(pi) { return { pi: pi, name: currentGame.players[pi] || ('Игрок ' + (pi + 1)), score: finalScores[pi] || 0 }; }).sort(function(a, b) { return b.score - a.score; });
-    breakLabel.textContent = 'Финал завершён'; breakTitle.textContent = '🏆 ' + (sorted[0] ? sorted[0].name : '—'); breakSubtitle.textContent = 'Победитель игры'; breakScores.innerHTML = '';
-    sorted.forEach(function(p, i) { var row = document.createElement('div'); row.className = 'break-score-row ' + (i === 0 ? 'winner' : 'loser'); row.innerHTML = '<div class="break-score-name"></div><div class="break-score-value"></div>'; row.querySelector('.break-score-name').textContent = (i === 0 ? '🥇 ' : (i === 1 ? '🥈 ' : '🥉 ')) + p.name; row.querySelector('.break-score-value').textContent = p.score; breakScores.appendChild(row); });
-    gameFinished = true; breakOverlay.dataset.mode = 'finish'; breakOverlay.classList.add('open');
-}
-
-function resetGame() {
-    breakOverlay.classList.remove('open'); breakOverlay.dataset.mode = ''; breakScores.innerHTML = ''; modalOverlay.classList.remove('open'); finalOverlay.classList.remove('open'); hideAllModalPanels();
-    currentRound = 0; currentCell = null; gameFinished = false; answeredCells = new Set(); modalState = 'question'; selectedScoringPi = null; selectedFinalPi = null;
-    catReceiverPi = null; auctionWinnerPi = null; auctionBid = 0; secretModifierKey = null; passReceiverPi = null; passValue = 0; finalState = 'select'; finalRemaining = []; finalEliminated = 0; finalCurrentTopic = null; finalScores = {};
-    roundScores = {}; currentGame.rounds.forEach(function(r, idx) { roundScores[idx] = {}; (r.playerIndices || []).forEach(function(pi) { roundScores[idx][pi] = 0; }); }); roundWinners = {};
-    renderBoard(); renderScorePanel();
-}
-
-function toggleFullscreen() { var fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement; if (!fsEl) { var el = document.documentElement; var req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen; if (req) { var p = req.call(el); if (p && p.catch) p.catch(function(err) { alert('Фуллскрин: ' + err.message); }); } } else { var exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen; if (exit) exit.call(document); } }
-function updateFullscreenMode() { var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement); document.body.classList.toggle('fullscreen-mode', isFs); }
-document.addEventListener('fullscreenchange', updateFullscreenMode); document.addEventListener('webkitfullscreenchange', updateFullscreenMode); document.addEventListener('MSFullscreenChange', updateFullscreenMode);
-
-function openEditor(gameId) {
-    var game = getGame(gameId); if (!game) return; migrateGame(game); editingGameId = gameId;
-    editorTextarea.value = JSON.stringify({ title: game.title || '', subtitle: game.subtitle || '', finalQuestionValue: game.finalQuestionValue || 1000, players: game.players || [], rounds: game.rounds || [], finalTopics: game.finalTopics || [] }, null, 2);
-    editorGameTitle.textContent = game.title || 'Без названия'; editorStatus.textContent = ''; editorStatus.className = 'editor-status'; editorOverlay.classList.add('open');
-}
-function closeEditor() { editorOverlay.classList.remove('open'); editingGameId = null; }
-function saveEditor() {
-    if (!editingGameId) return;
-    try {
-        var parsed = JSON.parse(editorTextarea.value); if (!Array.isArray(parsed.rounds)) throw new Error('Нужно поле "rounds"'); if (!Array.isArray(parsed.finalTopics)) throw new Error('Нужно поле "finalTopics"'); if (!Array.isArray(parsed.players)) throw new Error('Нужно поле "players"');
-        var game = getGame(editingGameId); if (!game) throw new Error('Игра не найдена');
-        game.title = parsed.title || game.title; game.subtitle = parsed.subtitle || ''; game.finalQuestionValue = typeof parsed.finalQuestionValue === 'number' ? parsed.finalQuestionValue : 1000; game.players = parsed.players; game.rounds = parsed.rounds; game.finalTopics = parsed.finalTopics;
-        saveData(); editorGameTitle.textContent = game.title; editorStatus.textContent = '✓ Сохранено'; editorStatus.className = 'editor-status ok';
-        if (currentGameId === editingGameId) { currentGame = game; gameTitleEl.textContent = game.title; gameSubtitleEl.textContent = game.subtitle; answeredCells = new Set(); if (currentRound >= game.rounds.length) currentRound = 0; roundScores = {}; game.rounds.forEach(function(r, idx) { roundScores[idx] = {}; (r.playerIndices || []).forEach(function(pi) { roundScores[idx][pi] = 0; }); }); renderBoard(); renderScorePanel(); }
-    } catch (e) { editorStatus.textContent = '✗ Ошибка: ' + e.message; editorStatus.className = 'editor-status err'; }
-}
+    ],
+    finalTopics: [
+        { title: "Астрономия", question: "Какая планета Солнечной системы вращается вокруг своей оси в противоположную сторону по сравнению с большинством других планет?", answer: "Венера (и Уран)" },
+        { title: "Изобретения", question: "Кто изобрёл первый в мире телефонный аппарат и получил на него патент в 1876 году?", answer: "Александр Грейам Белл" },
+        { title: "Архитектура", question: "В каком городе мира расположен знаменитый оперный театр, крыша которого напоминает белые паруса?", answer: "Сидней (Австралия)" },
+        { title: "Литература", question: "Какой литературный герой носил имя Дон Кихот Ламанчский и сражался с ветряными мельницами?", answer: "Алонсо Кихано (роман Мигеля де Сервантеса)" },
+        { title: "История Руси", question: "Какой русский князь основал Москву в 1147 году согласно летописям?", answer: "Юрий Долгорукий" },
+        { title: "Кинематограф", question: "Какой фильм стал первым в истории полнометражным анимационным фильмом студии Уолта Диснея (1937 год)?", answer: "«Белоснежка и семь гномов»" },
+        { title: "Биология", question: "Как называется процесс образования органических веществ из углекислого газа и воды на свету у растений?", answer: "Фотосинтез" },
+        { title: "География", question: "Какое государство является самым маленьким в мире по площади и населению?", answer: "Ватикан" },
+        { title: "Математика", question: "Чему равна сумма углов любого треугольника на евклидовой плоскости?", answer: "180 градусов" },
+        { title: "Спорт", question: "Какая страна чаще всех в истории становилась чемпионом мира по футболу (5 титулов)?", answer: "Бразилия" }
+    ]
+};
 
 // ==========================================
-// СИСТЕМА МУЛЬТИПЛЕЕРА (ТЕЛЕФОНЫ ИГРОКОВ)
+// СОСТОЯНИЕ ИГРЫ И ТУРНИРА
 // ==========================================
+var currentRound = 0;
+var answeredCells = new Set();
+var currentCell = null;
+var modalState = 'closed'; // 'splash' | 'question' | 'answer' | 'closed'
+
+// Распределение игроков по раундам: { 0: ['Имя1', 'Имя2', 'Имя3'], 1: [...], 2: [...] }
+var roundRosters = { 0: [], 1: [], 2: [] };
+var roundScores = { 0: {}, 1: {}, 2: {} };
+var roundWinners = { 0: null, 1: null, 2: null };
+var selectedScoringName = null;
+
+// Финал
+var finalState = 'select'; // 'select' | 'reveal' | 'question' | 'answer'
+var finalRemaining = [];
+var finalEliminated = 0;
+var finalCurrentTopic = null;
+var finalists = [];
+var finalScores = {};
+var selectedFinalName = null;
+
+// Мультиплеер (MQTT)
 var IS_PUBLIC = (new URLSearchParams(location.search).get('mode') === 'public');
 var playerMode = (new URLSearchParams(location.search).get('mode') === 'player');
 var mqttClient = null;
 var roomCode = "";
 var myName = "";
-var connectedPlayers = [];
+var connectedPlayers = []; // Все вошедшие игроки (до 9 человек)
 var activeTurnPlayer = null;
 var buzzedPlayer = null;
-var remoteAvailableQuestions = []; // Хранит доступные вопросы на телефоне игрока
+var remoteAvailableQuestions = [];
+var remoteFinalTopics = [];
 
-if (!playerMode && !IS_PUBLIC) {
-    roomCode = Math.floor(1000 + Math.random() * 9000).toString();
-    var codeDisplay = document.createElement('div');
-    codeDisplay.style.cssText = 'position:fixed;bottom:20px;right:20px;background:var(--gold);color:#000;padding:12px 18px;font-weight:bold;font-size:20px;z-index:1000;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.5);font-family:Georgia,serif;';
-    codeDisplay.innerHTML = 'Код комнаты: ' + roomCode;
-    document.body.appendChild(codeDisplay);
+function $(id) { return document.getElementById(id); }
+
+// ==========================================
+// ИНИЦИАЛИЗАЦИЯ ЭКРАНА
+// ==========================================
+if (IS_PUBLIC) {
+    document.body.classList.add('public-mode');
 }
 
-// Синхронизируем подключённых по телефону игроков с табло игры
-function syncConnectedPlayersToGame() {
-    if (!currentGame || connectedPlayers.length === 0) return;
-    currentGame.players = connectedPlayers.slice();
-    var indices = connectedPlayers.map(function(_, idx) { return idx; });
-    currentGame.rounds.forEach(function(r, rIdx) {
-        r.playerIndices = indices;
-        if (!roundScores[rIdx]) roundScores[rIdx] = {};
-        indices.forEach(function(pi) {
-            if (typeof roundScores[rIdx][pi] !== 'number') roundScores[rIdx][pi] = 0;
+if (playerMode) {
+    $('gameScreen').classList.remove('active');
+    $('hostPanel').style.display = 'none';
+    $('playerScreen').classList.add('active');
+} else {
+    renderBoard();
+    renderScorePanel();
+    if (!IS_PUBLIC) {
+        roomCode = Math.floor(1000 + Math.random() * 9000).toString();
+        $('roomCodeText').textContent = 'Код: ' + roomCode;
+        initMQTT(true, roomCode);
+    }
+}
+
+// ==========================================
+// ДОСКА И ТАБЛО ОЧКОВ
+// ==========================================
+function getRoundPlayers(rIdx) {
+    var roster = roundRosters[rIdx] || [];
+    if (roster.length > 0) return roster;
+    return ['Игрок 1', 'Игрок 2', 'Игрок 3'];
+}
+
+function renderBoard() {
+    var board = $('board');
+    board.innerHTML = '';
+    var round = GAME_DATA.rounds[currentRound];
+    
+    var corner = document.createElement('div');
+    corner.className = 'cell-topic';
+    corner.textContent = 'Темы / Баллы';
+    board.appendChild(corner);
+    
+    round.points.forEach(function(p) {
+        var el = document.createElement('div');
+        el.className = 'cell-topic';
+        el.textContent = p;
+        board.appendChild(el);
+    });
+    
+    round.topics.forEach(function(topic, ti) {
+        var title = document.createElement('div');
+        title.className = 'cell-topic';
+        title.textContent = topic.title;
+        board.appendChild(title);
+        
+        topic.questions.forEach(function(q, qi) {
+            var cell = document.createElement('div');
+            cell.className = 'cell-points';
+            cell.textContent = q.points;
+            var key = currentRound + '-' + ti + '-' + qi;
+            if (answeredCells.has(key)) cell.classList.add('answered');
+            
+            cell.dataset.key = key;
+            cell.dataset.topic = topic.title;
+            cell.dataset.points = q.points;
+            cell.dataset.question = q.question;
+            cell.dataset.answer = q.answer;
+            
+            cell.addEventListener('click', function() { selectTopicSplash(cell); });
+            board.appendChild(cell);
         });
     });
-    renderScorePanel();
-    if (modalOverlay.classList.contains('open')) buildScoringPanel(modalState === 'modifier');
-    if (typeof broadcast === 'function') broadcast();
+    
+    $('roundIndicator').textContent = 'Раунд ' + (currentRound + 1) + ' из 3';
+    $('prevRound').disabled = (currentRound === 0);
 }
 
-// Собираем доступные вопросы текущего раунда для отправки на телефон игрока
+function renderScorePanel() {
+    var panel = $('scorePanel');
+    panel.innerHTML = '';
+    var players = getRoundPlayers(currentRound);
+    panel.style.gridTemplateColumns = 'repeat(' + Math.max(1, players.length) + ', 1fr)';
+    
+    var scores = roundScores[currentRound] || {};
+    var maxScore = -Infinity, leaderName = null;
+    players.forEach(function(name) {
+        var s = scores[name] || 0;
+        if (s > maxScore) { maxScore = s; leaderName = name; }
+    });
+    
+    players.forEach(function(name) {
+        var s = scores[name] || 0;
+        var card = document.createElement('div');
+        card.className = 'score-card';
+        if (maxScore > 0 && name === leaderName) card.classList.add('leader');
+        if (selectedScoringName === name) card.classList.add('answering');
+        if (s < 0) card.classList.add('negative');
+        card.innerHTML = '<div class="score-card-name"></div><div class="score-card-score"></div>';
+        card.querySelector('.score-card-name').textContent = name;
+        card.querySelector('.score-card-score').textContent = s;
+        panel.appendChild(card);
+    });
+}
+
+// ==========================================
+// ДВУХЭТАПНОЕ ОТКРЫТИЕ: 1) ЗАСТАВКА ТЕМЫ -> 2) ПРОБЕЛ -> ВОПРОС + КНОПКА
+// ==========================================
+function selectTopicSplash(cell) {
+    currentCell = cell;
+    buzzedPlayer = null;
+    selectedScoringName = null;
+    modalState = 'splash';
+    
+    // Прячем панель вопроса, показываем заставку темы на весь экран
+    $('modalTopic').style.display = 'none';
+    $('modalPoints').style.display = 'none';
+    $('modalQuestion').style.display = 'none';
+    $('modalAnswer').classList.remove('visible');
+    $('modalAnswerPreview').textContent = '';
+    $('scoringPanel').classList.remove('visible');
+    
+    $('splashTopicTitle').textContent = cell.dataset.topic;
+    $('splashTopicPoints').textContent = cell.dataset.points;
+    $('topicSplash').style.display = 'flex';
+    $('modalOverlay').classList.add('open');
+    
+    if (!playerMode && !IS_PUBLIC && mqttClient) {
+        $('hostStartBuzzBtn').style.display = 'block';
+        $('hostEvaluationBtns').style.display = 'none';
+        $('hostStatusText').textContent = 'Тема: «' + cell.dataset.topic + '» (' + cell.dataset.points + '). Нажмите ПРОБЕЛ!';
+        mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({
+            type: 'topic_splash',
+            topic: cell.dataset.topic,
+            points: cell.dataset.points
+        }));
+    }
+    broadcast();
+}
+
+function hostOpenQuestionAndBuzz() {
+    if (!currentCell || modalState !== 'splash') return;
+    modalState = 'question';
+    
+    // Убираем заставку, показываем сам вопрос
+    $('topicSplash').style.display = 'none';
+    $('modalTopic').style.display = 'block';
+    $('modalPoints').style.display = 'inline-block';
+    $('modalQuestion').style.display = 'block';
+    
+    $('modalTopic').textContent = currentCell.dataset.topic;
+    $('modalPoints').textContent = currentCell.dataset.points;
+    $('modalQuestion').textContent = currentCell.dataset.question;
+    $('modalAnswer').textContent = currentCell.dataset.answer;
+    $('modalAnswerPreview').textContent = 'Ответ для ведущего: ' + currentCell.dataset.answer;
+    
+    buildScoringPanel();
+    $('scoringPanel').classList.add('visible');
+    
+    if (!playerMode && !IS_PUBLIC && mqttClient) {
+        $('hostStartBuzzBtn').style.display = 'none';
+        $('hostStatusText').textContent = 'Вопрос открыт! Кнопки у игроков активны.';
+        // Отправляем сигнал только игрокам ТЕКУЩЕГО раунда
+        mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({
+            type: 'question_opened',
+            allowedPlayers: getRoundPlayers(currentRound)
+        }));
+    }
+    broadcast();
+}
+
+function showAnswer() {
+    if (modalState !== 'question') return;
+    modalState = 'answer';
+    $('modalQuestion').style.display = 'none';
+    $('modalAnswer').classList.add('visible');
+    broadcast();
+}
+
+function closeQuestion() {
+    $('modalOverlay').classList.remove('open');
+    $('topicSplash').style.display = 'none';
+    modalState = 'closed';
+    selectedScoringName = null;
+    
+    if (currentCell) {
+        answeredCells.add(currentCell.dataset.key);
+        currentCell.classList.add('answered');
+        currentCell = null;
+    }
+    
+    renderScorePanel();
+    
+    if (!playerMode && !IS_PUBLIC && mqttClient) {
+        $('hostStartBuzzBtn').style.display = 'none';
+        $('hostEvaluationBtns').style.display = 'none';
+        mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'question_closed' }));
+    }
+    
+    var remaining = $('board').querySelectorAll('.cell-points:not(.answered)').length;
+    if (remaining === 0) endRound();
+    broadcast();
+}
+
+function buildScoringPanel() {
+    var row = $('playerSelectRow');
+    row.innerHTML = '';
+    var players = getRoundPlayers(currentRound);
+    row.style.gridTemplateColumns = 'repeat(' + Math.max(1, players.length) + ', 1fr)';
+    $('scoreInput').value = currentCell ? (parseInt(currentCell.dataset.points, 10) || 0) : 0;
+    $('adjustMinus').disabled = true;
+    $('adjustPlus').disabled = true;
+    
+    var scores = roundScores[currentRound] || {};
+    players.forEach(function(name) {
+        var btn = document.createElement('button');
+        btn.className = 'player-select-btn';
+        btn.dataset.name = name;
+        btn.innerHTML = '<div class="psb-name"></div><div class="psb-score"></div>';
+        btn.querySelector('.psb-name').textContent = name;
+        btn.querySelector('.psb-score').textContent = scores[name] || 0;
+        btn.addEventListener('click', function() { selectScoringPlayer(name); });
+        row.appendChild(btn);
+    });
+}
+
+function selectScoringPlayer(name) {
+    selectedScoringName = name;
+    var btns = $('playerSelectRow').querySelectorAll('.player-select-btn');
+    btns.forEach(function(b) {
+        b.classList.toggle('selected', b.dataset.name === name);
+    });
+    $('adjustMinus').disabled = false;
+    $('adjustPlus').disabled = false;
+    renderScorePanel();
+}
+
+function adjustRoundScore(delta) {
+    if (!selectedScoringName) return;
+    if (!roundScores[currentRound]) roundScores[currentRound] = {};
+    roundScores[currentRound][selectedScoringName] = (roundScores[currentRound][selectedScoringName] || 0) + delta;
+    
+    var btns = $('playerSelectRow').querySelectorAll('.player-select-btn');
+    btns.forEach(function(btn) {
+        if (btn.dataset.name === selectedScoringName) {
+            btn.querySelector('.psb-score').textContent = roundScores[currentRound][selectedScoringName];
+        }
+    });
+    renderScorePanel();
+    broadcast();
+}
+
+// ==========================================
+// ПЕРЕХОД МЕЖДУ РАУНДАМИ И ФИНАЛ
+// ==========================================
+function goToRound(idx) {
+    if (idx < 0 || idx >= 3) return;
+    currentRound = idx;
+    selectedScoringName = null;
+    renderBoard();
+    renderScorePanel();
+    renderHostPlayerList();
+    broadcast();
+}
+
+function nextRound() {
+    if (currentRound < 2) {
+        goToRound(currentRound + 1);
+    } else {
+        showFinalIntro();
+    }
+}
+
+function endRound() {
+    var players = getRoundPlayers(currentRound);
+    var scores = roundScores[currentRound] || {};
+    var sorted = players.map(function(name) {
+        return { name: name, score: scores[name] || 0 };
+    }).sort(function(a, b) { return b.score - a.score; });
+    
+    roundWinners[currentRound] = sorted[0] ? sorted[0].name : players[0];
+    
+    $('breakLabel').textContent = 'Раунд ' + (currentRound + 1) + ' завершён';
+    $('breakTitle').textContent = 'Победитель: ' + roundWinners[currentRound];
+    $('breakSubtitle').textContent = 'Выходит в Финал турнира!';
+    
+    var list = $('breakScores');
+    list.innerHTML = '';
+    sorted.forEach(function(p, i) {
+        var row = document.createElement('div');
+        row.className = 'break-score-row ' + (i === 0 ? 'winner' : '');
+        row.innerHTML = '<span>' + (i === 0 ? '🏆 ' : '') + p.name + '</span><span>' + p.score + '</span>';
+        list.appendChild(row);
+    });
+    
+    $('breakOverlay').dataset.mode = 'round-results';
+    $('breakOverlay').classList.add('open');
+    broadcast();
+}
+
+function showFinalIntro() {
+    // Собираем 3 победителей из 3 раундов
+    finalists = [0, 1, 2].map(function(rIdx) {
+        if (roundWinners[rIdx]) return roundWinners[rIdx];
+        var players = getRoundPlayers(rIdx);
+        var scores = roundScores[rIdx] || {};
+        var best = players.slice().sort(function(a, b) { return (scores[b] || 0) - (scores[a] || 0); })[0];
+        return best || ('Победитель Р' + (rIdx + 1));
+    });
+    
+    $('breakLabel').textContent = 'Все 3 раунда позади';
+    $('breakTitle').textContent = 'ФИНАЛ';
+    $('breakSubtitle').textContent = 'Финалисты: ' + finalists.join('  ·  ');
+    $('breakScores').innerHTML = '';
+    $('breakOverlay').dataset.mode = 'final-intro';
+    $('breakOverlay').classList.add('open');
+    broadcast();
+}
+
+function startFinalRound() {
+    finalState = 'select';
+    finalEliminated = 0;
+    finalCurrentTopic = null;
+    finalRemaining = GAME_DATA.finalTopics.map(function(_, i) { return i; });
+    finalScores = {};
+    finalists.forEach(function(name) { finalScores[name] = 0; });
+    selectedFinalName = null;
+    
+    $('finalSelectView').style.display = 'flex';
+    $('finalRevealView').style.display = 'none';
+    $('finalQuestionView').style.display = 'none';
+    $('finalAnswerText').classList.remove('visible');
+    $('finalScoringPanel').classList.remove('visible');
+    
+    renderFinalTopics();
+    updateFinalTurn();
+    $('finalOverlay').classList.add('open');
+    broadcast();
+}
+
+function updateFinalTurn() {
+    var currentFinalist = finalists[finalEliminated % finalists.length];
+    $('finalTurn').textContent = 'Убирает тему: ' + currentFinalist;
+    
+    if (mqttClient && !playerMode && !IS_PUBLIC) {
+        var remList = finalRemaining.map(function(idx) {
+            return { idx: idx, title: GAME_DATA.finalTopics[idx].title };
+        });
+        mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({
+            type: 'final_turn',
+            name: currentFinalist,
+            topics: remList,
+            finalists: finalists
+        }));
+        $('hostStatusText').textContent = 'Финал: тему убирает ' + currentFinalist;
+    }
+}
+
+function renderFinalTopics() {
+    var container = $('finalTopics');
+    container.innerHTML = '';
+    finalRemaining.forEach(function(idx) {
+        var topic = GAME_DATA.finalTopics[idx];
+        var card = document.createElement('div');
+        card.className = 'final-topic-card';
+        card.textContent = topic.title;
+        card.addEventListener('click', function() { eliminateFinalTopic(idx); });
+        container.appendChild(card);
+    });
+}
+
+function eliminateFinalTopic(idx) {
+    if (finalState !== 'select' || !finalRemaining.includes(idx)) return;
+    finalRemaining = finalRemaining.filter(function(i) { return i !== idx; });
+    finalEliminated++;
+    
+    if (finalRemaining.length === 1) {
+        finalCurrentTopic = GAME_DATA.finalTopics[finalRemaining[0]];
+        finalState = 'reveal';
+        $('finalSelectView').style.display = 'none';
+        $('finalRevealView').style.display = 'flex';
+        $('finalRevealTitle').textContent = finalCurrentTopic.title;
+        
+        if (mqttClient && !playerMode && !IS_PUBLIC) {
+            $('hostStartBuzzBtn').style.display = 'block';
+            $('hostStatusText').textContent = 'Осталась тема «' + finalCurrentTopic.title + '»! Нажмите ПРОБЕЛ для вопроса.';
+            mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({
+                type: 'topic_splash',
+                topic: 'ФИНАЛ: ' + finalCurrentTopic.title,
+                points: GAME_DATA.finalQuestionValue
+            }));
+        }
+    } else {
+        renderFinalTopics();
+        updateFinalTurn();
+    }
+    broadcast();
+}
+
+function showFinalQuestion() {
+    if (finalState !== 'reveal') return;
+    finalState = 'question';
+    buzzedPlayer = null;
+    $('finalRevealView').style.display = 'none';
+    $('finalQuestionView').style.display = 'flex';
+    $('finalTopicSmall').textContent = 'ФИНАЛ · ' + finalCurrentTopic.title;
+    $('finalQuestionText').textContent = finalCurrentTopic.question;
+    $('finalQuestionText').style.display = 'block';
+    $('finalAnswerText').textContent = finalCurrentTopic.answer;
+    $('finalAnswerText').classList.remove('visible');
+    
+    buildFinalScoringPanel();
+    $('finalScoringPanel').classList.add('visible');
+    
+    if (mqttClient && !playerMode && !IS_PUBLIC) {
+        $('hostStartBuzzBtn').style.display = 'none';
+        $('hostStatusText').textContent = 'Финальный вопрос открыт! Кнопки у финалистов активны.';
+        mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({
+            type: 'question_opened',
+            allowedPlayers: finalists
+        }));
+    }
+    broadcast();
+}
+
+function showFinalAnswer() {
+    if (finalState !== 'question') return;
+    finalState = 'answer';
+    $('finalQuestionText').style.display = 'none';
+    $('finalAnswerText').classList.add('visible');
+    broadcast();
+}
+
+function buildFinalScoringPanel() {
+    var row = $('finalPlayerSelectRow');
+    row.innerHTML = '';
+    selectedFinalName = null;
+    $('finalAdjustMinus').disabled = true;
+    $('finalAdjustPlus').disabled = true;
+    $('finalScoreInput').value = GAME_DATA.finalQuestionValue;
+    
+    finalists.forEach(function(name) {
+        var btn = document.createElement('button');
+        btn.className = 'player-select-btn';
+        btn.dataset.name = name;
+        btn.innerHTML = '<div class="psb-name"></div><div class="psb-score"></div>';
+        btn.querySelector('.psb-name').textContent = name;
+        btn.querySelector('.psb-score').textContent = finalScores[name] || 0;
+        btn.addEventListener('click', function() { selectFinalPlayer(name); });
+        row.appendChild(btn);
+    });
+}
+
+function selectFinalPlayer(name) {
+    selectedFinalName = name;
+    $('finalPlayerSelectRow').querySelectorAll('.player-select-btn').forEach(function(b) {
+        b.classList.toggle('selected', b.dataset.name === name);
+    });
+    $('finalAdjustMinus').disabled = false;
+    $('finalAdjustPlus').disabled = false;
+}
+
+function adjustFinalScore(delta) {
+    if (!selectedFinalName) return;
+    finalScores[selectedFinalName] = (finalScores[selectedFinalName] || 0) + delta;
+    $('finalPlayerSelectRow').querySelectorAll('.player-select-btn').forEach(function(btn) {
+        if (btn.dataset.name === selectedFinalName) {
+            btn.querySelector('.psb-score').textContent = finalScores[selectedFinalName];
+        }
+    });
+    broadcast();
+}
+
+function closeFinalRound() {
+    $('finalOverlay').classList.remove('open');
+    var sorted = finalists.map(function(name) {
+        return { name: name, score: finalScores[name] || 0 };
+    }).sort(function(a, b) { return b.score - a.score; });
+    
+    $('breakLabel').textContent = 'Турнир завершён';
+    $('breakTitle').textContent = '🏆 ' + (sorted[0] ? sorted[0].name : '—');
+    $('breakSubtitle').textContent = 'Чемпион игры!';
+    
+    var list = $('breakScores');
+    list.innerHTML = '';
+    sorted.forEach(function(p, i) {
+        var row = document.createElement('div');
+        row.className = 'break-score-row ' + (i === 0 ? 'winner' : '');
+        row.innerHTML = '<span>' + (i === 0 ? '🥇 ' : (i === 1 ? '🥈 ' : '🥉 ')) + p.name + '</span><span>' + p.score + '</span>';
+        list.appendChild(row);
+    });
+    
+    $('breakOverlay').dataset.mode = 'finish';
+    $('breakOverlay').classList.add('open');
+    broadcast();
+}
+
+// ==========================================
+// МУЛЬТИПЛЕЕР (MQTT) И ЛОББИ РАСПРЕДЕЛЕНИЯ 9 ИГРОКОВ
+// ==========================================
 function getAvailableQuestionsPayload() {
-    if (!currentGame) return [];
-    var round = currentGame.rounds[currentRound];
-    if (!round) return [];
+    var round = GAME_DATA.rounds[currentRound];
     var list = [];
     round.topics.forEach(function(topic, ti) {
         topic.questions.forEach(function(q, qi) {
@@ -949,23 +977,106 @@ function getAvailableQuestionsPayload() {
     return list;
 }
 
+function assignPlayerToRound(playerName, targetRoundIdx) {
+    // Убираем игрока из всех других раундов, если он там был
+    [0, 1, 2].forEach(function(r) {
+        roundRosters[r] = roundRosters[r].filter(function(n) { return n !== playerName; });
+    });
+    // Добавляем в выбранный раунд (максимум 3 игрока в раунде)
+    if (roundRosters[targetRoundIdx].length >= 3) {
+        roundRosters[targetRoundIdx].shift();
+    }
+    roundRosters[targetRoundIdx].push(playerName);
+    if (typeof roundScores[targetRoundIdx][playerName] !== 'number') {
+        roundScores[targetRoundIdx][playerName] = 0;
+    }
+    
+    renderHostPlayerList();
+    renderScorePanel();
+    broadcast();
+    
+    if (mqttClient) {
+        mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({
+            type: 'roster_update',
+            rosters: roundRosters
+        }));
+    }
+}
+
+function renderHostPlayerList() {
+    var list = $('hostPlayerList');
+    list.innerHTML = '';
+    if (connectedPlayers.length === 0) {
+        list.innerHTML = '<div style="color:#666;font-size:13px;">Никто ещё не вошёл с телефона...</div>';
+        return;
+    }
+    
+    connectedPlayers.forEach(function(name) {
+        var assignedRound = -1;
+        [0, 1, 2].forEach(function(r) {
+            if (roundRosters[r].includes(name)) assignedRound = r;
+        });
+        
+        var item = document.createElement('div');
+        item.className = 'host-player-item';
+        
+        var nameSpan = document.createElement('span');
+        nameSpan.textContent = name;
+        nameSpan.style.fontWeight = '700';
+        nameSpan.style.flex = '1';
+        item.appendChild(nameSpan);
+        
+        var btnGroup = document.createElement('div');
+        btnGroup.className = 'r-assign-group';
+        
+        [0, 1, 2].forEach(function(rIdx) {
+            var rBtn = document.createElement('button');
+            rBtn.className = 'r-btn' + (assignedRound === rIdx ? ' active' : '');
+            rBtn.textContent = 'Р' + (rIdx + 1);
+            rBtn.title = 'Назначить в Раунд ' + (rIdx + 1);
+            rBtn.onclick = function() { assignPlayerToRound(name, rIdx); };
+            btnGroup.appendChild(rBtn);
+        });
+        
+        // Кнопка «Ход» активна для игроков текущего раунда
+        if (assignedRound === currentRound) {
+            var turnBtn = document.createElement('button');
+            turnBtn.className = 'give-turn-btn';
+            turnBtn.textContent = 'Ход';
+            turnBtn.onclick = function() { giveTurnToPlayer(name); };
+            btnGroup.appendChild(turnBtn);
+        }
+        
+        item.appendChild(btnGroup);
+        list.appendChild(item);
+    });
+}
+
+function giveTurnToPlayer(name) {
+    if (!mqttClient) return;
+    activeTurnPlayer = name;
+    mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({
+        type: 'your_turn',
+        name: name,
+        questions: getAvailableQuestionsPayload(),
+        roundPlayers: getRoundPlayers(currentRound)
+    }));
+    $('hostStatusText').textContent = 'Тему выбирает: ' + name;
+}
+
 function initMQTT(isHost, code) {
     var clientId = "svoya_" + Math.random().toString(16).substr(2, 8);
-    var host = "wss://broker.emqx.io:8084/mqtt";
-    mqttClient = mqtt.connect(host, { clientId: clientId });
+    mqttClient = mqtt.connect("wss://broker.emqx.io:8084/mqtt", { clientId: clientId });
     var topic = "svoya_game_" + code;
 
     mqttClient.on('connect', function () {
         mqttClient.subscribe(topic);
         if (!isHost) {
-            document.getElementById('playerLobby').style.display = 'none';
-            document.getElementById('playerGame').style.display = 'flex';
-            document.getElementById('playerNameDisplay').textContent = myName;
-            document.getElementById('playerStatus').textContent = "Подключено! Ждем ведущего...";
+            $('playerLobby').style.display = 'none';
+            $('playerGame').style.display = 'flex';
+            $('playerNameDisplay').textContent = myName;
+            $('playerStatus').textContent = "Ты в игре! Ждём, пока ведущий распределит раунды...";
             mqttClient.publish(topic, JSON.stringify({ type: 'join', name: myName }));
-        } else {
-            document.getElementById('hostPanel').style.display = 'block';
-            document.getElementById('hostStatusText').textContent = "Ожидание игроков...";
         }
     });
 
@@ -975,113 +1086,121 @@ function initMQTT(isHost, code) {
             if (data.type === 'join') {
                 if (!connectedPlayers.includes(data.name)) {
                     connectedPlayers.push(data.name);
-                    renderHostPlayerList();
-                    syncConnectedPlayersToGame();
-                }
-            }
-            if (data.type === 'buzz') {
-                if (!buzzedPlayer) {
-                    buzzedPlayer = data.name;
-                    document.getElementById('hostStatusText').textContent = "Отвечает: " + buzzedPlayer;
-                    document.getElementById('hostStartBuzzBtn').style.display = 'none';
-                    document.getElementById('hostEvaluationBtns').style.display = 'flex';
-                    
-                    // Блокируем кнопки у остальных игроков
-                    mqttClient.publish(topic, JSON.stringify({ type: 'player_buzzed', name: buzzedPlayer }));
-                    
-                    // Выделяем игрока на панели начисления баллов
-                    if (currentGame) {
-                        var pi = currentGame.players.indexOf(buzzedPlayer);
-                        if (pi !== -1) selectScoringPlayer(pi);
-                    }
+                    // Автоматически раскладываем первых 9 игроков по 3 в каждый раунд
+                    if (roundRosters[0].length < 3) assignPlayerToRound(data.name, 0);
+                    else if (roundRosters[1].length < 3) assignPlayerToRound(data.name, 1);
+                    else if (roundRosters[2].length < 3) assignPlayerToRound(data.name, 2);
+                    else renderHostPlayerList();
+                } else {
+                    // Если игрок перезагрузил страницу, отправим ему актуальные ростеры
+                    mqttClient.publish(topic, JSON.stringify({ type: 'roster_update', rosters: roundRosters }));
                 }
             }
             if (data.type === 'select_topic') {
                 var cell = document.querySelector('.cell-points[data-key="' + data.key + '"]');
-                if (cell && !cell.classList.contains('answered')) {
-                    openQuestion(cell);
+                if (cell && !cell.classList.contains('answered') && modalState === 'closed') {
+                    selectTopicSplash(cell);
+                }
+            }
+            if (data.type === 'buzz') {
+                if (!buzzedPlayer && (modalState === 'question' || finalState === 'question')) {
+                    buzzedPlayer = data.name;
+                    $('hostStatusText').textContent = 'ОТВЕЧАЕТ: ' + buzzedPlayer;
+                    $('hostEvaluationBtns').style.display = 'flex';
+                    
+                    mqttClient.publish(topic, JSON.stringify({ type: 'player_buzzed', name: buzzedPlayer }));
+                    
+                    if (finalState === 'question') selectFinalPlayer(buzzedPlayer);
+                    else selectScoringPlayer(buzzedPlayer);
+                }
+            }
+            if (data.type === 'final_eliminate') {
+                if (finalState === 'select') {
+                    eliminateFinalTopic(data.idx);
                 }
             }
         } else {
-            // ЛОГИКА НА ТЕЛЕФОНЕ ИГРОКА
+            // === ЛОГИКА НА ТЕЛЕФОНЕ ИГРОКА ===
+            if (data.type === 'roster_update') {
+                var myRound = -1;
+                [0, 1, 2].forEach(function(r) {
+                    if (data.rosters[r] && data.rosters[r].includes(myName)) myRound = r;
+                });
+                if (myRound !== -1) {
+                    $('playerRoundBadge').textContent = 'Ты в Раунде ' + (myRound + 1);
+                }
+            }
             if (data.type === 'your_turn') {
                 activeTurnPlayer = data.name;
                 remoteAvailableQuestions = data.questions || [];
-                document.getElementById('buzzBtn').style.display = 'none';
+                $('buzzBtn').style.display = 'none';
                 
                 if (myName === activeTurnPlayer) {
-                    document.getElementById('playerStatus').textContent = "ТВОЙ ХОД! Выбери тему:";
-                    document.getElementById('playerBoard').style.display = 'flex';
-                    renderPlayerBoard();
+                    $('playerStatus').textContent = 'ТВОЙ ХОД! Выбери тему:';
+                    $('playerBoard').style.display = 'flex';
+                    renderPlayerBoard(false);
                 } else {
-                    document.getElementById('playerStatus').textContent = "Тему выбирает: " + activeTurnPlayer;
-                    document.getElementById('playerBoard').style.display = 'none';
+                    $('playerStatus').textContent = 'Тему выбирает: ' + activeTurnPlayer;
+                    $('playerBoard').style.display = 'none';
                 }
             }
+            if (data.type === 'topic_splash') {
+                $('playerBoard').style.display = 'none';
+                $('buzzBtn').style.display = 'none';
+                $('playerStatus').textContent = 'Тема: «' + data.topic + '» (' + data.points + '). Приготовься!';
+            }
             if (data.type === 'question_opened') {
-                document.getElementById('buzzBtn').style.display = 'block';
-                document.getElementById('playerBoard').style.display = 'none';
-                document.getElementById('playerStatus').textContent = "ЖМИ КНОПКУ, ЕСЛИ ЗНАЕШЬ ОТВЕТ!";
+                $('playerBoard').style.display = 'none';
+                var allowed = data.allowedPlayers || [];
+                if (allowed.includes(myName)) {
+                    $('buzzBtn').style.display = 'flex';
+                    $('playerStatus').textContent = 'ЖМИ КНОПКУ, ЕСЛИ ЗНАЕШЬ ОТВЕТ!';
+                } else {
+                    $('buzzBtn').style.display = 'none';
+                    $('playerStatus').textContent = 'Сейчас отвечают игроки текущего раунда...';
+                }
             }
             if (data.type === 'player_buzzed') {
-                document.getElementById('buzzBtn').style.display = 'none';
+                $('buzzBtn').style.display = 'none';
                 if (data.name === myName) {
-                    document.getElementById('playerStatus').textContent = "ТЫ ОТВЕЧАЕШЬ!";
+                    $('playerStatus').textContent = 'ТЫ НАЖАЛ ПЕРВЫМ! Отвечай!';
                 } else {
-                    document.getElementById('playerStatus').textContent = "Первым нажал: " + data.name;
+                    $('playerStatus').textContent = 'Первым нажал: ' + data.name;
                 }
             }
             if (data.type === 'evaluation') {
-                document.getElementById('buzzBtn').style.display = 'none';
+                $('buzzBtn').style.display = 'none';
                 if (data.name === myName) {
-                    document.getElementById('playerStatus').textContent = data.correct ? "Верно! +" + data.points : "Неверно! −" + data.points;
+                    $('playerStatus').textContent = data.correct ? ('Верно! +' + data.points) : ('Неверно! −' + data.points);
                 } else {
-                    document.getElementById('playerStatus').textContent = data.name + (data.correct ? " ответил верно!" : " ответил неверно.");
+                    $('playerStatus').textContent = data.name + (data.correct ? ' ответил верно!' : ' ответил неверно.');
                 }
             }
             if (data.type === 'question_closed') {
-                document.getElementById('buzzBtn').style.display = 'none';
-                document.getElementById('playerStatus').textContent = "Ждем следующего хода...";
+                $('buzzBtn').style.display = 'none';
+                $('playerStatus').textContent = 'Ожидание следующего вопроса...';
+            }
+            if (data.type === 'final_turn') {
+                $('playerRoundBadge').textContent = 'ФИНАЛ ТУРНИРА';
+                $('buzzBtn').style.display = 'none';
+                remoteFinalTopics = data.topics || [];
+                if (data.name === myName) {
+                    $('playerStatus').textContent = 'ФИНАЛ! Нажми на тему, которую хочешь УБРАТЬ:';
+                    $('playerBoard').style.display = 'flex';
+                    renderPlayerBoard(true);
+                } else {
+                    $('playerBoard').style.display = 'none';
+                    $('playerStatus').textContent = 'Тему убирает финалист: ' + data.name;
+                }
             }
         }
     });
 }
 
-function renderHostPlayerList() {
-    var list = document.getElementById('hostPlayerList');
-    list.innerHTML = '';
-    if (connectedPlayers.length === 0) {
-        list.innerHTML = '<div style="color:#666;">Пока никого...</div>';
-        return;
-    }
-    connectedPlayers.forEach(function(name) {
-        var item = document.createElement('div');
-        item.className = 'host-player-item';
-        item.innerHTML = '<span>' + name + '</span>';
-        var btn = document.createElement('button');
-        btn.className = 'give-turn-btn';
-        btn.textContent = 'Дать ход';
-        btn.onclick = function() {
-            if (mqttClient) {
-                activeTurnPlayer = name;
-                mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ 
-                    type: 'your_turn', 
-                    name: name,
-                    questions: getAvailableQuestionsPayload()
-                }));
-                document.getElementById('hostStatusText').textContent = "Выбирает тему: " + name;
-            }
-        };
-        item.appendChild(btn);
-        list.appendChild(item);
-    });
-}
-
-// === ФУНКЦИИ ИГРОКА ===
 function connectPlayer() {
-    var room = document.getElementById('playerRoomInput').value.trim();
-    myName = document.getElementById('playerNameInput').value.trim();
-    if (!room || !myName) { alert("Введите код и имя!"); return; }
+    var room = $('playerRoomInput').value.trim();
+    myName = $('playerNameInput').value.trim();
+    if (!room || !myName) { alert("Введите код комнаты и своё имя!"); return; }
     roomCode = room;
     initMQTT(false, room);
 }
@@ -1089,233 +1208,260 @@ function connectPlayer() {
 function buzz() {
     if (!mqttClient) return;
     mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'buzz', name: myName }));
-    document.getElementById('buzzBtn').style.display = 'none';
-    document.getElementById('playerStatus').textContent = "Отправлено! Ждём ведущего...";
+    $('buzzBtn').style.display = 'none';
+    $('playerStatus').textContent = 'Сигнал отправлен!';
 }
 
-function renderPlayerBoard() {
-    var container = document.getElementById('playerTopics');
+function renderPlayerBoard(isFinalElimination) {
+    var container = $('playerTopics');
     container.innerHTML = '';
-    if (!remoteAvailableQuestions || remoteAvailableQuestions.length === 0) {
-        container.innerHTML = '<div style="color:#fff;">Нет доступных вопросов</div>';
+    
+    if (isFinalElimination) {
+        remoteFinalTopics.forEach(function(item) {
+            var btn = document.createElement('button');
+            btn.className = 'player-topic-btn final-elim';
+            btn.innerHTML = '<div class="pt-title" style="color:#ff8b8b;">УБРАТЬ ТЕМУ</div><div class="pt-points" style="font-size:16px;">' + item.title + '</div>';
+            btn.onclick = function() {
+                mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'final_eliminate', idx: item.idx }));
+                $('playerBoard').style.display = 'none';
+                $('playerStatus').textContent = 'Ты убрал тему: ' + item.title;
+            };
+            container.appendChild(btn);
+        });
         return;
     }
+    
     remoteAvailableQuestions.forEach(function(item) {
         var btn = document.createElement('button');
         btn.className = 'player-topic-btn';
         btn.innerHTML = '<div class="pt-title">' + item.topic + '</div><div class="pt-points">' + item.points + '</div>';
         btn.onclick = function() {
-            if (!mqttClient) return;
             mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'select_topic', key: item.key }));
-            document.getElementById('playerBoard').style.display = 'none';
-            document.getElementById('playerStatus').textContent = "Выбрано: " + item.topic + " (" + item.points + ")";
+            $('playerBoard').style.display = 'none';
+            $('playerStatus').textContent = 'Выбрано: ' + item.topic + ' (' + item.points + ')';
         };
         container.appendChild(btn);
     });
 }
 
-// === ФУНКЦИИ ВЕДУЩЕГО ===
-function hostStartBuzz() {
-    if (!mqttClient) return;
-    buzzedPlayer = null;
-    mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ type: 'question_opened' }));
-    document.getElementById('hostStartBuzzBtn').style.display = 'none';
-    document.getElementById('hostStatusText').textContent = "Кнопки открыты! Ждем ответа...";
-}
-
 function hostEvaluate(isCorrect) {
     if (!mqttClient) return;
-    var points = parseInt(scoreInput.value, 10) || 0;
+    var isFinal = (finalState === 'question');
+    var points = parseInt(isFinal ? $('finalScoreInput').value : $('scoreInput').value, 10) || 0;
     var responder = buzzedPlayer;
     
-    if (responder && currentGame) {
-        var pi = currentGame.players.indexOf(responder);
-        if (pi !== -1) {
-            roundScores[currentRound][pi] = (roundScores[currentRound][pi] || 0) + (isCorrect ? points : -points);
-            updateScoringPanelScores();
-            renderScorePanel();
-        }
+    if (responder) {
+        if (isFinal) adjustFinalScore(isCorrect ? points : -points);
+        else adjustRoundScore(isCorrect ? points : -points);
     }
     
-    mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ 
-        type: 'evaluation', 
-        correct: isCorrect, 
-        points: points, 
-        name: responder 
+    mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({
+        type: 'evaluation',
+        correct: isCorrect,
+        points: points,
+        name: responder
     }));
     
-    document.getElementById('hostEvaluationBtns').style.display = 'none';
+    $('hostEvaluationBtns').style.display = 'none';
     buzzedPlayer = null;
-
+    
+    if (isFinal) {
+        if (isCorrect) {
+            showFinalAnswer();
+            setTimeout(closeFinalRound, 3000);
+        } else {
+            $('hostStatusText').textContent = 'Неверно! Открываем кнопки для остальных финалистов...';
+            mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({
+                type: 'question_opened',
+                allowedPlayers: finalists
+            }));
+        }
+        return;
+    }
+    
     if (isCorrect) {
-        document.getElementById('hostStatusText').textContent = "Верно! Показываем ответ и закрываем...";
+        $('hostStatusText').textContent = 'Верно! Показываем ответ...';
         showAnswer();
         setTimeout(function() {
             closeQuestion();
-            // Победитель вопроса выбирает следующую тему
-            activeTurnPlayer = responder;
-            if (activeTurnPlayer) {
-                mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({ 
-                    type: 'your_turn', 
-                    name: activeTurnPlayer,
-                    questions: getAvailableQuestionsPayload()
-                }));
-                document.getElementById('hostStatusText').textContent = "Тему выбирает: " + activeTurnPlayer;
-            }
+            if (responder) giveTurnToPlayer(responder);
         }, 2500);
     } else {
-        // Если ответил неверно — даём возможность другим игрокам нажать кнопку!
-        document.getElementById('hostStatusText').textContent = "Неверно! Можете снова открыть кнопки для остальных.";
-        document.getElementById('hostStartBuzzBtn').style.display = 'block';
+        $('hostStatusText').textContent = 'Неверно! Кнопки снова открыты для остальных игроков раунда.';
+        mqttClient.publish("svoya_game_" + roomCode, JSON.stringify({
+            type: 'question_opened',
+            allowedPlayers: getRoundPlayers(currentRound)
+        }));
     }
 }
 
 // ==========================================
-// ПРИВЯЗКА КНОПОК ИНТЕРФЕЙСА И КЛАВИАТУРЫ
+// УПРАВЛЕНИЕ КЛАВИАТУРОЙ (ПРОБЕЛ) И КЛИКАМИ
 // ==========================================
-btnAddGame.addEventListener('click', addNewGame);
-btnMenuFullscreen.addEventListener('click', toggleFullscreen);
-btnBackToMenu.addEventListener('click', backToMenu);
-btnGameEditor.addEventListener('click', function() { if (currentGameId) openEditor(currentGameId); });
-btnReset.addEventListener('click', resetGame);
-btnFullscreen.addEventListener('click', toggleFullscreen);
-prevRoundBtn.addEventListener('click', function() { goToRound(currentRound - 1); });
-nextRoundBtn.addEventListener('click', nextRound);
-editorSave.addEventListener('click', saveEditor);
-editorClose.addEventListener('click', closeEditor);
+$('prevRound').addEventListener('click', function() { goToRound(currentRound - 1); });
+$('nextRound').addEventListener('click', nextRound);
+$('adjustMinus').addEventListener('click', function() { adjustRoundScore(-(parseInt($('scoreInput').value, 10) || 0)); });
+$('adjustPlus').addEventListener('click', function() { adjustRoundScore(parseInt($('scoreInput').value, 10) || 0)); });
+$('finalAdjustMinus').addEventListener('click', function() { adjustFinalScore(-(parseInt($('finalScoreInput').value, 10) || 0)); });
+$('finalAdjustPlus').addEventListener('click', function() { adjustFinalScore(parseInt($('finalScoreInput').value, 10) || 0)); });
 
-adjustMinus.addEventListener('click', function() { adjustRoundScore(-(parseInt(scoreInput.value, 10) || 0)); });
-adjustPlus.addEventListener('click', function() { adjustRoundScore(parseInt(scoreInput.value, 10) || 0); });
-adjustFlip.addEventListener('click', flipSelectedScore);
+$('btnReset').addEventListener('click', function() {
+    if (!confirm('Сбросить все очки и открытые вопросы?')) return;
+    answeredCells = new Set();
+    currentRound = 0;
+    roundScores = { 0: {}, 1: {}, 2: {} };
+    roundWinners = { 0: null, 1: null, 2: null };
+    renderBoard();
+    renderScorePanel();
+    broadcast();
+});
 
-finalAdjustMinus.addEventListener('click', function() { adjustFinalScore(-(parseInt(finalScoreInput.value, 10) || 0)); });
-finalAdjustPlus.addEventListener('click', function() { adjustFinalScore(parseInt(finalScoreInput.value, 10) || 0); });
+$('btnFullscreen').addEventListener('click', function() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function(){});
+    else document.exitFullscreen();
+});
 
-// Клики по модальному окну (показать ответ / закрыть)
-modalOverlay.addEventListener('click', function(e) {
+$('btnPublicScreen').addEventListener('click', function() {
+    var base = location.href.split('?')[0];
+    window.open(base + '?mode=public', '_blank');
+});
+
+// ПРОБЕЛ: 1) Снимает заставку темы и открывает вопрос + кнопки; 2) Показывает ответ; 3) Закрывает вопрос
+document.addEventListener('keydown', function(e) {
+    if (playerMode || IS_PUBLIC) return;
+    if (e.key === ' ' || e.code === 'Space') {
+        if (document.activeElement.tagName === 'INPUT') return;
+        e.preventDefault();
+        if (modalState === 'splash') {
+            hostOpenQuestionAndBuzz();
+        } else if (modalState === 'question') {
+            showAnswer();
+        } else if (modalState === 'answer') {
+            closeQuestion();
+        } else if ($('finalOverlay').classList.contains('open')) {
+            if (finalState === 'reveal') showFinalQuestion();
+            else if (finalState === 'question') showFinalAnswer();
+            else if (finalState === 'answer') closeFinalRound();
+        }
+    }
+});
+
+$('modalOverlay').addEventListener('click', function(e) {
     if (e.target.closest('button') || e.target.closest('input')) return;
-    if (modalState === 'modifier-intro') revealModifier();
-    else if (modalState === 'modifier') closeQuestion();
+    if (modalState === 'splash') hostOpenQuestionAndBuzz();
     else if (modalState === 'question') showAnswer();
     else if (modalState === 'answer') closeQuestion();
 });
 
-breakOverlay.addEventListener('click', function() {
-    var mode = breakOverlay.dataset.mode;
-    breakOverlay.classList.remove('open');
+$('breakOverlay').addEventListener('click', function() {
+    var mode = $('breakOverlay').dataset.mode;
+    $('breakOverlay').classList.remove('open');
     if (mode === 'round-results') nextRound();
     else if (mode === 'final-intro') startFinalRound();
-    else if (mode === 'finish') backToMenu();
+    else if (mode === 'finish') location.reload();
+    broadcast();
 });
 
-finalRevealView.addEventListener('click', showFinalQuestion);
-finalQuestionView.addEventListener('click', function(e) {
+$('finalRevealView').addEventListener('click', showFinalQuestion);
+$('finalQuestionView').addEventListener('click', function(e) {
     if (e.target.closest('button') || e.target.closest('input')) return;
     if (finalState === 'question') showFinalAnswer();
     else if (finalState === 'answer') closeFinalRound();
 });
 
-document.addEventListener('keydown', function(e) {
-    if (playerMode || IS_PUBLIC) return;
-    if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') {
-        if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') toggleFullscreen();
-    }
-    if ((e.key === ' ' || e.code === 'Space') && modalOverlay.classList.contains('open') && modalState === 'question') {
-        e.preventDefault();
-        hostStartBuzz();
-    }
-});
-
-if (playerMode) {
-    showScreen('playerScreen');
-} else {
-    renderMenu();
-    showScreen('menuScreen');
-}
-
 // ==========================================
-// ЭКРАН ЗРИТЕЛЯ (PUBLIC MODE)
+// СИНХРОНИЗАЦИЯ С ЭКРАНОМ ЗРИТЕЛЯ (PUBLIC MODE)
 // ==========================================
 var BC = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('svoya-igra-sync') : null;
-var PUBLIC_STATE_KEY = 'svoya-public-state';
-var PUBLIC_STATE_TS = 'svoya-public-state-ts';
-
-function buildPublicState() {
-    return {
-        screen: gameScreen.classList.contains('active') ? 'game' : 'menu', gameId: currentGameId, round: currentRound, roundScores: roundScores, answeredCells: Array.from(answeredCells), selectedScoringPi: selectedScoringPi, modalOpen: modalOverlay.classList.contains('open'), modalState: modalState,
-        currentCell: currentCell ? { key: currentCell.dataset.key || '', topic: currentCell.dataset.topic || '', points: currentCell.dataset.points || '', question: currentCell.dataset.question || '', answer: currentCell.dataset.answer || '', image: currentCell.dataset.image || '', type: currentCell.dataset.type || '', modifier: currentCell.dataset.modifier || '', modTitle: currentCell.dataset.modTitle || '', modDesc: currentCell.dataset.modDesc || '', modIcon: currentCell.dataset.modIcon || '', modValue: currentCell.dataset.modValue || '' } : null,
-        catReceiverPi: catReceiverPi, auctionWinnerPi: auctionWinnerPi, passReceiverPi: passReceiverPi, passValue: passValue, secretModifierKey: secretModifierKey,
-        breakOpen: breakOverlay.classList.contains('open'), breakMode: breakOverlay.dataset.mode || '', breakLabel: breakLabel.textContent, breakTitle: breakTitle.textContent, breakSubtitle: breakSubtitle.textContent, breakScoresHtml: breakScores.innerHTML,
-        finalOpen: finalOverlay.classList.contains('open'), finalState: finalState, finalRemaining: finalRemaining, finalCurrentTopic: finalCurrentTopic, finalists: finalists, finalScores: finalScores, finalEliminated: finalEliminated, finalRevealTitle: finalRevealTitle.textContent,
-        players: currentGame ? currentGame.players : []
-    };
-}
 
 function broadcast() {
-    if (IS_PUBLIC) return;
-    var state = buildPublicState();
-    try { localStorage.setItem(PUBLIC_STATE_KEY, JSON.stringify(state)); localStorage.setItem(PUBLIC_STATE_TS, String(Date.now())); } catch (e) {}
-    if (BC) { try { BC.postMessage({ type: 'state', state: state }); } catch (e) {} }
-}
-
-function applyPublicState(state) {
-    if (!state) return;
-    if (state.gameId) { currentGameId = state.gameId; currentGame = getGame(state.gameId); } else { currentGameId = null; currentGame = null; }
-    if (currentGame && Array.isArray(state.players) && state.players.length) {
-        currentGame.players = state.players;
-        currentGame.rounds.forEach(function(r) { r.playerIndices = state.players.map(function(_, i){ return i; }); });
-    }
-    currentRound = state.round || 0; roundScores = state.roundScores || {}; answeredCells = new Set(state.answeredCells || []); selectedScoringPi = state.selectedScoringPi; modalState = state.modalState || 'question'; catReceiverPi = state.catReceiverPi; auctionWinnerPi = state.auctionWinnerPi; passReceiverPi = state.passReceiverPi; passValue = state.passValue || 0; secretModifierKey = state.secretModifierKey;
-    finalState = state.finalState || 'select'; finalRemaining = state.finalRemaining || []; finalCurrentTopic = state.finalCurrentTopic; finalists = state.finalists || []; finalScores = state.finalScores || {}; finalEliminated = state.finalEliminated || 0;
-
-    if (state.screen === 'menu') { showScreen('menuScreen'); modalOverlay.classList.remove('open'); breakOverlay.classList.remove('open'); finalOverlay.classList.remove('open'); return; }
-    showScreen('gameScreen'); if (!currentGame) return;
-
-    gameTitleEl.textContent = currentGame.title || 'Своя игра'; gameSubtitleEl.textContent = currentGame.subtitle || '';
-    renderBoard(); renderScorePanel(); hideAllModalPanels();
-    
-    if (state.modalOpen && state.currentCell) {
-        var c = state.currentCell; var fake = document.createElement('div');
-        ['key','topic','points','question','answer','image','type','modifier','modTitle','modDesc','modIcon','modValue'].forEach(function(k) { if (c[k]) fake.dataset[k] = c[k]; });
-        currentCell = fake;
-        if (modalState === 'modifier-intro') { modifierIntro.style.display = 'flex'; modalOverlay.classList.add('open'); }
-        else if (modalState === 'modifier') { modifierPanel.style.display = 'flex'; modifierIcon.textContent = fake.dataset.modIcon || '✨'; modifierTitle.textContent = fake.dataset.modTitle || 'МОДИФИКАТОР'; modifierDesc.textContent = fake.dataset.modDesc || ''; modalOverlay.classList.add('open'); }
-        else if (modalState === 'question') { showQuestionPanel(); modalOverlay.classList.add('open'); }
-        else if (modalState === 'answer') { showQuestionPanel(); modalQuestion.style.display = 'none'; modalImage.style.display = 'none'; if (fake.dataset.type !== 'manual') modalAnswer.classList.add('visible'); modalOverlay.classList.add('open'); }
-        else { currentCell = null; modalOverlay.classList.remove('open'); }
-    } else { currentCell = null; modalOverlay.classList.remove('open'); }
-
-    if (state.breakOpen) { breakLabel.textContent = state.breakLabel || ''; breakTitle.textContent = state.breakTitle || ''; breakSubtitle.textContent = state.breakSubtitle || ''; breakScores.innerHTML = state.breakScoresHtml || ''; breakOverlay.dataset.mode = state.breakMode || ''; breakOverlay.classList.add('open'); } else { breakOverlay.classList.remove('open'); }
-
-    if (state.finalOpen) {
-        finalSelectView.style.display = 'none'; finalRevealView.style.display = 'none'; finalQuestionView.style.display = 'none'; finalAnswerText.classList.remove('visible'); finalScoringPanel.classList.remove('visible');
-        if (state.finalState === 'select') { finalSelectView.style.display = 'flex'; finalTurn.textContent = 'Ход игрока ' + ((state.finalEliminated % Math.max(1, finalists.length)) + 1); finalTopicsEl.innerHTML = ''; finalRemaining.forEach(function(idx) { var topic = currentGame.finalTopics[idx]; var card = document.createElement('div'); card.className = 'final-topic-card'; card.textContent = topic.title; finalTopicsEl.appendChild(card); }); }
-        else if (state.finalState === 'reveal') { finalRevealView.style.display = 'flex'; finalRevealTitle.textContent = state.finalRevealTitle || ''; }
-        else if (state.finalState === 'question') { finalQuestionView.style.display = 'flex'; finalTopicSmall.textContent = state.finalCurrentTopic ? state.finalCurrentTopic.title : ''; finalQuestionText.textContent = state.finalCurrentTopic ? state.finalCurrentTopic.question : ''; finalQuestionText.style.display = ''; }
-        else if (state.finalState === 'answer') { finalQuestionView.style.display = 'flex'; finalTopicSmall.textContent = state.finalCurrentTopic ? state.finalCurrentTopic.title : ''; finalQuestionText.style.display = 'none'; finalAnswerText.textContent = ((state.finalCurrentTopic && state.finalCurrentTopic.answer) || 'не указан'); finalAnswerText.classList.add('visible'); }
-        finalOverlay.classList.add('open');
-    } else { finalOverlay.classList.remove('open'); }
-}
-
-if (IS_PUBLIC) {
-    document.body.classList.add('public-mode');
-    if (BC) { BC.onmessage = function(ev) { if (ev.data && ev.data.type === 'state') applyPublicState(ev.data.state); }; BC.postMessage({ type: 'public-ready' }); }
-    window.addEventListener('storage', function(e) { if (e.key === PUBLIC_STATE_TS) { try { var s = JSON.parse(localStorage.getItem(PUBLIC_STATE_KEY)); if (s) applyPublicState(s); } catch(err) {} } if (e.key === STORAGE_KEY) { appData = loadData(); } });
-}
-
-if (!IS_PUBLIC && !playerMode) {
-    var btnPublicScreen = document.getElementById('btnPublicScreen');
-    if (btnPublicScreen) { btnPublicScreen.addEventListener('click', function() { var base = location.href.split('?')[0]; window.open(base + '?mode=public', '_blank'); }); }
-    ['startGame','backToMenu','goToRound','nextRound','openQuestion','revealModifier','selectCatReceiver','selectAuctionWinner','selectPassReceiver','showAnswer','selectScoringPlayer','adjustRoundScore','flipSelectedScore','closeQuestion','endRound','showFinalIntro','startFinalRound','eliminateFinalTopic','showFinalQuestion','showFinalAnswer','selectFinalPlayer','adjustFinalScore','closeFinalRound','resetGame','saveEditor'].forEach(function(name) {
-        if (typeof window[name] === 'function' && !window['_wrapped_' + name]) {
-            window['_wrapped_' + name] = true; var orig = window[name];
-            window[name] = function() { var r = orig.apply(this, arguments); broadcast(); return r; };
-        }
+    if (IS_PUBLIC || !BC) return;
+    BC.postMessage({
+        round: currentRound,
+        rosters: roundRosters,
+        scores: roundScores,
+        answered: Array.from(answeredCells),
+        modalState: modalState,
+        cell: currentCell ? {
+            topic: currentCell.dataset.topic,
+            points: currentCell.dataset.points,
+            question: currentCell.dataset.question,
+            answer: currentCell.dataset.answer
+        } : null,
+        breakOpen: $('breakOverlay').classList.contains('open'),
+        breakHtml: $('breakOverlay').innerHTML,
+        finalOpen: $('finalOverlay').classList.contains('open'),
+        finalState: finalState,
+        finalRemaining: finalRemaining,
+        finalCurrentTopic: finalCurrentTopic,
+        finalists: finalists,
+        finalEliminated: finalEliminated
     });
-    if (BC) { BC.onmessage = function(ev) { if (ev.data && ev.data.type === 'public-ready') broadcast(); }; }
-    setTimeout(broadcast, 600);
+}
+
+if (IS_PUBLIC && BC) {
+    BC.onmessage = function(ev) {
+        var s = ev.data;
+        if (!s) return;
+        currentRound = s.round;
+        roundRosters = s.rosters;
+        roundScores = s.scores;
+        answeredCells = new Set(s.answered);
+        renderBoard();
+        renderScorePanel();
+        
+        if (s.modalState !== 'closed' && s.cell) {
+            $('modalOverlay').classList.add('open');
+            $('topicSplash').style.display = (s.modalState === 'splash') ? 'flex' : 'none';
+            $('splashTopicTitle').textContent = s.cell.topic;
+            $('splashTopicPoints').textContent = s.cell.points;
+            
+            $('modalTopic').style.display = (s.modalState !== 'splash') ? 'block' : 'none';
+            $('modalPoints').style.display = (s.modalState !== 'splash') ? 'inline-block' : 'none';
+            $('modalQuestion').style.display = (s.modalState === 'question') ? 'block' : 'none';
+            $('modalAnswer').classList.toggle('visible', s.modalState === 'answer');
+            
+            $('modalTopic').textContent = s.cell.topic;
+            $('modalPoints').textContent = s.cell.points;
+            $('modalQuestion').textContent = s.cell.question;
+            $('modalAnswer').textContent = s.cell.answer;
+        } else {
+            $('modalOverlay').classList.remove('open');
+        }
+        
+        if (s.breakOpen) {
+            $('breakOverlay').innerHTML = s.breakHtml;
+            $('breakOverlay').classList.add('open');
+        } else {
+            $('breakOverlay').classList.remove('open');
+        }
+        
+        if (s.finalOpen) {
+            $('finalOverlay').classList.add('open');
+            $('finalSelectView').style.display = (s.finalState === 'select') ? 'flex' : 'none';
+            $('finalRevealView').style.display = (s.finalState === 'reveal') ? 'flex' : 'none';
+            $('finalQuestionView').style.display = (s.finalState === 'question' || s.finalState === 'answer') ? 'flex' : 'none';
+            
+            if (s.finalState === 'select') {
+                finalists = s.finalists;
+                finalEliminated = s.finalEliminated;
+                finalRemaining = s.finalRemaining;
+                $('finalTurn').textContent = 'Убирает тему: ' + finalists[finalEliminated % finalists.length];
+                renderFinalTopics();
+            } else if (s.finalState === 'reveal' && s.finalCurrentTopic) {
+                $('finalRevealTitle').textContent = s.finalCurrentTopic.title;
+            } else if (s.finalCurrentTopic) {
+                $('finalTopicSmall').textContent = 'ФИНАЛ · ' + s.finalCurrentTopic.title;
+                $('finalQuestionText').textContent = s.finalCurrentTopic.question;
+                $('finalQuestionText').style.display = (s.finalState === 'question') ? 'block' : 'none';
+                $('finalAnswerText').textContent = s.finalCurrentTopic.answer;
+                $('finalAnswerText').classList.toggle('visible', s.finalState === 'answer');
+            }
+        } else {
+            $('finalOverlay').classList.remove('open');
+        }
+    };
 }
 </script>
-
 </body>
 </html>
